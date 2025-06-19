@@ -19,9 +19,7 @@ axiosInstance.interceptors.request.use(
     }
     return config
   },
-  (error) => {
-    return Promise.reject(error)
-  }
+  (error) => Promise.reject(error)
 )
 
 // Response interceptor
@@ -42,7 +40,7 @@ axiosInstance.interceptors.response.use(
           // Update tokens
           // Retry original request
         }
-      } catch (error) {
+      } catch {
         // Redirect to login
         window.location.href = '/auth/login'
       }
