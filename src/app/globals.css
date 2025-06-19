@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+/* Base color tokens */
+:root {
+  /* Primary colors */
+  --base-blue: #445EE5;
+  --base-black: #070707;
+  --base-cream: #FFFEF9;
+
+  /* Support colors (500-900) */
+  --support-500: #E2E4F3;
+  --support-600: #242424;
+  --support-700: #1A1A1A;
+  --support-800: #121212;
+  --support-900: #070707;
+
+  /* Neutral - Grey scale */
+  --grey-100: #F7F7F9;
+  --grey-200: #E7E7E9;
+  --grey-300: #D8D8D9;
+  --grey-400: #B5B5B5;
+
+  /* Neutral - White scale */
+  --white-600: #F7F7F7;
+  --white-700: #F2F2F2;
+  --white-800: #ECECEC;
+  --white-900: #E5E5E5;
+
+  /* Semantic colors */
+  --success-dark: #0F7B3D;
+  --success-base: #27AE60;
+  --success-support: #E7F5EC;
+  
+  --warning-dark: #B45E05;
+  --warning-base: #F2994A;
+  --warning-support: #FEF2E7;
+  
+  --fail-dark: #B91C1C;
+  --fail-base: #DC2626;
+  --fail-support: #FEE2E2;
+  
+  --info-base: #000000;
+  --info-support: #F2F7FF;
+}
+
+/* Light mode - default */
+:root, [data-theme="light"] {
+  /* Default theme colors */
+  --background: var(--base-cream);
+  --foreground: var(--base-black);
+  
+  /* Semantic status colors */
+  --status-success: var(--success-base);
+  --status-warning: var(--warning-base);
+  --status-error: var(--fail-base);
+  --status-info: var(--info-base);
+  
+  /* Support backgrounds */
+  --bg-success: var(--success-support);
+  --bg-warning: var(--warning-support);
+  --bg-error: var(--fail-support);
+  --bg-info: var(--info-support);
+}
+
+/* Dark mode */
+[data-theme="dark"] {
+  --background: var(--base-black);
+  --foreground: var(--base-cream);
+  
+  /* Adjust semantic colors for dark mode if needed */
+  --status-success: var(--success-dark);
+  --status-warning: var(--warning-dark);
+  --status-error: var(--fail-dark);
+  
+  /* Support backgrounds might need adjustment for dark mode */
+  --bg-success: color-mix(in srgb, var(--success-support) 10%, transparent);
+  --bg-warning: color-mix(in srgb, var(--warning-support) 10%, transparent);
+  --bg-error: color-mix(in srgb, var(--fail-support) 10%, transparent);
+  --bg-info: color-mix(in srgb, var(--info-support) 10%, transparent);
+}
+
+/* System preference dark mode - only applies if no theme is explicitly set */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --background: var(--base-black);
+    --foreground: var(--base-cream);
+    
+    /* Adjust semantic colors for dark mode if needed */
+    --status-success: var(--success-dark);
+    --status-warning: var(--warning-dark);
+    --status-error: var(--fail-dark);
+    
+    /* Support backgrounds might need adjustment for dark mode */
+    --bg-success: color-mix(in srgb, var(--success-support) 10%, transparent);
+    --bg-warning: color-mix(in srgb, var(--warning-support) 10%, transparent);
+    --bg-error: color-mix(in srgb, var(--fail-support) 10%, transparent);
+    --bg-info: color-mix(in srgb, var(--info-support) 10%, transparent);
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-satoshi);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-satoshi);
+  font-weight: 400;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
