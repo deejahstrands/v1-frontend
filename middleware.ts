@@ -4,8 +4,8 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Admin routes protection
-  if (pathname.startsWith("/admin")) {
+  // Check if the route is under the (admin) group
+  if (pathname.startsWith("/(admin)") || pathname === "/") {
     const isAdmin = Boolean(request.cookies.get("admin-auth-token"));
     if (!isAdmin) {
       return NextResponse.redirect(new URL("/admin-auth/login", request.url));
@@ -25,5 +25,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/cart", "/account/:path*"],
+  matcher: ["/(admin)/:path*", "/cart", "/account/:path*"],
 };

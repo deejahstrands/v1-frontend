@@ -43,7 +43,7 @@ export default function AdminLoginPage() {
       document.cookie = 'admin-auth-token=your-token-here; path=/'
       
       // Redirect to admin dashboard
-      router.push('/admin')
+      router.push('/(admin)')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
     }
