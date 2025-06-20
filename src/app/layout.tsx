@@ -21,7 +21,7 @@ const satoshi = localFont({
 
 export const metadata: Metadata = {
   title: "Deejah Strands",
-  description: "Deejah Strands",
+  description: "Luxury in hairs",
 };
 
 export default function RootLayout({

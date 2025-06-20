@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { PasswordInput } from "@/components/ui/password-input";
 
 const loginSchema = z.object({
@@ -14,6 +15,7 @@ const loginSchema = z.object({
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
 const AdminLoginPage = () => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -33,7 +35,8 @@ const AdminLoginPage = () => {
       });
 
       if (res.ok) {
-        window.location.href = "/admin";
+        router.push("/admin");
+        router.refresh();
       } else {
         alert("Invalid credentials");
       }
@@ -46,16 +49,19 @@ const AdminLoginPage = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div
-      className="relative min-h-screen w-full flex flex-col items-center justify-center bg-cover bg-center"
-      style={{ backgroundImage: "url('/dummy/bg.png')" }}
-    >
-      <div className="absolute inset-0 bg-black opacity-50"></div>
-      <div className="relative z-10 flex flex-col items-center justify-center flex-grow w-full">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full">
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-[#0E0E0E]">
+      <div className="relative z-10 flex flex-col items-center justify-center flex-grow w-full px-4">
+        <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 max-w-sm w-full text-black">
           <div className="text-center mb-6 flex flex-col items-center">
-            <Image src="/logo/logo.svg" alt="Deejah Strands Logo" width={60} height={60} />
-            <h2 className="text-xl font-bold mt-2">Welcome to Deejah Strands</h2>
+            <Image
+              src="/logo/logo.svg"
+              alt="Deejah Strands Logo"
+              width={80}
+              height={80}
+            />
+            <h2 className="text-2xl font-bold mt-4">
+              Welcome to Deejah Strands
+            </h2>
             <p className="text-gray-500 mt-2">
               Enter your details below to login your account.
             </p>
@@ -114,7 +120,7 @@ const AdminLoginPage = () => {
           </form>
         </div>
       </div>
-      <footer className="relative z-10 text-center text-white py-4 w-full">
+      <footer className="relative z-10 text-center text-white py-4 w-full flex items-center justify-center gap-2">
         <p>Copyright © {currentYear} Deejah Strands</p>
       </footer>
     </div>
