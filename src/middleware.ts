@@ -5,8 +5,14 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Admin routes protection
-  if (pathname.startsWith("/admin")) {
-    const isAdmin = Boolean(request.cookies.get("admin-auth-token"));
+  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin-auth")) {
+    const token = request.cookies.get("admin-auth-token");
+    const isAdmin = Boolean(token);
+
+    console.log(
+      `[Middleware] Admin check on '${pathname}'. Token found: ${!!token}. Redirecting: ${!isAdmin}`
+    );
+
     if (!isAdmin) {
       return NextResponse.redirect(new URL("/admin-auth/login", request.url));
     }
@@ -25,5 +31,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/cart", "/account/:path*"],
+  matcher: ["/admin", "/admin/:path*", "/cart", "/account/:path*"],
 };
