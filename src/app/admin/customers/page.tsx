@@ -6,25 +6,25 @@ import { useState, useMemo, useEffect } from 'react';
 import { Table, TableColumn } from '@/components/ui/table';
 import { SearchInput } from '@/components/ui/search-input';
 import { Filter } from '@/components/ui/filter';
-import { FilterDropdown, FilterOption } from '@/components/ui/filter-dropdown';
+import { FilterDropdown } from '@/components/ui/filter-dropdown';
 import { SubDropdown } from '@/components/ui/sub-dropdown';
-import { useUsers, UserFilterKey } from '@/store/admin/use-users';
-import { Eye } from "lucide-react";
+import { useUsers } from '@/store/admin/use-users';
+import { Eye, MessageSquare } from "lucide-react";
 import { Pagination } from '@/components/ui/pagination';
 import Link from 'next/link';
+import { useFilter, type FilterConfig } from "@/hooks/use-filter";
 
-const consultationOptions = [
-  { label: 'Yes', value: 'Yes' },
-  { label: 'No', value: 'No' },
-];
+type FilterKeys = "consultation";
 
-const filterOptions: FilterOption[] = [
+const filterConfigs: FilterConfig[] = [
   {
-    label: 'Consultation',
-    value: 'consultation',
-    icon: (
-      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><rect x="4" y="4" width="16" height="16" rx="4" /><path d="M8 12h8M12 8v8" /></svg>
-    ),
+    key: "consultation",
+    label: "Consultation",
+    icon: <MessageSquare className="w-5 h-5" />,
+    options: [
+      { label: "Yes", value: "Yes" },
+      { label: "No", value: "No" },
+    ],
   },
 ];
 
@@ -50,7 +50,7 @@ const columns: TableColumn<any>[] = [
   },
 ];
 
-export default function AdminUsersPage() {
+export default function AdminCustomersPage() {
   const {
     filteredUsers,
     search,
@@ -60,9 +60,16 @@ export default function AdminUsersPage() {
     removeFilter,
   } = useUsers();
 
+  const {
+    subDropdown,
+    isFilterOpen,
+    setIsFilterOpen,
+    setSubDropdown,
+    availableFilters,
+    getSubOptions,
+  } = useFilter<FilterKeys>(filterConfigs);
+
   const [currentPage, setCurrentPage] = useState(1);
-  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
-  const [subDropdown, setSubDropdown] = useState<UserFilterKey | null>(null);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isPaginationLoading, setIsPaginationLoading] = useState(false);
 
@@ -100,9 +107,6 @@ export default function AdminUsersPage() {
     setCurrentPage(1);
   }, [search, filters]);
 
-  // Only show filters not already active
-  const availableFilters = filterOptions.filter(f => !(f.value in filters));
-
   return (
     <div className="w-full mx-auto" >
       <h1 className="text-2xl font-semibold mb-1">Customer</h1>
@@ -124,7 +128,7 @@ export default function AdminUsersPage() {
             value={search}
             onChange={setSearch}
             onSearch={setSearch}
-            placeholder="Search Order ID"
+            placeholder="Search Customer Name/Email"
             className="md:w-72"
           />
           <div className="flex flex-wrap items-center gap-2 ml-auto">
@@ -134,7 +138,7 @@ export default function AdminUsersPage() {
                 {key.charAt(0).toUpperCase() + key.slice(1)}: {value}
                 <button
                   className="ml-1 text-gray-400 hover:text-gray-700"
-                  onClick={() => removeFilter(key as UserFilterKey)}
+                  onClick={() => removeFilter(key as FilterKeys)}
                   aria-label="Remove filter"
                 >
                   &times;
@@ -142,22 +146,35 @@ export default function AdminUsersPage() {
               </span>
             ))}
             {/* Filter button and dropdown */}
-            <Filter buttonLabel="Filter">
-              <FilterDropdown
-                options={availableFilters}
-                selected={subDropdown || undefined}
-                onSelect={(val) => setSubDropdown(val as UserFilterKey)}
-              />
-              {/* SubDropdown for filter value selection */}
-              {subDropdown === 'consultation' && (
+            <Filter 
+              buttonLabel="Filter" 
+              hasSubDropdownOpen={!!subDropdown}
+              onOpenChange={setIsFilterOpen}
+            >
+              {subDropdown !== 'consultation' ? (
+                <FilterDropdown
+                  options={availableFilters}
+                  selected={subDropdown || undefined}
+                  onSelect={(val) => {
+                    setSubDropdown(val as FilterKeys);
+                    if (val === 'consultation') {
+                      setIsFilterOpen(true);
+                    }
+                  }}
+                />
+              ) : (
                 <SubDropdown
-                  options={consultationOptions}
+                  options={getSubOptions('consultation')}
                   selected={filters['consultation']}
                   onSelect={(val) => {
                     setFilter('consultation', val);
                     setSubDropdown(null);
+                    setIsFilterOpen(false);
                   }}
-                  onClose={() => setSubDropdown(null)}
+                  onClose={() => {
+                    setSubDropdown(null);
+                    setIsFilterOpen(true);
+                  }}
                   title="Consultation"
                 />
               )}
