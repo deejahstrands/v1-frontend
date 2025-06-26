@@ -1,38 +1,25 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-
-
+import React from "react";
 
 interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
-  onSearch?: (value: string) => void;
   placeholder?: string;
   className?: string;
-  debounceMs?: number;
 }
 
 export const SearchInput: React.FC<SearchInputProps> = ({
   value,
   onChange,
-  onSearch,
   placeholder = "Search...",
   className = "",
-  debounceMs = 300,
 }) => {
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (!onSearch) return;
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      onSearch(value);
-    }, debounceMs);
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [value, onSearch, debounceMs]);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    console.log('SearchInput - New value:', newValue);
+    onChange(newValue);
+  };
 
   return (
     <div className={`relative w-full max-w-xs ${className}`}>
@@ -45,7 +32,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
       <input
         type="text"
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={handleChange}
         placeholder={placeholder}
         className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black/10 text-sm bg-white"
       />

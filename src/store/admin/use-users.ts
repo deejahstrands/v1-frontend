@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { create } from 'zustand';
 import { users as dummyUsers, User } from '@/data/users';
@@ -21,7 +20,10 @@ export type UserStore = {
 export const useUsers = create<UserStore>((set, get) => ({
   users: dummyUsers,
   search: '',
-  setSearch: (search) => set({ search }),
+  setSearch: (search) => {
+    console.log('Store - setSearch called with:', search);
+    set({ search });
+  },
   filters: {} as UserFilters,
   setFilter: (key, value) => set((state) => ({ filters: { ...state.filters, [key]: value } })),
   removeFilter: (key) => set((state) => {
@@ -32,19 +34,42 @@ export const useUsers = create<UserStore>((set, get) => ({
   isLoading: false,
   get filteredUsers() {
     const { users, search, filters } = get();
-    let filtered = users;
-    if (search.trim()) {
-      const s = search.trim().toLowerCase();
-      filtered = filtered.filter(
-        (u) =>
-          u.name.toLowerCase().includes(s) ||
-          u.email.toLowerCase().includes(s) ||
-          u.id.includes(s)
-      );
+    let filtered = [...users];
+
+    // Search implementation
+    const searchTerm = search.toLowerCase();
+    if (searchTerm) {
+      filtered = users.filter(user => {
+        const nameMatches = user.name.toLowerCase().includes(searchTerm);
+        const emailMatches = user.email.toLowerCase().includes(searchTerm);
+        
+        console.log('Checking user:', {
+          name: user.name,
+          nameMatches,
+          email: user.email,
+          emailMatches,
+          searchTerm
+        });
+        
+        return nameMatches || emailMatches;
+      });
+
+      console.log('Search results:', {
+        term: searchTerm,
+        matchCount: filtered.length,
+        matches: filtered.map(u => u.name)
+      });
     }
-    Object.entries(filters).forEach(([key, value]) => {
-      filtered = filtered.filter((u) => (u as any)[key] === value);
-    });
+
+    // Filter implementation
+    if (Object.keys(filters).length > 0) {
+      filtered = filtered.filter(user => {
+        return Object.entries(filters).every(([key, value]) => 
+          user[key as keyof User] === value
+        );
+      });
+    }
+
     return filtered;
   },
 })); 

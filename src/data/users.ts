@@ -20,6 +20,14 @@ export interface WishlistItem {
   date: string;
 }
 
+export interface Consultation {
+  id: string;
+  date: string;
+  type: 'In Studio' | 'Home Visit';
+  notes: string;
+  status: 'Completed' | 'Upcoming' | 'Cancelled';
+}
+
 export interface User {
   id: string;
   name: string;
@@ -29,6 +37,7 @@ export interface User {
   totalSpend: string;
   lastOrder: string;
   consultation: 'Yes' | 'No';
+  consultations: Consultation[];
   addresses: Address[];
   orders: Order[];
   wishlist: WishlistItem[];
@@ -44,6 +53,29 @@ export const users: User[] = [
     totalSpend: '₦4,009,284',
     lastOrder: "01 May '25",
     consultation: 'Yes',
+    consultations: [
+      {
+        id: '1',
+        date: "01 May '25",
+        type: 'In Studio',
+        notes: "Needs 14\" curly",
+        status: 'Completed'
+      },
+      {
+        id: '2',
+        date: "01 May '25",
+        type: 'Home Visit',
+        notes: "Looking for frontal",
+        status: 'Upcoming'
+      },
+      {
+        id: '3',
+        date: "01 May '25",
+        type: 'Home Visit',
+        notes: "Looking for frontal",
+        status: 'Cancelled'
+      }
+    ],
     addresses: [
       {
         id: '1',
@@ -79,6 +111,7 @@ export const users: User[] = [
     totalSpend: '₦4,009,284',
     lastOrder: '--',
     consultation: 'No',
+    consultations: [],
     addresses: [],
     orders: [],
     wishlist: []
@@ -92,6 +125,57 @@ export const users: User[] = [
     totalSpend: '₦4,009,284',
     lastOrder: "01 May '25",
     consultation: 'Yes',
+    consultations: [
+      {
+        id: '1',
+        date: "01 May '25",
+        type: 'In Studio',
+        notes: "Needs 14\" curly",
+        status: 'Completed'
+      },
+      {
+        id: '2',
+        date: "01 May '25",
+        type: 'Home Visit',
+        notes: "Looking for frontal",
+        status: 'Upcoming'
+      },
+      {
+        id: '3',
+        date: "01 May '25",
+        type: 'Home Visit',
+        notes: "Looking for frontal",
+        status: 'Cancelled'
+      },  
+      {
+        id: '4',
+        date: "01 May '25",
+        type: 'Home Visit',
+        notes: "Looking for frontal",
+        status: 'Cancelled'
+      },
+      {
+        id: '5',
+        date: "01 May '25",
+        type: 'Home Visit',
+        notes: "Looking for frontal",
+        status: 'Cancelled'
+      },
+      {
+        id: '6',
+        date: "01 May '25",
+        type: 'Home Visit',
+        notes: "Looking for frontal",
+        status: 'Cancelled'
+      },
+      {
+        id: '7',
+        date: "01 May '25",
+        type: 'Home Visit',
+        notes: "Looking for frontal",
+        status: 'Cancelled'
+      }
+    ],
     addresses: [
       {
         id: '2',
@@ -147,6 +231,7 @@ export const users: User[] = [
     totalSpend: '₦4,009,284',
     lastOrder: "01 May '25",
     consultation: 'Yes',
+    consultations: [],
     addresses: [
       {
         id: '3',
@@ -182,6 +267,7 @@ export const users: User[] = [
     totalSpend: '₦4,009,284',
     lastOrder: "01 May '25",
     consultation: 'Yes',
+    consultations: [],
     addresses: [
       {
         id: '4',
@@ -217,6 +303,7 @@ export const users: User[] = [
     totalSpend: '₦4,009,284',
     lastOrder: "01 May '25",
     consultation: 'Yes',
+    consultations: [],
     addresses: [
       {
         id: '5',
@@ -237,6 +324,7 @@ export const users: User[] = [
     totalSpend: '₦4,009,284',
     lastOrder: "01 May '25",
     consultation: 'No',
+    consultations: [],
     addresses: [],
     orders: [],
     wishlist: []
@@ -250,6 +338,7 @@ export const users: User[] = [
     totalSpend: '₦4,009,284',
     lastOrder: "01 May '25",
     consultation: 'Yes',
+    consultations: [],
     addresses: [],
     orders: [],
     wishlist: []
@@ -263,6 +352,7 @@ export const users: User[] = [
     totalSpend: '₦4,009,284',
     lastOrder: "01 May '25",
     consultation: 'No',
+    consultations: [],
     addresses: [],
     orders: [],
     wishlist: []
