@@ -50,11 +50,6 @@ export const Pagination: React.FC<PaginationProps> = ({
     return pages;
   };
 
-  // Scroll to top on page change
-  React.useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentPage]);
-
   return (
     <div className={`flex flex-col sm:flex-row items-center justify-between gap-2 ${className}`}>
       <span className="text-xs sm:text-sm text-gray-600">

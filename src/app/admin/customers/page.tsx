@@ -1,24 +1,31 @@
 "use client";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo, useEffect } from 'react';
 import { Table, TableColumn } from '@/components/ui/table';
 import { SearchInput } from '@/components/ui/search-input';
 import { Filter } from '@/components/ui/filter';
 import { FilterDropdown } from '@/components/ui/filter-dropdown';
 import { SubDropdown } from '@/components/ui/sub-dropdown';
-import { useUsers } from '@/store/admin/use-users';
+import { useUsers, type UserFilterKey } from '@/store/admin/use-users';
 import { Eye, MessageSquare } from "lucide-react";
 import { Pagination } from '@/components/ui/pagination';
 import Link from 'next/link';
 import { useFilter, type FilterConfig } from "@/hooks/use-filter";
 
-type FilterKeys = "consultation";
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  totalOrders: number;
+  totalSpend: string;
+  lastOrder: string;
+  consultation: 'Yes' | 'No';
+};
 
 const filterConfigs: FilterConfig[] = [
   {
-    key: "consultation",
+    key: "consultation" as UserFilterKey,
     label: "Consultation",
     icon: <MessageSquare className="w-5 h-5" />,
     options: [
@@ -28,7 +35,7 @@ const filterConfigs: FilterConfig[] = [
   },
 ];
 
-const columns: TableColumn<any>[] = [
+const columns: TableColumn<User>[] = [
   { label: 'NAME', accessor: 'name' },
   { label: 'EMAIL', accessor: 'email' },
   { label: 'TOTAL ORDERS', accessor: 'totalOrders' },
@@ -58,7 +65,18 @@ export default function AdminCustomersPage() {
     filters,
     setFilter,
     removeFilter,
+    isLoading: isUsersLoading,
   } = useUsers();
+
+  // Add logging for filtered results
+  useEffect(() => {
+    console.log('Table data status:', {
+      filteredUsers: filteredUsers.map(u => u.name),
+      searchTerm: search,
+      filters,
+      totalResults: filteredUsers.length
+    });
+  }, [filteredUsers, search, filters]);
 
   const {
     subDropdown,
@@ -67,7 +85,7 @@ export default function AdminCustomersPage() {
     setSubDropdown,
     availableFilters,
     getSubOptions,
-  } = useFilter<FilterKeys>(filterConfigs);
+  } = useFilter<UserFilterKey>(filterConfigs);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [isPageLoading, setIsPageLoading] = useState(true);
@@ -80,8 +98,16 @@ export default function AdminCustomersPage() {
   // Get paginated data
   const paginatedUsers = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredUsers.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredUsers, currentPage]);
+    const slicedData = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+    console.log('CustomersPage - Paginated data:', {
+      totalFiltered: filteredUsers.length,
+      currentPage,
+      itemsPerPage,
+      slicedDataCount: slicedData.length,
+      slicedData: slicedData.map(u => u.name)
+    });
+    return slicedData;
+  }, [filteredUsers, currentPage, itemsPerPage]);
 
   // Handle page change
   const handlePageChange = async (page: number) => {
@@ -107,6 +133,18 @@ export default function AdminCustomersPage() {
     setCurrentPage(1);
   }, [search, filters]);
 
+  const isLoading = isPageLoading || isPaginationLoading || isUsersLoading;
+
+  // Add logging for filtered results
+  useEffect(() => {
+    console.log('Table data status:', {
+      filteredUsers: filteredUsers.map(u => u.name),
+      paginatedUsers: paginatedUsers.map(u => u.name),
+      searchTerm: search,
+      isLoading
+    });
+  }, [filteredUsers, paginatedUsers, search, isLoading]);
+
   return (
     <div className="w-full mx-auto" >
       <h1 className="text-2xl font-semibold mb-1">Customer</h1>
@@ -114,7 +152,7 @@ export default function AdminCustomersPage() {
       <Table 
         columns={columns} 
         data={paginatedUsers}
-        isLoading={isPageLoading || isPaginationLoading}
+        isLoading={isLoading}
         footerContent={
           <Pagination
             totalPages={totalPages}
@@ -127,7 +165,6 @@ export default function AdminCustomersPage() {
           <SearchInput
             value={search}
             onChange={setSearch}
-            onSearch={setSearch}
             placeholder="Search Customer Name/Email"
             className="md:w-72"
           />
@@ -138,7 +175,7 @@ export default function AdminCustomersPage() {
                 {key.charAt(0).toUpperCase() + key.slice(1)}: {value}
                 <button
                   className="ml-1 text-gray-400 hover:text-gray-700"
-                  onClick={() => removeFilter(key as FilterKeys)}
+                  onClick={() => removeFilter(key as UserFilterKey)}
                   aria-label="Remove filter"
                 >
                   &times;
@@ -156,7 +193,7 @@ export default function AdminCustomersPage() {
                   options={availableFilters}
                   selected={subDropdown || undefined}
                   onSelect={(val) => {
-                    setSubDropdown(val as FilterKeys);
+                    setSubDropdown(val as UserFilterKey);
                     if (val === 'consultation') {
                       setIsFilterOpen(true);
                     }
