@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Header } from "@/components/common/header";
+import { MobileFooter } from "@/components/common/mobile-footer";
 
 const satoshi = localFont({
   src: [
@@ -31,8 +33,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="light">
-      <body className={`${satoshi.variable} antialiased`}>
-        {children}
+      <body className={`${satoshi.variable} antialiased min-h-screen flex flex-col`}>
+        <Header />
+        <main className="flex-1 pb-[72px] md:pb-0">
+          {children}
+        </main>
+        <MobileFooter 
+          isLoggedIn={false}
+          onSearchClick={() => {
+            document.dispatchEvent(new CustomEvent('toggle-search'));
+          }} 
+        />
       </body>
     </html>
   );
