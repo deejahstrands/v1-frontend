@@ -33,15 +33,6 @@ export function Header() {
       <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Mobile menu button */}
-            <button
-              type="button"
-              className="lg:hidden -ml-2 p-2 text-gray-600 hover:text-gray-900"
-              onClick={() => setIsMobileMenuOpen(true)}
-            >
-              <Menu className="h-6 w-6" />
-            </button>
-
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/" className="flex items-center">
@@ -92,45 +83,55 @@ export function Header() {
               </div>
             </nav>
 
-            {/* Right side icons */}
-            <div className="flex items-center space-x-4">
+            {/* Right side icons and mobile menu button */}
+            <div className="flex items-center">
+              <div className="hidden lg:flex items-center space-x-4">
+                <button
+                  type="button"
+                  className="p-2 text-gray-600 hover:text-gray-900"
+                  onClick={() => setIsSearchOpen(true)}
+                  aria-label="Search"
+                >
+                  <Search className="h-5 w-5" />
+                </button>
+
+                {isLoggedIn ? (
+                  <>
+                    <Link href="/account/wishlist" className="p-2 text-gray-600 hover:text-gray-900">
+                      <Heart className="h-5 w-5" />
+                    </Link>
+                    <Link href="/cart" className="p-2 text-gray-600 hover:text-gray-900">
+                      <ShoppingBag className="h-5 w-5" />
+                    </Link>
+                    <Link href="/account" className="p-2 text-gray-600 hover:text-gray-900">
+                      <User className="h-5 w-5" />
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/account/wishlist" className="p-2 text-gray-600 hover:text-gray-900">
+                      <Heart className="h-5 w-5" />
+                    </Link>
+                    <Link href="/cart" className="p-2 text-gray-600 hover:text-gray-900">
+                      <ShoppingBag className="h-5 w-5" />
+                    </Link>
+                    <Link
+                      href="/auth/login"
+                      className="hidden sm:inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-900"
+                    >
+                      Login
+                    </Link>
+                  </>
+                )}
+              </div>
+              {/* Mobile menu button */}
               <button
                 type="button"
-                className="p-2 text-gray-600 hover:text-gray-900"
-                onClick={() => setIsSearchOpen(true)}
-                aria-label="Search"
+                className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
+                onClick={() => setIsMobileMenuOpen(true)}
               >
-                <Search className="h-5 w-5" />
+                <Menu className="h-6 w-6" />
               </button>
-
-              {isLoggedIn ? (
-                <>
-                  <Link href="/account/wishlist" className="p-2 text-gray-600 hover:text-gray-900">
-                    <Heart className="h-5 w-5" />
-                  </Link>
-                  <Link href="/cart" className="p-2 text-gray-600 hover:text-gray-900">
-                    <ShoppingBag className="h-5 w-5" />
-                  </Link>
-                  <Link href="/account" className="p-2 text-gray-600 hover:text-gray-900">
-                    <User className="h-5 w-5" />
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link href="/account/wishlist" className="p-2 text-gray-600 hover:text-gray-900">
-                    <Heart className="h-5 w-5" />
-                  </Link>
-                  <Link href="/cart" className="p-2 text-gray-600 hover:text-gray-900">
-                    <ShoppingBag className="h-5 w-5" />
-                  </Link>
-                  <Link
-                    href="/auth/login"
-                    className="hidden sm:inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-900"
-                  >
-                    Login
-                  </Link>
-                </>
-              )}
             </div>
           </div>
         </div>
@@ -142,6 +143,7 @@ export function Header() {
         onClose={() => setIsMobileMenuOpen(false)}
         mainNavItems={mainNavItems}
         categories={categories}
+        isLoggedIn={isLoggedIn}
       />
 
       {/* Search modal */}
