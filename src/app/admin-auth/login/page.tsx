@@ -1,94 +1,108 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { PasswordInput } from "@/components/ui/password-input";
 
-const adminLoginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-})
+const loginSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(1, { message: "Password is required" }),
+});
 
-type AdminLoginForm = z.infer<typeof adminLoginSchema>
+type LoginFormInputs = z.infer<typeof loginSchema>;
 
-export default function AdminLoginPage() {
-  const router = useRouter()
-  const [error, setError] = useState<string>('')
-  
+const AdminLoginPage = () => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<AdminLoginForm>({
-    resolver: zodResolver(adminLoginSchema),
-  })
+  } = useForm<LoginFormInputs>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const onSubmit = async (data: AdminLoginForm) => {
+  const onSubmit = async (data: LoginFormInputs) => {
     try {
-      setError('')
-      // TODO: Replace with your actual admin auth API call
-      const response = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
         body: JSON.stringify(data),
-      })
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-      if (!response.ok) {
-        throw new Error('Invalid credentials')
+      if (res.ok) {
+        router.push("/admin");
+        router.refresh();
+      } else {
+        alert("Invalid credentials");
       }
-
-      // Set admin auth token in cookie (this should be done by your API)
-      document.cookie = 'admin-auth-token=your-token-here; path=/'
-      
-      // Redirect to admin dashboard
-      router.push('/admin')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed')
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("An error occurred during login.");
     }
-  }
+  };
+
+  const currentYear = new Date().getFullYear();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Admin Login
-          </h2>
-        </div>
-        
-        {error && (
-          <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm">
-            {error}
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-[#0E0E0E]">
+      <div className="relative z-10 flex flex-col items-center justify-center flex-grow w-full px-4">
+        <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 max-w-sm w-full text-black">
+          <div className="text-center mb-6 flex flex-col items-center">
+            <Image
+              src="/logo/logo.svg"
+              alt="Deejah Strands Logo"
+              width={80}
+              height={80}
+            />
+            <h2 className="text-2xl font-bold mt-4">
+              Welcome to Deejah Strands
+            </h2>
+            <p className="text-gray-500 mt-2">
+              Enter your details below to login your account.
+            </p>
           </div>
-        )}
-
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="mb-4">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Email
               </label>
               <input
-                {...register('email')}
                 type="email"
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Admin Email"
+                id="email"
+                {...register("email")}
+                placeholder="Enter Email Address"
+                className={`mt-1 block w-full px-3 py-2 bg-white border ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-black focus:border-black sm:text-sm`}
               />
               {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.email.message}
+                </p>
               )}
             </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
+            <div className="mb-6">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
-              <input
-                {...register('password')}
-                type="password"
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
+              <PasswordInput
+                id="password"
+                {...register("password")}
+                placeholder="Enter Password"
+                className={`mt-1 block w-full px-3 py-2 bg-white border ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-black focus:border-black sm:text-sm`}
               />
               {errors.password && (
                 <p className="text-red-500 text-xs mt-1">
@@ -96,19 +110,21 @@ export default function AdminLoginPage() {
                 </p>
               )}
             </div>
-          </div>
-
-          <div>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50"
             >
-              {isSubmitting ? 'Signing in...' : 'Sign in to Admin'}
+              {isSubmitting ? "Signing in..." : "Continue"}
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
+      <footer className="relative z-10 text-center text-white py-4 w-full flex items-center justify-center gap-2">
+        <p>Copyright © {currentYear} Deejah Strands</p>
+      </footer>
     </div>
-  )
-} 
+  );
+};
+
+export default AdminLoginPage;
