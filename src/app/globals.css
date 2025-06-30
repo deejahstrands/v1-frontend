@@ -2,6 +2,13 @@
 
 /* Base color tokens */
 :root {
+  /* Custom colors */
+  --primary: #D2A391;
+  --secondary: #EBE4DE;
+  --tertiary: #FFFCF7;
+  --background: #FFFFFF;
+  --foreground: #000000;
+
   /* Primary colors */
   --base-blue: #445EE5;
   --base-black: #070707;
@@ -41,79 +48,16 @@
   
   --info-base: #000000;
   --info-support: #F2F7FF;
+
+  --cream-100: #FFFCF7;
+  --cream-200: #EBE4DE;
+  --cream-300: #D2A391;
+
+  --font-ethereal: 'Ethereal', serif;
 }
 
-/* Light mode - default */
-:root, [data-theme="light"] {
-  /* Default theme colors */
-  --background: var(--base-cream);
-  --foreground: var(--base-black);
-  
-  --card: 48 100% 98.6%;
-  --card-foreground: 0 0% 2.7%;
-  --popover: 48 100% 98.6%;
-  --popover-foreground: 0 0% 2.7%;
-  --primary: 231 79% 58%;
-  --primary-foreground: 48 100% 98.6%;
-  --secondary: 240 5% 96%;
-  --secondary-foreground: 0 0% 2.7%;
-  --muted: 240 5% 96%;
-  --muted-foreground: 240 4% 46%;
-  --accent: 240 5% 96%;
-  --accent-foreground: 0 0% 2.7%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 240 6% 90%;
-  --input: 240 6% 90%;
-  --ring: 231 79% 58%;
-  --radius: 0.5rem;
-  
-  /* Semantic status colors */
-  --status-success: var(--success-base);
-  --status-warning: var(--warning-base);
-  --status-error: var(--fail-base);
-  --status-info: var(--info-base);
-  
-  /* Support backgrounds */
-  --bg-success: var(--success-support);
-  --bg-warning: var(--warning-support);
-  --bg-error: var(--fail-support);
-  --bg-info: var(--info-support);
-}
-
-/* Dark mode */
-[data-theme="dark"] {
-  --background: var(--base-black);
-  --foreground: var(--base-cream);
-  
-  --card: 0 0% 2.7%;
-  --card-foreground: 48 100% 98.6%;
-  --popover: 0 0% 2.7%;
-  --popover-foreground: 48 100% 98.6%;
-  --primary: 48 100% 98.6%;
-  --primary-foreground: 0 0% 2.7%;
-  --secondary: 0 0% 15%;
-  --secondary-foreground: 48 100% 98.6%;
-  --muted: 0 0% 15%;
-  --muted-foreground: 0 0% 64%;
-  --accent: 0 0% 15%;
-  --accent-foreground: 48 100% 98.6%;
-  --destructive: 0 63% 31%;
-  --destructive-foreground: 48 100% 98.6%;
-  --border: 0 0% 15%;
-  --input: 0 0% 15%;
-  --ring: 231 79% 58%;
-  
-  /* Adjust semantic colors for dark mode if needed */
-  --status-success: var(--success-dark);
-  --status-warning: var(--warning-dark);
-  --status-error: var(--fail-dark);
-  
-  /* Support backgrounds might need adjustment for dark mode */
-  --bg-success: color-mix(in srgb, var(--success-support) 10%, transparent);
-  --bg-warning: color-mix(in srgb, var(--warning-support) 10%, transparent);
-  --bg-error: color-mix(in srgb, var(--fail-support) 10%, transparent);
-  --bg-info: color-mix(in srgb, var(--info-support) 10%, transparent);
+.font-ethereal {
+  font-family: var(--font-ethereal);
 }
 
 /* System preference dark mode - only applies if no theme is explicitly set */
@@ -136,10 +80,27 @@
 }
 
 @theme inline {
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-satoshi);
   --font-mono: var(--font-geist-mono);
+
+  --cream-100: var(--cream-100);
+  --cream-200: var(--cream-200);
+  --cream-300: var(--cream-300);
+
+  --bg-base-blue: var(--base-blue);
+  --bg-base-black: var(--base-black);
+  --bg-base-cream: var(--base-cream);
+
+  --bg-support-500: var(--support-500);
+  --bg-support-600: var(--support-600);
+
+  --font-ethereal: var(--font-ethereal);
 }
 
 *{
