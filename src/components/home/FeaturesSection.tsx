@@ -22,10 +22,10 @@ export function FeaturesSection() {
         {/* Right: Content */}
         <div className="col-span-1 lg:col-span-5 xl:col-span-4 flex flex-col items-start justify-center h-full">
           <h2 className="text-2xl md:text-3xl font-ethereal mb-4 text-gray-900">Customize Your Own Unit</h2>
-          <p className="text-sm md:text-lg text-gray-700 mb-6">
+          <p className="text-sm md:text-base text-gray-700 mb-6">
            Tailored to Your specifications: A custom-made wig uniquely crafted to reflect your personality, style, and preferences.
           </p>
-          <p className="text-sm md:text-lg text-gray-700 mb-6">Personally creating a unit that is uniquely yours from the color, cut, and styling</p>
+          <p className="text-sm md:text-base text-gray-700 mb-6">Personally creating a unit that is uniquely yours from the color, cut, and styling</p>
           <Button variant="primary" icon={<Settings2 size={18} />}>
             Start Customizing
           </Button>

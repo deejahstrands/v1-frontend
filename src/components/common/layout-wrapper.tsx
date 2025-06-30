@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Header } from "./header";
 import { ClientFooterWrapper } from "./client-footer-wrapper";
+import { Footer } from "./footer";
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -21,6 +22,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <ClientFooterWrapper />
+      <Footer />
     </>
   );
 } 
