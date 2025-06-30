@@ -7,6 +7,8 @@ import { Search, Heart, ShoppingBag, User, Menu, ChevronDown } from "lucide-reac
 import { useState } from "react";
 import { MobileMenu } from "./mobile-menu";
 import { SearchModal } from "./search-modal";
+import { Button } from "./button";
+import { SectionContainer } from "./section-container";
 
 const mainNavItems = [
   { label: "Home", href: "/" },
@@ -30,20 +32,20 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <header className="sticky top-0 z-50 bg-primary border-b border-gray-100">
+        <SectionContainer>
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/" className="flex items-center">
                 <Image
-                  src="/logo/logo.svg"
+                  src="/logo/logo-white.svg"
                   alt="Deejah Strands"
                   width={40}
                   height={40}
                   className="h-10 w-auto"
                 />
-                <span className="ml-2 text-lg font-semibold hidden sm:inline">DEEJAH STRANDS</span>
+                <span className="ml-2 text-lg text-tertiary font-semibold font-ethereal hidden xl:inline">DEEJAH STRANDS</span>
               </Link>
             </div>
 
@@ -53,10 +55,10 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`text-sm font-medium py-2 border-b-2 transition-colors hover:text-gray-900 ${
+                  className={`text-sm font-medium py-2 border-b-2 transition-colors text-tertiary hover:text-tertiary ${
                     pathname === item.href
-                      ? "border-[#ED6745] text-gray-900"
-                      : "border-transparent text-gray-600"
+                      ? "border-secondary text-secondary"
+                      : "border-transparent text-secondary"
                   }`}
                 >
                   {item.label}
@@ -65,7 +67,7 @@ export function Header() {
               
               {/* Categories Dropdown */}
               <div className="relative group">
-                <button className="flex items-center text-sm font-medium py-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900 group-hover:border-[#ED6745]">
+                <button className="flex items-center text-sm font-medium py-2 border-b-2 border-transparent text-tertiary hover:text-tertiary">
                   Categories
                   <ChevronDown className="ml-1 h-4 w-4" />
                 </button>
@@ -88,7 +90,7 @@ export function Header() {
               <div className="hidden lg:flex items-center space-x-4">
                 <button
                   type="button"
-                  className="p-2 text-gray-600 hover:text-gray-900"
+                  className="p-2 text-tertiary hover:text-tertiary"
                   onClick={() => setIsSearchOpen(true)}
                   aria-label="Search"
                 >
@@ -97,29 +99,26 @@ export function Header() {
 
                 {isLoggedIn ? (
                   <>
-                    <Link href="/account/wishlist" className="p-2 text-gray-600 hover:text-gray-900">
+                    <Link href="/account/wishlist" className="p-2 text-tertiary hover:text-tertiary">
                       <Heart className="h-5 w-5" />
                     </Link>
-                    <Link href="/cart" className="p-2 text-gray-600 hover:text-gray-900">
+                    <Link href="/cart" className="p-2 text-tertiary hover:text-tertiary">
                       <ShoppingBag className="h-5 w-5" />
                     </Link>
-                    <Link href="/account" className="p-2 text-gray-600 hover:text-gray-900">
+                    <Link href="/account" className="p-2 text-tertiary hover:text-tertiary">
                       <User className="h-5 w-5" />
                     </Link>
                   </>
                 ) : (
                   <>
-                    <Link href="/account/wishlist" className="p-2 text-gray-600 hover:text-gray-900">
+                    <Link href="/account/wishlist" className="p-2 text-tertiary hover:text-tertiary">
                       <Heart className="h-5 w-5" />
                     </Link>
-                    <Link href="/cart" className="p-2 text-gray-600 hover:text-gray-900">
+                    <Link href="/cart" className="p-2 text-tertiary hover:text-tertiary">
                       <ShoppingBag className="h-5 w-5" />
                     </Link>
-                    <Link
-                      href="/auth/login"
-                      className="hidden sm:inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-900"
-                    >
-                      Login
+                    <Link href="/auth/login" className="hidden sm:inline-flex">
+                      <Button variant="tertiary" className="w-full">Login</Button>
                     </Link>
                   </>
                 )}
@@ -127,14 +126,14 @@ export function Header() {
               {/* Mobile menu button */}
               <button
                 type="button"
-                className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
+                className="lg:hidden p-2 text-tertiary hover:text-tertiary"
                 onClick={() => setIsMobileMenuOpen(true)}
               >
                 <Menu className="h-6 w-6" />
               </button>
             </div>
           </div>
-        </div>
+        </SectionContainer>
       </header>
 
       {/* Mobile menu */}
