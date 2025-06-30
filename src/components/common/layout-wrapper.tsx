@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { Header } from "./header";
 import { ClientFooterWrapper } from "./client-footer-wrapper";
 import { Footer } from "./footer";
+import { ScrollToTopButton } from "./scroll-to-top-button";
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -22,6 +23,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <ClientFooterWrapper />
+      <ScrollToTopButton />
       <Footer />
     </>
   );

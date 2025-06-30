@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="w-full bg-[#161616] pt-10 pb-6">
+    <footer className="w-full bg-[#161616] pt-10 pb-20 lg:pb-10">
       <SectionContainer className="flex flex-col md:flex-row md:justify-between md:items-start gap-8 text-[#FCFCFC]">
         {/* Left: Logo and Contact */}
         <div className="flex flex-col gap-4 md:w-1/3">
