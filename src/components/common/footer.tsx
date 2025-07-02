@@ -63,7 +63,7 @@ export function Footer() {
         {/* Right: Subscribe */}
         <div className="md:w-1/3 flex flex-col gap-3">
           <div className="font-semibold mb-4 text-sm">Subscribe</div>
-          <p className="text-xs mb-2">Enter your email below to be the first to know about new collections and product launches</p>
+          <p className="text-xs mb-4">Enter your email below to be the first to know about new collections and product launches</p>
           <form className="flex gap-2 w-full" onSubmit={e => e.preventDefault()}>
             <input
               type="email"
