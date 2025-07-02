@@ -1,7 +1,10 @@
+"use client";
+
 import { SectionContainer } from "@/components/common/section-container";
 import { Button } from "@/components/common/button";
 import { ShoppingBag, Calendar } from "lucide-react";
 import Image from "next/image";
+import { motion } from "motion/react";
 
 interface HeroSectionData {
     backgroundType: "image" | "video";
@@ -14,7 +17,16 @@ interface HeroSectionData {
 export function HeroSection({ data }: { data: HeroSectionData }) {
     return (
         <SectionContainer className="pt-8 pb-12">
-            <div className="relative rounded-2xl overflow-hidden shadow-lg min-h-[400px] h-[80vh] flex items-end justify-center">
+            <motion.div 
+                className="relative rounded-2xl overflow-hidden shadow-lg min-h-[400px] h-[80vh] flex items-end justify-center"
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ 
+                    duration: 1, 
+                    ease: [0.25, 0.46, 0.45, 0.94]
+                }}
+            >
                 {/* Background Media */}
                 {data.backgroundType === "video" ? (
                     <video
@@ -36,31 +48,72 @@ export function HeroSection({ data }: { data: HeroSectionData }) {
                 )}
                 {/* Overlay at the bottom */}
                 <div className="relative z-10 w-full p-8 md:p-16 flex flex-col items-start justify-end bg-transparent">
-                    <h1 className="text-lg md:text-xl lg:text-2xl xl:text-5xl font-ethereal font-semibold text-white mb-2 md:mb-4 drop-shadow-lg">
+                    <motion.h1 
+                        className="text-lg md:text-xl lg:text-2xl xl:text-5xl font-ethereal font-semibold text-white mb-2 md:mb-4 drop-shadow-lg"
+                        initial={{ opacity: 0, y: 50 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ 
+                            duration: 0.8, 
+                            ease: [0.25, 0.46, 0.45, 0.94],
+                            delay: 0.3
+                        }}
+                    >
                         {data.title}
-                    </h1>
-                    <p className="text-xs md:text-base text-white mb-6 md:mb-8 max-w-2xl drop-shadow">
+                    </motion.h1>
+                    <motion.p 
+                        className="text-xs md:text-base text-white mb-6 md:mb-8 max-w-2xl drop-shadow"
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ 
+                            duration: 0.8, 
+                            ease: [0.25, 0.46, 0.45, 0.94],
+                            delay: 0.6
+                        }}
+                    >
                         {data.description}
-                    </p>
-                    <div className="flex gap-4">
-                        <Button
-                            asChild
-                            variant="primary"
-                            icon={<ShoppingBag size={18} />}
+                    </motion.p>
+                    <motion.div 
+                        className="flex gap-4"
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ 
+                            duration: 0.8, 
+                            ease: [0.25, 0.46, 0.45, 0.94],
+                            delay: 0.9
+                        }}
+                    >
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
                         >
-                            <a href={data.shopNowLink}>Shop Now</a>
-                        </Button>
-                        <Button
-                            asChild
-                            variant="tertiary"
-                            icon={<Calendar size={18} />}
+                            <Button
+                                asChild
+                                variant="primary"
+                                icon={<ShoppingBag size={18} />}
+                            >
+                                <a href={data.shopNowLink}>Shop Now</a>
+                            </Button>
+                        </motion.div>
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
                         >
-                            <a href="/consultation">Book A Consultation</a>
-                        </Button>
-                    </div>
+                            <Button
+                                asChild
+                                variant="tertiary"
+                                icon={<Calendar size={18} />}
+                            >
+                                <a href="/consultation">Book A Consultation</a>
+                            </Button>
+                        </motion.div>
+                    </motion.div>
                 </div>
-            </div>
-
+            </motion.div>
         </SectionContainer>
     );
 }
