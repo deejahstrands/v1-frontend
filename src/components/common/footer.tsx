@@ -2,10 +2,12 @@ import Image from "next/image";
 import { SectionContainer } from "./section-container";
 import { Button } from "./button";
 import Link from "next/link";
+import { Phone, Mail, MapPin } from "lucide-react";
+import { HairTagsCloud } from "@/components/home/HairTagsCloud";
 
 export function Footer() {
   return (
-    <footer className="w-full bg-[#161616] pt-10 pb-20 lg:pb-10">
+    <footer className="w-full bg-[#161616] pt-10 pb-20 lg:pb-0">
       <SectionContainer className="flex flex-col md:flex-row md:justify-between md:items-start gap-8 text-[#FCFCFC]">
         {/* Left: Logo and Contact */}
         <div className="flex flex-col gap-4 md:w-1/3">
@@ -13,44 +15,54 @@ export function Footer() {
             <Image src="/logo/logo-footer.svg" alt="Deejah Strands Logo" width={40} height={40} />
             <span className="font-ethereal text-2xl font-semibold text-[#FCFCFC]">Deejah Strands</span>
           </div>
-          <Link href="tel:09064296611" className="hover:underline text-sm">09064296611</Link>
-          <Link href="mailto:deejahstrands@gmail.com" className="hover:underline text-sm">deejahstrands@gmail.com</Link>
-          <Link href="https://maps.google.com/?q=3 Otunba Olumide Osunsina Crescent, Lekki 106104" passHref target="_blank" rel="noopener noreferrer" className="hover:underline text-sm">
-            3 Otunba Olumide Osunsina Crescent, Lekki 106104
+          <Link href="tel:09064296611" className="hover:underline text-xs flex items-center gap-2">
+            <Phone size={16} className="mr-2" /> 09064296611
+          </Link>
+          <Link href="mailto:deejahstrands@gmail.com" className="hover:underline text-xs flex items-center gap-2">
+            <Mail size={16} className="mr-2" /> deejahstrands@gmail.com
+          </Link>
+          <Link
+            href="https://maps.google.com/?q=3 Otunba Olumide Osunsina Crescent, Lekki 106104"
+            passHref
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline text-sm flex items-center gap-2"
+          >
+            <MapPin size={16} className="mr-2" /> 3 Otunba Olumide Osunsina Crescent, Lekki 106104
           </Link>
         </div>
         {/* Middle: Navigation */}
         <div className="flex flex-col sm:flex-row gap-8 md:gap-16 flex-1 justify-center">
           <div>
-            <div className="font-semibold mb-2 text-sm">Site Map</div>
-            <ul className="space-y-1 text-sm">
-              <li><Link href="/" className="hover:underline">Home</Link></li>
-              <li><Link href="/shop" className="hover:underline">Shop</Link></li>
-              <li><Link href="/category/new-arrivals" className="hover:underline">New Arrivals</Link></li>
-              <li><Link href="/category/categories" className="hover:underline">Categories</Link></li>
+            <div className="font-semibold mb-4 text-xs">Site Map</div>
+            <ul className="space-y-1 text-xs">
+              <li className="mb-4"><Link href="/" className="hover:underline">Home</Link></li>
+              <li className="mb-4"><Link href="/shop" className="hover:underline">Shop</Link></li>
+              <li className="mb-4"><Link href="/category/new-arrivals" className="hover:underline">New Arrivals</Link></li>
+              <li className="mb-4"><Link href="/category/categories" className="hover:underline">Categories</Link></li>
             </ul>
           </div>
           <div>
-            <div className="font-semibold mb-2 text-sm">Service</div>
-            <ul className="space-y-1 text-sm">
-              <li><Link href="/consultation" className="hover:underline">Consultation</Link></li>
-              <li><Link href="/custom-wigs" className="hover:underline">Custom Wigs</Link></li>
-              <li><Link href="/about" className="hover:underline">About Us</Link></li>
+            <div className="font-semibold mb-4 text-sm">Service</div>
+            <ul className="space-y-1 text-xs">
+              <li className="mb-4"><Link href="/consultation" className="hover:underline">Consultation</Link></li>
+              <li className="mb-4"><Link href="/custom-wigs" className="hover:underline">Custom Wigs</Link></li>
+              <li className="mb-4"><Link href="/about" className="hover:underline">About Us</Link></li>
             </ul>
           </div>
           <div>
-            <div className="font-semibold mb-2 text-sm">Socials</div>
-            <ul className="space-y-1 text-sm">
-              <li><Link href="https://instagram.com/deejahstrands" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">Instagram</Link></li>
-              <li><Link href="https://tiktok.com/@deejahstrands" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">Tiktok</Link></li>
-              <li><Link href="https://pinterest.com/deejahstrands" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">Pinterest</Link></li>
-              <li><Link href="https://x.com/deejahstrands" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">X</Link></li>
+            <div className="font-semibold mb-4 text-sm">Socials</div>
+            <ul className="space-y-1 text-xs">
+              <li className="mb-4"><Link href="https://instagram.com/deejahstrands" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">Instagram</Link></li>
+              <li className="mb-4"><Link href="https://tiktok.com/@deejahstrands" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">Tiktok</Link></li>
+              <li className="mb-4"><Link href="https://pinterest.com/deejahstrands" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">Pinterest</Link></li>
+              <li className="mb-4"><Link href="https://x.com/deejahstrands" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">X</Link></li>
             </ul>
           </div>
         </div>
         {/* Right: Subscribe */}
         <div className="md:w-1/3 flex flex-col gap-3">
-          <div className="font-semibold mb-2 text-sm">Subscribe</div>
+          <div className="font-semibold mb-4 text-sm">Subscribe</div>
           <p className="text-xs mb-2">Enter your email below to be the first to know about new collections and product launches</p>
           <form className="flex gap-2 w-full" onSubmit={e => e.preventDefault()}>
             <input
@@ -66,6 +78,8 @@ export function Footer() {
       <div className="mt-8 border-t border-[#FCFCFC]/10 pt-4 text-center text-xs text-[#FCFCFC] opacity-80">
         © 2025 Deejah Strands. All rights reserved.
       </div>
+
+      <HairTagsCloud />
     </footer>
   );
 } 

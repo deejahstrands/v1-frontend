@@ -19,7 +19,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Header />
-      <main className="flex-1 pb-[72px] md:pb-0">
+      <main className="flex-1 md:pb-0">
         {children}
       </main>
       <ClientFooterWrapper />
