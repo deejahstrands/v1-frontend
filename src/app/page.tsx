@@ -1,6 +1,8 @@
 import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { DeejahStrandsCollectionSection } from "@/components/home/DeejahStrandsCollectionSection";
+import { CategoriesSection } from "@/components/home/CategoriesSection";
+import { ConsultationCtaSection } from "@/components/home/ConsultationCtaSection";
 
 export default function HomePage() {
   return (
@@ -16,7 +18,8 @@ export default function HomePage() {
       />
       <FeaturesSection />
       <DeejahStrandsCollectionSection />
-      
+      <CategoriesSection />
+      <ConsultationCtaSection />
     </>
   );
 }
