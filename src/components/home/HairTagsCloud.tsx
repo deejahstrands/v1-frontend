@@ -58,11 +58,20 @@ function useIsMobile() {
     return isMobile;
 }
 
+function useHasMounted() {
+    const [hasMounted, setHasMounted] = useState(false);
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
+    return hasMounted;
+}
+
 const ROWS = 4;
 
 export function HairTagsCloud() {
+    const hasMounted = useHasMounted();
     const isMobile = useIsMobile();
-    const tagsToShow = isMobile ? hairTags.slice(0, 10) : hairTags;
+    const tagsToShow = hasMounted && isMobile ? hairTags.slice(0, 10) : hairTags;
     const tagsPerRow = Math.ceil(tagsToShow.length / ROWS);
 
     // Generate consistent animation values only once per mount
@@ -74,7 +83,7 @@ export function HairTagsCloud() {
             const rotation = pseudoRandom(i) > 0.5 ? -15 : 15;
             const yDrop = -100 - pseudoRandom(i + 100) * 100;
             // Row vertical position
-            const rowHeight = isMobile ? 40 : 70;
+            const rowHeight = hasMounted && isMobile ? 40 : 70;
             const top = 20 + row * rowHeight + pseudoRandom(i + 1) * 10;
             // Sequential horizontal position with jitter
             const leftBase = (col / tagsPerRow) * 90; // spread across 90% width
@@ -94,7 +103,9 @@ export function HairTagsCloud() {
                 left,
             };
         });
-    }, [isMobile, tagsToShow, tagsPerRow]);
+    }, [hasMounted, isMobile, tagsToShow, tagsPerRow]);
+
+    if (!hasMounted) return null;
 
     return (
         <section className="bg-[#161616] pt-12 w-full overflow-hidden">

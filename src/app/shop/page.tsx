@@ -1,3 +1,12 @@
+import { BannerSection } from "@/components/products/BannerSection";
+import { CategoriesSection } from "@/components/products/CategoriesSection";
+
 export default function ShopPage() {
-  return <div>Shop (public)</div>;
+  return (
+    <>
+      <BannerSection />
+      <CategoriesSection />
+      {/* ...other sections */}
+    </>
+  );
 } 
