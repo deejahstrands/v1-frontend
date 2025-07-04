@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { User, Search, Heart, ShoppingBag } from "lucide-react";
+import { User, Search, Heart, ShoppingBag, Store } from "lucide-react";
 
 interface MobileFooterProps {
   isLoggedIn?: boolean;
@@ -19,6 +19,15 @@ export function MobileFooter({ isLoggedIn = false, onSearchClick }: MobileFooter
           <User className="w-6 h-6" />
           <span className="text-xs mt-1">{isLoggedIn ? "Account" : "Login"}</span>
         </Link>
+        
+        <Link
+          href="/shop"
+          className="flex flex-col items-center text-gray-600 hover:text-gray-900"
+        >
+          <Store className="w-6 h-6" />
+          <span className="text-xs mt-1">Shop</span>
+        </Link>
+        
         <button
           onClick={onSearchClick}
           className="flex flex-col items-center text-gray-600 hover:text-gray-900"
