@@ -68,18 +68,19 @@ export function ProductCard({
         </motion.div>
       </div>
       <div className="p-4 flex flex-col gap-2">
-        <div className="font-medium text-base">{title}</div>
-        <div className="text-[#4A85E4] font-semibold text-lg">{price}</div>
+        <div className="font-medium text-xs md:text-base xl:text-lg">{title}</div>
+        <div className="text-[#4A85E4] font-semibold text-base md:text-lg xl:text-xl">{price}</div>
         <div className="text-xs text-[#162844]">Customization: {customization ? "Yes" : "No"}</div>
-        <div className="flex gap-2 mt-2">
+        <div className="grid grid-cols-12 gap-2 mt-2">
           <motion.div
+            className="col-span-9 md:col-span-10 lg:col-span-10"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             <Button
               variant="primary"
-              icon={<ShoppingBag size={18} />}
-              className="flex-1 bg-white border border-[#E4E7EC] text-black hover:bg-gray-50"
+              icon={<ShoppingBag size={18} className="text-xs md:text-base xl:text-lg hidden md:block"/>}
+              className="w-full bg-white border border-[#E4E7EC] text-black hover:bg-gray-50 text-xs md:text-base xl:text-lg !px-1 !lg:px-4"
               onClick={onAddToCart}
             >
               Add to Cart
@@ -87,15 +88,13 @@ export function ProductCard({
           </motion.div>
           <motion.button
             onClick={onWishlist}
-            className={`w-10 h-10 flex items-center justify-center rounded-md border border-gray-200 hover:bg-gray-100 transition-colors ${
-              isWishlisted ? "text-[#4A85E4]" : "text-gray-400"
-            }`}
             aria-label="Add to wishlist"
             type="button"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
+            className={`col-span-3 md:col-span-2 lg:col-span-2 w-full h-10 flex items-center justify-center rounded-md md:border border-gray-200 hover:bg-gray-100 transition-colors ${isWishlisted ? "text-[#4A85E4]" : "text-gray-400"}`}
           >
-            <Heart fill={isWishlisted ? "#4A85E4" : "none"} />
+            <Heart fill={isWishlisted ? "#4A85E4" : "none"} className="text-xs md:text-base xl:text-lg "/>
           </motion.button>
         </div>
       </div>

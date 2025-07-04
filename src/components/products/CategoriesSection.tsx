@@ -16,7 +16,7 @@ export function CategoriesSection() {
   const { selectedCategory, setCategory } = useCategoryFilter();
 
   return (
-    <SectionContainer>
+    <SectionContainer className="hidden lg:block">
       <div className="flex gap-4 sm:gap-6 items-center sm:justify-center py-6 sm:py-10 overflow-x-auto flex-nowrap">
         {displayCategories.map((cat) => {
           const isSelected = selectedCategory === cat.name;
