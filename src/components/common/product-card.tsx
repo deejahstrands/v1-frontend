@@ -5,6 +5,7 @@ import { Button } from "@/components/common/button";
 import { ShoppingBag, Heart } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
+import Link from "next/link";
 
 export function ProductCard({
   images,
@@ -14,6 +15,7 @@ export function ProductCard({
   onAddToCart,
   onWishlist,
   isWishlisted,
+  id,
 }: {
   images: string[];
   title: string;
@@ -22,6 +24,7 @@ export function ProductCard({
   onAddToCart?: () => void;
   onWishlist?: () => void;
   isWishlisted?: boolean;
+  id: string;
 }) {
   const [isHovered, setIsHovered] = useState(false);
   
@@ -68,7 +71,11 @@ export function ProductCard({
         </motion.div>
       </div>
       <div className="p-4 flex flex-col gap-2">
-        <div className="font-medium text-xs md:text-base xl:text-lg">{title}</div>
+        <div className="font-medium text-xs md:text-base xl:text-lg">
+          <Link href={`/shop/${id}`} className="hover:underline text-inherit">
+            {title}
+          </Link>
+        </div>
         <div className="text-[#4A85E4] font-semibold text-base md:text-lg xl:text-xl">{price}</div>
         <div className="text-xs text-[#162844]">Customization: {customization ? "Yes" : "No"}</div>
         <div className="grid grid-cols-12 gap-2 mt-2">

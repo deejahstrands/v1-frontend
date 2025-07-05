@@ -19,13 +19,13 @@ export function DeejahStrandsCollectionSection() {
     const nextMobileRef = useRef<HTMLButtonElement>(null);
 
     return (
-        <motion.section 
+        <motion.section
             className="py-10 lg:py-16"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ 
-                duration: 0.8, 
+            transition={{
+                duration: 0.8,
                 ease: [0.25, 0.46, 0.45, 0.94]
             }}
         >
@@ -34,8 +34,8 @@ export function DeejahStrandsCollectionSection() {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ 
-                        duration: 0.6, 
+                    transition={{
+                        duration: 0.6,
                         ease: [0.25, 0.46, 0.45, 0.94],
                         delay: 0.2
                     }}
@@ -47,13 +47,13 @@ export function DeejahStrandsCollectionSection() {
                         buttonHref="/collections"
                     />
                 </motion.div>
-                <motion.div 
+                <motion.div
                     className="relative"
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ 
-                        duration: 0.8, 
+                    transition={{
+                        duration: 0.8,
                         ease: [0.25, 0.46, 0.45, 0.94],
                         delay: 0.4
                     }}
@@ -108,14 +108,15 @@ export function DeejahStrandsCollectionSection() {
                                     initial={{ opacity: 0, y: 30 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
-                                    transition={{ 
-                                        duration: 0.6, 
+                                    transition={{
+                                        duration: 0.6,
                                         ease: [0.25, 0.46, 0.45, 0.94],
                                         delay: 0.6 + (index * 0.1)
                                     }}
                                     whileHover={{ y: -8 }}
                                 >
                                     <ProductCard
+                                        id={product.id}
                                         images={product.images}
                                         title={product.title}
                                         price={product.price}
