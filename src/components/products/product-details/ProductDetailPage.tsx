@@ -3,9 +3,13 @@
 import { SectionContainer } from "@/components/common/section-container";
 import Breadcrumb from "./Breadcrumb";
 import dynamic from "next/dynamic";
-// import ProductInfoPanel from "./ProductInfoPanel";
+import ProductInfoPanel from "./ProductInfoPanel";
 import ProductTabs from "./ProductTabs";
 import { Product } from "@/store/use-products";
+import ProductCustomization from "./ProductCustomization";
+import ConsultationCard from "./ConsultationCard";
+import ProductDeliveryAccordion from "./ProductDeliveryAccordion";
+import AddToCartSection from "./AddToCartSection";
 
 const ProductImageCarousel = dynamic(() => import("./ProductImageCarousel"), { ssr: false });
 
@@ -28,7 +32,11 @@ export default function ProductDetailPage({ product }: { product: Product }) {
           </div>
           {/* Right Side: Product Info */}
           <div className="lg:col-span-5">
-            {/* TODO: ProductInfoPanel */}
+            <ProductInfoPanel product={product} />
+            <ProductCustomization customizations={product.customizations || []} />
+            <ConsultationCard />
+            <ProductDeliveryAccordion delivery={product.delivery || []} />
+            <AddToCartSection product={product} />
             {/* ProductTabs (mobile only) */}
             <div className="block lg:hidden mt-6">
               <ProductTabs description={<div>{product.description}</div>} product={product} />

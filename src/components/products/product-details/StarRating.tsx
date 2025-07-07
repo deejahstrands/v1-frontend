@@ -1,17 +1,18 @@
 import { Star } from "lucide-react";
 
 interface StarRatingProps {
-  rating: number;
+  rating: number | undefined | null;
   onRate?: (rating: number) => void;
   size?: number;
   className?: string;
 }
 
 export default function StarRating({ rating, onRate, size = 20, className = "" }: StarRatingProps) {
+  const safeRating = rating || 0;
   return (
     <div className={`flex items-center gap-1 ${className}`}>
       {[1, 2, 3, 4, 5].map((star) => {
-        const filled = rating >= star || (star - rating <= 0.5 && rating % 1 !== 0);
+        const filled = safeRating >= star || (star - safeRating <= 0.5 && safeRating % 1 !== 0);
         return (
           <button
             key={star}
@@ -23,8 +24,8 @@ export default function StarRating({ rating, onRate, size = 20, className = "" }
           >
             <Star
               size={size}
-              fill={filled ? "#D2A391" : "#E4E7EC"}
-              stroke={filled ? "#D2A391" : "#E4E7EC"}
+              fill={filled ? "#FFA200" : "#E4E7EC"}
+              stroke={filled ? "#FFA200" : "#E4E7EC"}
               className="inline"
             />
           </button>

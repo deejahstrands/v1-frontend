@@ -27,6 +27,57 @@ export const products = [
         text: "Best wig I've ever purchased. The curls are so bouncy and natural. Customer service was excellent too!",
         rating: 4
       }
+    ],
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 40000 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
     ]
   },
   {
@@ -61,6 +112,57 @@ export const products = [
         text: "Best wig I've ever purchased. The curls are so bouncy and natural. Customer service was excellent too!",
         rating: 4
       }
+    ],
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 50000 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
     ]
   },
   {
@@ -77,6 +179,57 @@ export const products = [
     price: "₦350,000",
     customization: false,
     description: "Enjoy beautiful curls with our 22-inch HD lace wig. The ultra-thin lace ensures a seamless blend, while the curls add volume and style.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
   {
     id: "4",
@@ -90,6 +243,57 @@ export const products = [
     price: "₦650,000",
     customization: true,
     description: "Our 26-inch body wave closure is perfect for those who love full, bouncy hair. Crafted from raw hair for durability and shine.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
   {
     id: "5",
@@ -101,6 +305,57 @@ export const products = [
     price: "₦650,000",
     customization: true,
     description: "Achieve a natural look with our 26-inch body wave closure. The soft waves and natural luster make it a customer favorite.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
   {
     id: "6",
@@ -112,6 +367,57 @@ export const products = [
     price: "₦650,000",
     customization: true,
     description: "This 26-inch body wave closure is made from premium raw hair, offering a soft texture and long-lasting quality.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
   {
     id: "7",
@@ -123,6 +429,57 @@ export const products = [
     price: "₦900,000",
     customization: false,
     description: "Sleek and straight, our 18-inch lace wig is perfect for a polished, sophisticated look. The lace ensures a natural hairline.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
   {
     id: "8",
@@ -134,6 +491,57 @@ export const products = [
     price: "₦1,200,000",
     customization: true,
     description: "Our 20-inch deep wave wig offers defined waves and a luxurious feel. The perfect choice for volume and movement.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
   {
     id: "9",
@@ -145,6 +553,57 @@ export const products = [
     price: "₦400,000",
     customization: false,
     description: "Chic and stylish, our 14-inch bob lace wig is easy to wear and maintain. The lace front gives a natural finish.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
   {
     id: "10",
@@ -156,6 +615,57 @@ export const products = [
     price: "₦1,600,000",
     customization: true,
     description: "Make a statement with our 30-inch water wave wig. The long, flowing waves are perfect for a dramatic look.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
   {
     id: "11",
@@ -167,6 +677,57 @@ export const products = [
     price: "₦350,000",
     customization: false,
     description: "Fun and flirty, our 10-inch pixie cut wig is easy to style and perfect for a bold new look.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
   {
     id: "12",
@@ -178,6 +739,58 @@ export const products = [
     price: "₦1,100,000",
     customization: true,
     description: "Enjoy soft, loose waves with our 28-inch wig. The natural movement and shine make it a must-have.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+      
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
   {
     id: "13",
@@ -189,6 +802,57 @@ export const products = [
     price: "₦800,000",
     customization: false,
     description: "Our 22-inch kinky straight wig offers a natural texture and full volume. Perfect for a bold, beautiful look.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
   {
     id: "14",
@@ -200,6 +864,57 @@ export const products = [
     price: "₦1,300,000",
     customization: true,
     description: "Stand out with our 24-inch blonde lace wig. The vibrant color and soft texture make it a showstopper.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
   {
     id: "15",
@@ -211,6 +926,57 @@ export const products = [
     price: "₦600,000",
     customization: false,
     description: "Add dimension to your style with our 16-inch layered wig. The layers create movement and body for a fresh look.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
   {
     id: "16",
@@ -222,5 +988,56 @@ export const products = [
     price: "₦1,550,000",
     customization: true,
     description: "Go long with our 32-inch extra long wig. The length and shine make it perfect for special occasions.",
+    specifications: [
+      { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
+      { type: 'Hair Texture', value: '100% Raw Loose Wave' },
+      { type: 'Hair Length', value: '24 inches' },
+      { type: 'Hair Density', value: '400g' },
+      { type: 'Hair Colour', value: 'Light Brown Base with Neutral Beige Blonde Highlights' },
+      { type: 'Hair Styling', value: 'Middle Parting' },
+    ],
+    customizations: [
+      {
+        type: 'Length',
+        options: [
+          { label: '12"', price: 15000 },
+          { label: '16"', price: 17000 },
+          { label: '22"', price: 20000 },
+          { label: '12" (HD)', price: 25000 },
+        ],
+      },
+      {
+        type: 'Color',
+        options: [
+          { label: 'Natural Black' },
+          { label: 'Blonde', price: 5000 },
+        ],
+      },
+      {
+        type: 'Density',
+        options: [
+          { label: 'Standard' },
+          { label: 'High', price: 3000 },
+        ],
+      },
+    ],
+    delivery: [
+      {
+        type: 'Private Fitting',
+        options: [
+          { label: 'None', price: 0 },
+          { label: 'In Store', price: 0 },
+          { label: 'At Home', price: 10000 }
+        ]
+      },
+      {
+        type: 'Processing Time',
+        options: [
+          { label: '9-12 days', price: 0 },
+          { label: '3-4 days (Express)', price: 20000 },
+          { label: 'Below 9 days (Rush)', price: 40000 }
+        ]
+      }
+    ]
   },
 ]; 

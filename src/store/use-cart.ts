@@ -1,51 +1,48 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type CartItem = {
-  id: string
-  name: string
+interface CustomizationOption {
+  label: string
+  price?: number
+}
+
+interface ConsultationData {
+  type: string
   price: number
+  description?: string
+}
+
+interface CartItem {
+  productId: string
+  basePrice: number
+  customizations: { [type: string]: CustomizationOption }
+  customizationTotal: number
+  totalPrice: number
   quantity: number
-  image: string
+  consultation?: ConsultationData
+  delivery?: { [type: string]: { label: string; price: number } }
 }
 
-type CartStore = {
+interface CartState {
   items: CartItem[]
-  addItem: (item: CartItem) => void
-  removeItem: (id: string) => void
+  addToCart: (item: CartItem) => void
+  removeFromCart: (productId: string) => void
   clearCart: () => void
-  updateQuantity: (id: string, quantity: number) => void
+  getCartTotal: () => number
 }
 
-export const useCart = create<CartStore>()(
+export const useCart = create<CartState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       items: [],
-      addItem: (item) =>
-        set((state) => {
-          const existingItem = state.items.find((i) => i.id === item.id)
-          if (existingItem) {
-            return {
-              items: state.items.map((i) =>
-                i.id === item.id
-                  ? { ...i, quantity: i.quantity + 1 }
-                  : i
-              ),
-            }
-          }
-          return { items: [...state.items, { ...item, quantity: 1 }] }
-        }),
-      removeItem: (id) =>
-        set((state) => ({
-          items: state.items.filter((i) => i.id !== id),
-        })),
+      addToCart: (item) => set((state) => ({
+        items: [...state.items, item],
+      })),
+      removeFromCart: (productId) => set((state) => ({
+        items: state.items.filter((item) => item.productId !== productId),
+      })),
       clearCart: () => set({ items: [] }),
-      updateQuantity: (id, quantity) =>
-        set((state) => ({
-          items: state.items.map((i) =>
-            i.id === id ? { ...i, quantity } : i
-          ),
-        })),
+      getCartTotal: () => get().items.reduce((sum, item) => sum + item.totalPrice * item.quantity + (item.consultation?.price || 0), 0),
     }),
     {
       name: 'cart-storage',

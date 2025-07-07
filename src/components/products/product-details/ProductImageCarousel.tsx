@@ -57,19 +57,19 @@ export default function ProductImageCarousel({ images }: ProductImageCarouselPro
         {/* Custom navigation buttons (desktop only) */}
         <button
           ref={prevRef}
-          className="custom-swiper-prev hidden lg:flex items-center justify-center absolute top-1/2 left-10 -translate-y-1/2 -translate-x-1/2 w-10 h-10 rounded-lg bg-white shadow-md border border-gray-200 z-10 hover:bg-gray-100 transition"
+          className="custom-swiper-prev flex items-center justify-center absolute top-1/2 left-6 lg:left-10 -translate-y-1/2 -translate-x-1/2 w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-white shadow-md border border-gray-200 z-10 hover:bg-gray-100 transition"
           aria-label="Previous image"
           type="button"
         >
-          <ChevronLeft className="w-6 h-6 text-black" />
+          <ChevronLeft className="w-5 h-5 lg:w-6 lg:h-6 text-black" />
         </button>
         <button
           ref={nextRef}
-          className="custom-swiper-next hidden lg:flex items-center justify-center absolute top-1/2 right-10 -translate-y-1/2 translate-x-1/2 w-10 h-10 rounded-lg bg-white shadow-md border border-gray-200 z-10 hover:bg-gray-100 transition"
+          className="custom-swiper-next flex items-center justify-center absolute top-1/2 right-6 lg:right-10 -translate-y-1/2 translate-x-1/2 w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-white shadow-md border border-gray-200 z-10 hover:bg-gray-100 transition"
           aria-label="Next image"
           type="button"
         >
-          <ChevronRight className="w-6 h-6 text-black" />
+          <ChevronRight className="w-5 h-5 lg:w-6 lg:h-6 text-black" />
         </button>
       </Swiper>
 
