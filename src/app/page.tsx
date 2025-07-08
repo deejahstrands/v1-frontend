@@ -3,6 +3,8 @@ import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { DeejahStrandsCollectionSection } from "@/components/home/DeejahStrandsCollectionSection";
 import { CategoriesSection } from "@/components/home/CategoriesSection";
 import { ConsultationCtaSection } from "@/components/home/ConsultationCtaSection";
+import TestimonialsSection from "@/components/home/TestimonialsSection";
+import DealsSection from "@/components/home/DealsSection";
 
 export default function HomePage() {
   return (
@@ -13,12 +15,14 @@ export default function HomePage() {
           backgroundUrl: "https://res.cloudinary.com/dwpetnbf1/video/upload/v1750945562/19v_w20zdi.mp4",
           title: "LUXURY HAIR THAT SPEAKS FOR YOU",
           description: "Experience the finest raw and virgin hair — flawlessly customized for your look, lifestyle, and legacy.",
-          shopNowLink: "/shop",
+          shopNowLink: "/collections",
         }}
       />
       <FeaturesSection />
       <DeejahStrandsCollectionSection />
       <CategoriesSection />
+      <TestimonialsSection />
+      <DealsSection />
       <ConsultationCtaSection />
     </>
   );

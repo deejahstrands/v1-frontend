@@ -1,18 +1,34 @@
 export const categories = [
   {
-    name: "Closures",
-    image: "https://res.cloudinary.com/dwpetnbf1/image/upload/v1751461800/06_1_obtmbs.png",
+    name: "Closure",
+    image: "https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945539/16_nbayoa.jpg"
   },
   {
-    name: "Frontals",
-    image: "https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945478/20_vykyai.png",
+    name: "Frontal",
+    image: "https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945494/03_cqknsn.png"
   },
   {
-    name: "Raw Bundle Collection",
-    image: "https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945494/03_cqknsn.png",
+    name: "Wavy",
+    image: "https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945494/03_cqknsn.png"
   },
   {
-    name: "Wigs",
-    image: "https://res.cloudinary.com/dwpetnbf1/image/upload/v1750944596/16_witwsk.jpg",
+    name: "Straight",
+    image: "https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945495/01_fliqrz.png"
   },
+  {
+    name: "Raw Bundles",
+    image: "https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945494/03_cqknsn.png"
+  },
+  {
+    name: "Curly",
+    image: "https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945495/01_fliqrz.png"
+  },
+  {
+    name: "Bob Wigs",
+    image: "https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945494/03_cqknsn.png"
+  },
+  {
+    name: "Tap In",
+    image: "https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945495/01_fliqrz.png"
+  }
 ]; 

@@ -1,25 +1,42 @@
+'use client'
+
 import React, { useState } from 'react';
 import { useProductCustomization } from '@/store/use-product-customization';
 import { useConsultation } from '@/store/use-consultation';
 import { useDelivery } from '@/store/use-delivery';
 import { useCart } from '@/store/use-cart';
+import { useWishlist } from '@/store/use-wishlist';
+import { useToast } from '@/hooks/use-toast';
 
 interface AddToCartSectionProps {
   product: {
     id: string;
     price: string;
     title: string;
+    image?: string;
+    category?: string;
   };
 }
 
 const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
+  const [isHydrated, setIsHydrated] = useState(false);
   const customizationTotal = useProductCustomization(state => state.getTotalPrice());
   const selectedCustomizations = useProductCustomization(state => state.selected);
   const consultation = useConsultation(state => state.enabled ? state.data : undefined);
   const deliveryTotal = useDelivery(state => state.getTotalPrice());
   const selectedDelivery = useDelivery(state => state.selected);
   const addToCart = useCart(state => state.addToCart);
+  
+  // Wishlist functionality
+  const addToWishlist = useWishlist(state => state.addToWishlist);
+  const removeFromWishlist = useWishlist(state => state.removeFromWishlist);
+  const isInWishlist = useWishlist(state => state.isInWishlist);
+
+  // Handle hydration
+  React.useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const basePrice = Number(product.price.replace(/[^0-9.-]+/g, ""));
   const consultationPrice = consultation?.price || 0;
@@ -37,7 +54,37 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
       consultation: consultation ?? undefined,
       delivery: selectedDelivery,
     });
-    // Optionally show a toast or feedback
+    toast({
+      variant: "success",
+      title: "Added to Cart",
+      description: `${product.title} has been added to your cart.`,
+    });
+  };
+
+  const { toast } = useToast();
+
+  const handleWishlistToggle = () => {
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+      toast({
+        variant: "default",
+        title: "Removed from Wishlist",
+        description: `${product.title} has been removed from your wishlist.`,
+      });
+    } else {
+      addToWishlist({
+        productId: product.id,
+        title: product.title,
+        price: product.price,
+        image: product.image,
+        category: product.category,
+      });
+      toast({
+        variant: "success",
+        title: "Added to Wishlist",
+        description: `${product.title} has been added to your wishlist.`,
+      });
+    }
   };
 
   return (
@@ -78,13 +125,55 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
           <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-13z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="21" r="1" fill="currentColor"/><circle cx="19" cy="21" r="1" fill="currentColor"/></svg>
           Add to Cart - ₦{totalPrice.toLocaleString()}
         </button>
-        <button
-          type="button"
-          className="w-12 h-12 flex items-center justify-center border rounded-lg bg-white text-black hover:bg-gray-100"
-          aria-label="Add to Wishlist"
-        >
-          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 21s-6.5-4.35-9-7.5C1.5 10.5 2.5 7 6 7c2.5 0 3.5 2 3.5 2s1-2 3.5-2c3.5 0 4.5 3.5 3 6.5-2.5 3.15-9 7.5-9 7.5z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        </button>
+        {isHydrated && (
+          <button
+            type="button"
+            className={`w-12 h-12 flex items-center justify-center border rounded-lg transition-colors ${
+              isInWishlist(product.id) 
+                ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100' 
+                : 'bg-white text-black hover:bg-gray-100'
+            }`}
+            onClick={handleWishlistToggle}
+            aria-label={isInWishlist(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
+          >
+            <svg 
+              width="24" 
+              height="24" 
+              fill={isInWishlist(product.id) ? "currentColor" : "none"} 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                d="M12 21s-6.5-4.35-9-7.5C1.5 10.5 2.5 7 6 7c2.5 0 3.5 2 3.5 2s1-2 3.5-2c3.5 0 4.5 3.5 3 6.5-2.5 3.15-9 7.5-9 7.5z" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
+        {!isHydrated && (
+          <button
+            type="button"
+            className="w-12 h-12 flex items-center justify-center border rounded-lg bg-white text-black hover:bg-gray-100"
+            aria-label="Add to Wishlist"
+          >
+            <svg 
+              width="24" 
+              height="24" 
+              fill="none" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                d="M12 21s-6.5-4.35-9-7.5C1.5 10.5 2.5 7 6 7c2.5 0 3.5 2 3.5 2s1-2 3.5-2c3.5 0 4.5 3.5 3 6.5-2.5 3.15-9 7.5-9 7.5z" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
       </div>
       {/* Info */}
       <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">

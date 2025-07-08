@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { LayoutWrapper } from "@/components/common/layout-wrapper";
+import { Toaster } from "@/components/ui/toaster";
 
 const satoshi = localFont({
   src: [
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" data-theme="light">
       <body className={`${satoshi.variable} ${ethereal.variable} antialiased min-h-screen flex flex-col`}>
         <LayoutWrapper>{children}</LayoutWrapper>
+        <Toaster />
       </body>
     </html>
   );

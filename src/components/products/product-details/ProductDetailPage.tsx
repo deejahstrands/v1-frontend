@@ -15,7 +15,7 @@ const ProductImageCarousel = dynamic(() => import("./ProductImageCarousel"), { s
 
 export default function ProductDetailPage({ product }: { product: Product }) {
   return (
-    <div className="bg-tertiary my-8">
+    <div className="bg-tertiary my-8 pb-8">
       <SectionContainer>
         {/* Breadcrumb row (Back arrow, Go Back, Shop / Product Name) */}
         <div className="mb-4">

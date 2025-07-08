@@ -9,19 +9,13 @@ import { MobileMenu } from "./mobile-menu";
 import { SearchModal } from "./search-modal";
 import { Button } from "./button";
 import { SectionContainer } from "./section-container";
+import { categories } from "@/data/categories";
 
 const mainNavItems = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
   { label: "Book A Consultation", href: "/consultation" },
   { label: "Customization", href: "/customization" },
-];
-
-const categories = [
-  { label: "Hair Extensions", href: "/category/hair-extensions" },
-  { label: "Wigs", href: "/category/wigs" },
-  { label: "Hair Care", href: "/category/hair-care" },
-  { label: "Accessories", href: "/category/accessories" },
 ];
 
 export function Header() {
@@ -74,11 +68,11 @@ export function Header() {
                 <div className="absolute left-0 top-full w-48 py-2 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   {categories.map((category) => (
                     <Link
-                      key={category.href}
-                      href={category.href}
+                      key={category.name}
+                      href={`/shop/category/${encodeURIComponent(category.name)}`}
                       className="block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                     >
-                      {category.label}
+                      {category.name}
                     </Link>
                   ))}
                 </div>
@@ -141,7 +135,10 @@ export function Header() {
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         mainNavItems={mainNavItems}
-        categories={categories}
+        categories={categories.map(cat => ({
+          label: cat.name,
+          href: `/shop?category=${encodeURIComponent(cat.name)}`
+        }))}
         isLoggedIn={isLoggedIn}
       />
 

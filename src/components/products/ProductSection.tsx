@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { products } from "@/data/products";
 import { ProductCard } from "@/components/common/product-card";
 import { Pagination } from "@/components/ui/pagination";
 import { SectionContainer } from "@/components/common/section-container";
 import { useProductGrid } from "@/store/use-product-grid";
-import { motion, useInView, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 
 const PRODUCTS_PER_PAGE = 12;
 
@@ -14,7 +14,6 @@ export function ProductSection() {
   const [page, setPage] = useState(1);
   const gridRef = useRef<HTMLDivElement>(null);
   const { grid } = useProductGrid();
-  const isInView = useInView(gridRef, { once: false, amount: 0.1 });
 
   const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE);
   const paginated = products.slice((page - 1) * PRODUCTS_PER_PAGE, page * PRODUCTS_PER_PAGE);
@@ -35,7 +34,7 @@ export function ProductSection() {
             <motion.div
               key={`${product.id}-${page}`}
               initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{
                 duration: 0.4,
@@ -56,7 +55,7 @@ export function ProductSection() {
         <motion.div 
           className="mt-8 flex justify-center"
           initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.3 }}
         >
           <Pagination

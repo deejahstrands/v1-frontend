@@ -78,7 +78,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Curly"
   },
   {
     id: "2",
@@ -94,7 +95,9 @@ export const products = [
     ],
     title: "26\" Body Wave Closure",
     price: "₦175,000",
-    customization: true,
+    customization: false,
+    dealPrice: "₦245,000",
+    dealPercent: 30,
     description: "Get effortless waves with our 26-inch body wave closure, made from top-quality raw hair. The natural wave pattern offers volume and bounce for a glamorous look.",
     rating: 4.2,
     reviewCount: 12,
@@ -163,7 +166,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Tape In"
   },
   {
     id: "3",
@@ -178,6 +182,8 @@ export const products = [
     title: "22\" Curly HD Lace Wig",
     price: "₦350,000",
     customization: false,
+    dealPrice: "₦245,000",
+    dealPercent: 30,
     description: "Enjoy beautiful curls with our 22-inch HD lace wig. The ultra-thin lace ensures a seamless blend, while the curls add volume and style.",
     specifications: [
       { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
@@ -229,7 +235,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Curly"
   },
   {
     id: "4",
@@ -293,7 +300,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Wavy"
   },
   {
     id: "5",
@@ -355,7 +363,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Wavy"
   },
   {
     id: "6",
@@ -417,7 +426,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Wavy"
   },
   {
     id: "7",
@@ -428,6 +438,8 @@ export const products = [
     title: "18\" Straight Lace Wig",
     price: "₦900,000",
     customization: false,
+    dealPrice: "₦450,000",
+    dealPercent: 30,
     description: "Sleek and straight, our 18-inch lace wig is perfect for a polished, sophisticated look. The lace ensures a natural hairline.",
     specifications: [
       { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
@@ -479,7 +491,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Straight"
   },
   {
     id: "8",
@@ -541,7 +554,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Wavy"
   },
   {
     id: "9",
@@ -552,6 +566,8 @@ export const products = [
     title: "14\" Bob Lace Wig",
     price: "₦400,000",
     customization: false,
+    dealPrice: "₦450,000",
+    dealPercent: 30,
     description: "Chic and stylish, our 14-inch bob lace wig is easy to wear and maintain. The lace front gives a natural finish.",
     specifications: [
       { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
@@ -603,7 +619,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Bob Wigs"
   },
   {
     id: "10",
@@ -665,7 +682,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Wavy"
   },
   {
     id: "11",
@@ -676,6 +694,8 @@ export const products = [
     title: "10\" Pixie Cut Wig",
     price: "₦350,000",
     customization: false,
+    dealPrice: "₦450,000",
+    dealPercent: 30,
     description: "Fun and flirty, our 10-inch pixie cut wig is easy to style and perfect for a bold new look.",
     specifications: [
       { type: 'Closure Type', value: 'Customised Thin CB HD Lace Closure 5x5' },
@@ -727,7 +747,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Pixie"
   },
   {
     id: "12",
@@ -790,7 +811,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Wavy"
   },
   {
     id: "13",
@@ -852,7 +874,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Straight"
   },
   {
     id: "14",
@@ -914,7 +937,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Blonde"
   },
   {
     id: "15",
@@ -976,7 +1000,8 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Layered"
   },
   {
     id: "16",
@@ -1038,6 +1063,7 @@ export const products = [
           { label: 'Below 9 days (Rush)', price: 40000 }
         ]
       }
-    ]
+    ],
+    category: "Extra Long"
   },
 ]; 

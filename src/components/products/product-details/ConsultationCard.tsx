@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useConsultation } from '@/store/use-consultation';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
@@ -36,7 +37,7 @@ const ConsultationForm: React.FC<{ onSubmit: (data: ConsultationFormValues) => v
             render={({ field }) => (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button type="button" className="w-full border-[0.5px] border-[#E4E7EC] rounded-lg px-3 py-2 text-sm bg-gray-50 flex justify-between items-center">
+                  <button type="button" className="w-full border-[0.5px] border-[#E4E7EC] rounded-lg px-3 py-2 text-sm  flex justify-between items-center">
                     {selectedObj ? `${selectedObj.label} - ₦${selectedObj.price.toLocaleString()}` : 'Select type'}
                     <svg className="ml-2 h-4 w-4" viewBox="0 0 20 20" fill="none"><path d="M6 8l4 4 4-4" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                   </button>
@@ -57,7 +58,7 @@ const ConsultationForm: React.FC<{ onSubmit: (data: ConsultationFormValues) => v
           <label className="block font-medium mb-1 text-sm">Tell us about your hair goals (optional)</label>
           <textarea
             {...register('description')}
-            className="w-full border-[0.5px] border-[#E4E7EC] rounded-lg px-3 py-2 text-sm bg-gray-50 min-h-[100px]"
+            className="w-full border-[0.5px] border-[#E4E7EC] rounded-lg px-3 py-2 text-sm min-h-[100px]"
             placeholder="Describe your desired look, lifestyle or any specific concern..."
           />
         </div>
@@ -99,9 +100,23 @@ const ConsultationCard: React.FC = () => {
           <Switch.Thumb className={`block w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${enabled ? 'translate-x-4' : 'translate-x-0'}`} />
         </Switch.Root>
       </div>
-      {enabled && (
-        <ConsultationForm onSubmit={handleFormSubmit} />
-      )}
+      <AnimatePresence>
+        {enabled && (
+          <motion.div
+            initial={{ height: 0, opacity: 0, y: -10 }}
+            animate={{ height: "auto", opacity: 1, y: 0 }}
+            exit={{ height: 0, opacity: 0, y: -10 }}
+            transition={{ 
+              duration: 0.4, 
+              ease: [0.0, 0.0, 0.2, 1], // ease-out
+              opacity: { duration: 0.3 }
+            }}
+            className="overflow-hidden"
+          >
+            <ConsultationForm onSubmit={handleFormSubmit} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
