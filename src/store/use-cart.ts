@@ -23,6 +23,8 @@ interface CartItem {
   delivery?: { [type: string]: { label: string; price: number } }
 }
 
+export type { CartItem };
+
 interface CartState {
   items: CartItem[]
   addToCart: (item: CartItem) => void

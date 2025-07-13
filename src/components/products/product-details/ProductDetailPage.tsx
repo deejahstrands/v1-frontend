@@ -10,6 +10,8 @@ import ProductCustomization from "./ProductCustomization";
 import ConsultationCard from "./ConsultationCard";
 import ProductDeliveryAccordion from "./ProductDeliveryAccordion";
 import AddToCartSection from "./AddToCartSection";
+import OthersAccordion from "@/components/common/others-accordion/OthersAccordion";
+import RelatedProductsSection from "./RelatedProductsSection";
 
 const ProductImageCarousel = dynamic(() => import("./ProductImageCarousel"), { ssr: false });
 
@@ -41,9 +43,11 @@ export default function ProductDetailPage({ product }: { product: Product }) {
             <div className="block lg:hidden mt-6">
               <ProductTabs description={<div>{product.description}</div>} product={product} />
             </div>
+            <OthersAccordion />
           </div>
         </div>
       </SectionContainer>
+      <RelatedProductsSection />
     </div>
   );
 } 

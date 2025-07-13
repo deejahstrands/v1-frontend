@@ -9,9 +9,10 @@ import { ScrollToTopButton } from "./scroll-to-top-button";
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin') || pathname?.startsWith('/admin-auth');
+  const isAuthRoute = pathname?.startsWith('/auth');
 
-  // For admin routes, just render children directly (let admin layout handle it)
-  if (isAdminRoute) {
+  // For admin or auth routes, just render children directly (let admin/auth layout handle it)
+  if (isAdminRoute || isAuthRoute) {
     return <>{children}</>;
   }
 

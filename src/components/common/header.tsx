@@ -10,6 +10,7 @@ import { SearchModal } from "./search-modal";
 import { Button } from "./button";
 import { SectionContainer } from "./section-container";
 import { categories } from "@/data/categories";
+import { useCart } from '@/store/use-cart';
 
 const mainNavItems = [
   { label: "Home", href: "/" },
@@ -23,6 +24,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const isLoggedIn = false; // TODO: Replace with actual auth state
+  const cartCount = useCart(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
 
   return (
     <>
@@ -96,8 +98,11 @@ export function Header() {
                     <Link href="/account/wishlist" className="p-2 text-tertiary hover:text-tertiary">
                       <Heart className="h-5 w-5" />
                     </Link>
-                    <Link href="/cart" className="p-2 text-tertiary hover:text-tertiary">
+                    <Link href="/cart" className="p-2 text-tertiary hover:text-tertiary relative">
                       <ShoppingBag className="h-5 w-5" />
+                      {cartCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
+                      )}
                     </Link>
                     <Link href="/account" className="p-2 text-tertiary hover:text-tertiary">
                       <User className="h-5 w-5" />
@@ -108,8 +113,11 @@ export function Header() {
                     <Link href="/account/wishlist" className="p-2 text-tertiary hover:text-tertiary">
                       <Heart className="h-5 w-5" />
                     </Link>
-                    <Link href="/cart" className="p-2 text-tertiary hover:text-tertiary">
+                    <Link href="/cart" className="p-2 text-tertiary hover:text-tertiary relative">
                       <ShoppingBag className="h-5 w-5" />
+                      {cartCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
+                      )}
                     </Link>
                     <Link href="/auth/login" className="hidden sm:inline-flex">
                       <Button variant="tertiary" className="w-full">Login</Button>
@@ -120,10 +128,14 @@ export function Header() {
               {/* Mobile menu button */}
               <button
                 type="button"
-                className="lg:hidden p-2 text-tertiary hover:text-tertiary"
+                className="lg:hidden p-2 text-tertiary hover:text-tertiary relative"
                 onClick={() => setIsMobileMenuOpen(true)}
               >
-                <Menu className="h-6 w-6" />
+                <ShoppingBag className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
+                )}
+                <Menu className="h-6 w-6 ml-2" />
               </button>
             </div>
           </div>
