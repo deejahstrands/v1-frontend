@@ -41,6 +41,12 @@ export interface User {
   addresses: Address[];
   orders: Order[];
   wishlist: WishlistItem[];
+  firstName: string;
+  lastName: string;
+  image: string;
+  isAuthenticated: boolean;
+  hasPurchased: boolean;
+  purchases: { productId: string; date: string }[];
 }
 
 export const users: User[] = [
@@ -100,7 +106,16 @@ export const users: User[] = [
         status: 'In Stock',
         date: "01 May '25"
       }
-    ]
+    ],
+    firstName: 'Reiley',
+    lastName: 'Evans',
+    image: 'https://randomuser.me/api/portraits/women/1.jpg',
+    isAuthenticated: true,
+    hasPurchased: true,
+    purchases: [
+      { productId: "1", date: "2024-07-01" },
+      { productId: "2", date: "2024-07-02" }
+    ],
   },
   {
     id: '2',
@@ -114,7 +129,13 @@ export const users: User[] = [
     consultations: [],
     addresses: [],
     orders: [],
-    wishlist: []
+    wishlist: [],
+    firstName: 'Funmi',
+    lastName: 'L.',
+    image: 'https://randomuser.me/api/portraits/women/2.jpg',
+    isAuthenticated: false,
+    hasPurchased: false,
+    purchases: [],
   },
   {
     id: '3',
@@ -220,7 +241,13 @@ export const users: User[] = [
         status: 'Out of Stock',
         date: "01 May '25"
       }
-    ]
+    ],
+    firstName: 'Roland',
+    lastName: 'Tony',
+    image: 'https://randomuser.me/api/portraits/men/3.jpg',
+    isAuthenticated: true,
+    hasPurchased: true,
+    purchases: [],
   },
   {
     id: '4',
@@ -256,7 +283,13 @@ export const users: User[] = [
         date: "01 May '25"
       }
     ],
-    wishlist: []
+    wishlist: [],
+    firstName: 'Princess',
+    lastName: 'Divine',
+    image: 'https://randomuser.me/api/portraits/women/4.jpg',
+    isAuthenticated: true,
+    hasPurchased: true,
+    purchases: [],
   },
   {
     id: '5',
@@ -292,7 +325,13 @@ export const users: User[] = [
         status: 'In Stock',
         date: "01 May '25"
       }
-    ]
+    ],
+    firstName: 'Queen',
+    lastName: 'Ini',
+    image: 'https://randomuser.me/api/portraits/women/5.jpg',
+    isAuthenticated: true,
+    hasPurchased: true,
+    purchases: [],
   },
   {
     id: '6',
@@ -313,7 +352,13 @@ export const users: User[] = [
       }
     ],
     orders: [],
-    wishlist: []
+    wishlist: [],
+    firstName: 'Erna',
+    lastName: 'Esema',
+    image: 'https://randomuser.me/api/portraits/women/6.jpg',
+    isAuthenticated: true,
+    hasPurchased: true,
+    purchases: [],
   },
   {
     id: '7',
@@ -327,7 +372,13 @@ export const users: User[] = [
     consultations: [],
     addresses: [],
     orders: [],
-    wishlist: []
+    wishlist: [],
+    firstName: 'Abdullahi',
+    lastName: 'Yusuff',
+    image: 'https://randomuser.me/api/portraits/men/7.jpg',
+    isAuthenticated: false,
+    hasPurchased: false,
+    purchases: [],
   },
   {
     id: '8',
@@ -341,7 +392,13 @@ export const users: User[] = [
     consultations: [],
     addresses: [],
     orders: [],
-    wishlist: []
+    wishlist: [],
+    firstName: 'Kate',
+    lastName: 'Ahurika',
+    image: 'https://randomuser.me/api/portraits/women/8.jpg',
+    isAuthenticated: true,
+    hasPurchased: true,
+    purchases: [],
   },
   {
     id: '9',
@@ -355,6 +412,12 @@ export const users: User[] = [
     consultations: [],
     addresses: [],
     orders: [],
-    wishlist: []
+    wishlist: [],
+    firstName: 'Rebecca',
+    lastName: 'Eze',
+    image: 'https://randomuser.me/api/portraits/women/9.jpg',
+    isAuthenticated: false,
+    hasPurchased: false,
+    purchases: [],
   }
 ]; 

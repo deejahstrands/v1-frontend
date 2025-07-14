@@ -7,6 +7,10 @@ import { Search, Heart, ShoppingBag, User, Menu, ChevronDown } from "lucide-reac
 import { useState } from "react";
 import { MobileMenu } from "./mobile-menu";
 import { SearchModal } from "./search-modal";
+import { Button } from "./button";
+import { SectionContainer } from "./section-container";
+import { categories } from "@/data/categories";
+import { useCart } from '@/store/use-cart';
 
 const mainNavItems = [
   { label: "Home", href: "/" },
@@ -15,35 +19,29 @@ const mainNavItems = [
   { label: "Customization", href: "/customization" },
 ];
 
-const categories = [
-  { label: "Hair Extensions", href: "/category/hair-extensions" },
-  { label: "Wigs", href: "/category/wigs" },
-  { label: "Hair Care", href: "/category/hair-care" },
-  { label: "Accessories", href: "/category/accessories" },
-];
-
 export function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const isLoggedIn = false; // TODO: Replace with actual auth state
+  const cartCount = useCart(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      <header className="sticky top-0 z-50 bg-primary border-b border-gray-100">
+        <SectionContainer>
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/" className="flex items-center">
                 <Image
-                  src="/logo/logo.svg"
+                  src="/logo/logo-white.svg"
                   alt="Deejah Strands"
                   width={40}
                   height={40}
                   className="h-10 w-auto"
                 />
-                <span className="ml-2 text-lg font-semibold hidden sm:inline">DEEJAH STRANDS</span>
+                <span className="ml-2 text-lg text-tertiary font-semibold font-ethereal hidden xl:inline">DEEJAH STRANDS</span>
               </Link>
             </div>
 
@@ -53,10 +51,10 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`text-sm font-medium py-2 border-b-2 transition-colors hover:text-gray-900 ${
+                  className={`text-sm font-medium py-2 border-b-2 transition-colors text-tertiary hover:text-tertiary ${
                     pathname === item.href
-                      ? "border-[#ED6745] text-gray-900"
-                      : "border-transparent text-gray-600"
+                      ? "border-secondary text-secondary"
+                      : "border-transparent text-secondary"
                   }`}
                 >
                   {item.label}
@@ -65,18 +63,18 @@ export function Header() {
               
               {/* Categories Dropdown */}
               <div className="relative group">
-                <button className="flex items-center text-sm font-medium py-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900 group-hover:border-[#ED6745]">
+                <button className="flex items-center text-sm font-medium py-2 border-b-2 border-transparent text-tertiary hover:text-tertiary">
                   Categories
                   <ChevronDown className="ml-1 h-4 w-4" />
                 </button>
                 <div className="absolute left-0 top-full w-48 py-2 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   {categories.map((category) => (
                     <Link
-                      key={category.href}
-                      href={category.href}
+                      key={category.name}
+                      href={`/shop/category/${encodeURIComponent(category.name)}`}
                       className="block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                     >
-                      {category.label}
+                      {category.name}
                     </Link>
                   ))}
                 </div>
@@ -88,7 +86,7 @@ export function Header() {
               <div className="hidden lg:flex items-center space-x-4">
                 <button
                   type="button"
-                  className="p-2 text-gray-600 hover:text-gray-900"
+                  className="p-2 text-tertiary hover:text-tertiary"
                   onClick={() => setIsSearchOpen(true)}
                   aria-label="Search"
                 >
@@ -97,29 +95,32 @@ export function Header() {
 
                 {isLoggedIn ? (
                   <>
-                    <Link href="/account/wishlist" className="p-2 text-gray-600 hover:text-gray-900">
+                    <Link href="/account/wishlist" className="p-2 text-tertiary hover:text-tertiary">
                       <Heart className="h-5 w-5" />
                     </Link>
-                    <Link href="/cart" className="p-2 text-gray-600 hover:text-gray-900">
+                    <Link href="/cart" className="p-2 text-tertiary hover:text-tertiary relative">
                       <ShoppingBag className="h-5 w-5" />
+                      {cartCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
+                      )}
                     </Link>
-                    <Link href="/account" className="p-2 text-gray-600 hover:text-gray-900">
+                    <Link href="/account" className="p-2 text-tertiary hover:text-tertiary">
                       <User className="h-5 w-5" />
                     </Link>
                   </>
                 ) : (
                   <>
-                    <Link href="/account/wishlist" className="p-2 text-gray-600 hover:text-gray-900">
+                    <Link href="/account/wishlist" className="p-2 text-tertiary hover:text-tertiary">
                       <Heart className="h-5 w-5" />
                     </Link>
-                    <Link href="/cart" className="p-2 text-gray-600 hover:text-gray-900">
+                    <Link href="/cart" className="p-2 text-tertiary hover:text-tertiary relative">
                       <ShoppingBag className="h-5 w-5" />
+                      {cartCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
+                      )}
                     </Link>
-                    <Link
-                      href="/auth/login"
-                      className="hidden sm:inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-900"
-                    >
-                      Login
+                    <Link href="/auth/login" className="hidden sm:inline-flex">
+                      <Button variant="tertiary" className="w-full">Login</Button>
                     </Link>
                   </>
                 )}
@@ -127,14 +128,18 @@ export function Header() {
               {/* Mobile menu button */}
               <button
                 type="button"
-                className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
+                className="lg:hidden p-2 text-tertiary hover:text-tertiary relative"
                 onClick={() => setIsMobileMenuOpen(true)}
               >
-                <Menu className="h-6 w-6" />
+                <ShoppingBag className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
+                )}
+                <Menu className="h-6 w-6 ml-2" />
               </button>
             </div>
           </div>
-        </div>
+        </SectionContainer>
       </header>
 
       {/* Mobile menu */}
@@ -142,7 +147,10 @@ export function Header() {
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         mainNavItems={mainNavItems}
-        categories={categories}
+        categories={categories.map(cat => ({
+          label: cat.name,
+          href: `/shop?category=${encodeURIComponent(cat.name)}`
+        }))}
         isLoggedIn={isLoggedIn}
       />
 
