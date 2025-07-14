@@ -1,3 +1,5 @@
+'use client'
+
 import { Banner } from '@/components/common/banner';
 import { SectionContainer } from '@/components/common/section-container';
 import React from 'react';

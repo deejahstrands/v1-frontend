@@ -48,6 +48,7 @@ export const useCart = create<CartState>()(
     }),
     {
       name: 'cart-storage',
+      skipHydration: true,
     }
   )
 ) 
