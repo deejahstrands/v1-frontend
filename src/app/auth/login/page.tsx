@@ -1,6 +1,53 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+'use client';
+
 import Image from 'next/image';
+import { Formik, Form, Field } from 'formik';
+import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
+import { Button } from '@/components/ui/button';
+import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/store/use-auth';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function UserLoginPage() {
+  const { toast } = useToast();
+  const { login, isLoading, clearError } = useAuth();
+  const router = useRouter();
+
+  // Clear error on component mount
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
+
+  const handleSubmit = async (values: LoginFormData, { setSubmitting }: any) => {
+    try {
+      await login({
+        email: values.email,
+        password: values.password,
+      });
+      
+      toast({
+        variant: "success",
+        title: "Login Successful",
+        description: "Welcome back! You have been successfully logged in.",
+      });
+      
+      // Redirect to home page or dashboard
+      router.push('/');
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: error.response?.data?.message || "Invalid email or password. Please try again.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex">
       {/* Left: Form Side */}
@@ -11,24 +58,63 @@ export default function UserLoginPage() {
             <h2 className="text-2xl font-semibold text-center mb-1">Welcome back</h2>
             <p className="text-gray-500 text-center mb-6">Welcome back! Please enter your details.</p>
           </div>
-          {/* Login form placeholder */}
-          <form className="bg-[#F7F9FC] rounded-xl p-6 space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
-              <input type="email" className="w-full px-3 py-2 rounded border border-gray-200 bg-white" placeholder="Enter your email" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Password</label>
-              <input type="password" className="w-full px-3 py-2 rounded border border-gray-200 bg-white" placeholder="Enter your password" />
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="rounded" /> Remember Me
-              </label>
-              <a href="#" className="text-gray-500 hover:underline">Forgot Password?</a>
-            </div>
-            <button type="submit" className="w-full py-2 rounded bg-[#C9A898] text-white font-semibold mt-2">Continue</button>
-          </form>
+          
+          <Formik
+            initialValues={{
+              email: '',
+              password: '',
+              rememberMe: false,
+            }}
+            validationSchema={loginSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ errors, touched, isSubmitting, handleChange, handleBlur, values }) => (
+              <Form className="bg-[#F7F9FC] rounded-xl p-6 space-y-4">
+                <Input
+                  name="email"
+                  type="email"
+                  label="Email"
+                  placeholder="Enter your email"
+                  value={values.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.email && errors.email ? errors.email : undefined}
+                />
+                
+                <PasswordInput
+                  name="password"
+                  label="Password"
+                  placeholder="Enter your password"
+                  value={values.password}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.password && errors.password ? errors.password : undefined}
+                />
+                
+                <div className="flex items-center justify-between text-xs">
+                  <label className="flex items-center gap-2">
+                    <Field
+                      type="checkbox"
+                      name="rememberMe"
+                      className="rounded border-gray-300 text-[#C9A898] focus:ring-[#C9A898]"
+                    />
+                    Remember Me
+                  </label>
+                  <a href="/auth/forgot-password" className="text-gray-500 hover:underline">Forgot Password?</a>
+                </div>
+                
+                <Button
+                  type="submit"
+                  className="w-full"
+                  loading={isSubmitting || isLoading}
+                  disabled={isSubmitting || isLoading}
+                >
+                  {isSubmitting || isLoading ? 'Signing in...' : 'Continue'}
+                </Button>
+              </Form>
+            )}
+          </Formik>
+          
           <div className="text-center text-sm mt-4">
             Don&apos;t have an account? <a href="/auth/signup" className="font-semibold underline">Sign Up</a>
           </div>
@@ -37,6 +123,7 @@ export default function UserLoginPage() {
           Copyright &copy; {new Date().getFullYear()} Deejah Strands
         </footer>
       </div>
+      
       {/* Right: Image Side (hidden on mobile) */}
       <div className="hidden lg:flex flex-1 py-12 pr-12 relative bg-[#F7F9FC] overflow-hidden">
         {/* Background pattern overlay */}

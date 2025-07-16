@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
 import { X, ChevronLeft, ChevronRight, User } from "lucide-react";
 import clsx from "clsx";
+import type { User as UserType } from "@/services/auth";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -13,6 +14,8 @@ interface MobileMenuProps {
   mainNavItems: Array<{ label: string; href: string }>;
   categories: Array<{ label: string; href: string }>;
   isLoggedIn?: boolean;
+  user?: UserType | null;
+  onLogout?: () => void;
 }
 
 export function MobileMenu({ 
@@ -20,7 +23,9 @@ export function MobileMenu({
   onClose, 
   mainNavItems, 
   categories,
-  isLoggedIn = false
+  isLoggedIn = false,
+  user,
+  onLogout
 }: MobileMenuProps) {
   const pathname = usePathname();
   const [showCategories, setShowCategories] = useState(false);
@@ -120,14 +125,38 @@ export function MobileMenu({
                               </button>
                               
                               {/* Login/Account Button */}
-                              <Link
-                                href={isLoggedIn ? "/account" : "/auth/login"}
-                                className="flex items-center justify-center w-full px-3 py-3 text-base font-medium text-white bg-black hover:bg-gray-900 rounded-lg mt-8"
-                                onClick={handleClose}
-                              >
-                                <User className="h-5 w-5 mr-2" />
-                                {isLoggedIn ? "My Account" : "Login"}
-                              </Link>
+                              {isLoggedIn ? (
+                                <div className="space-y-2 mt-8">
+                                  <Link
+                                    href="/account"
+                                    className="flex items-center justify-center w-full px-3 py-3 text-base font-medium text-white bg-black hover:bg-gray-900 rounded-lg"
+                                    onClick={handleClose}
+                                  >
+                                    <User className="h-5 w-5 mr-2" />
+                                    {user?.firstName ? `${user.firstName}'s Account` : "My Account"}
+                                  </Link>
+                                  {onLogout && (
+                                    <button
+                                      onClick={() => {
+                                        onLogout();
+                                        handleClose();
+                                      }}
+                                      className="flex items-center justify-center w-full px-3 py-3 text-base font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg"
+                                    >
+                                      Logout
+                                    </button>
+                                  )}
+                                </div>
+                              ) : (
+                                <Link
+                                  href="/auth/login"
+                                  className="flex items-center justify-center w-full px-3 py-3 text-base font-medium text-white bg-black hover:bg-gray-900 rounded-lg mt-8"
+                                  onClick={handleClose}
+                                >
+                                  <User className="h-5 w-5 mr-2" />
+                                  Login
+                                </Link>
+                              )}
                             </nav>
                           </div>
                         </TransitionChild>

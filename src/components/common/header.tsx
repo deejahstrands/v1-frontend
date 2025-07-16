@@ -11,6 +11,7 @@ import { Button } from "./button";
 import { SectionContainer } from "./section-container";
 import { categories } from "@/data/categories";
 import { useCart } from '@/store/use-cart';
+import { useAuth } from '@/store/use-auth';
 
 const mainNavItems = [
   { label: "Home", href: "/" },
@@ -23,7 +24,7 @@ export function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const isLoggedIn = false; // TODO: Replace with actual auth state
+  const { isAuthenticated, user, logout } = useAuth();
   const cartCount = useCart(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
 
   return (
@@ -93,7 +94,7 @@ export function Header() {
                   <Search className="h-5 w-5" />
                 </button>
 
-                {isLoggedIn ? (
+                {isAuthenticated ? (
                   <>
                     <Link href="/account/wishlist" className="p-2 text-tertiary hover:text-tertiary">
                       <Heart className="h-5 w-5" />
@@ -104,9 +105,23 @@ export function Header() {
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
                       )}
                     </Link>
-                    <Link href="/account" className="p-2 text-tertiary hover:text-tertiary">
-                      <User className="h-5 w-5" />
-                    </Link>
+                    <div className="relative group">
+                      <button className="p-2 text-tertiary hover:text-tertiary flex items-center gap-1">
+                        <User className="h-5 w-5" />
+                        <span className="text-sm hidden sm:block">{user?.firstName || 'Account'}</span>
+                      </button>
+                      <div className="absolute right-0 top-full w-48 py-2 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <Link href="/account" className="block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+                          My Account
+                        </Link>
+                        <button
+                          onClick={logout}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    </div>
                   </>
                 ) : (
                   <>
@@ -151,7 +166,9 @@ export function Header() {
           label: cat.name,
           href: `/shop?category=${encodeURIComponent(cat.name)}`
         }))}
-        isLoggedIn={isLoggedIn}
+        isLoggedIn={isAuthenticated}
+        user={user}
+        onLogout={logout}
       />
 
       {/* Search modal */}
