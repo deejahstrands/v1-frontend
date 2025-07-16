@@ -38,11 +38,7 @@ export default function UserSignupPage() {
       // Redirect to success page with email as query param
       router.push(`/auth/success/account-created?email=${encodeURIComponent(values.email)}`);
     } catch {
-      toast({
-        variant: "destructive",
-        title: "Signup Failed",
-        description: "There was an error creating your account. Please try again.",
-      });
+      toast.error("There was an error creating your account. Please try again.");
     } finally {
       setSubmitting(false);
     }

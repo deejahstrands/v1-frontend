@@ -25,11 +25,7 @@ function EmailVerificationForm() {
       try {
         await verifyEmail(token);
         setIsVerified(true);
-        toast({
-          variant: "success",
-          title: "Email Verified",
-          description: "Your email has been verified successfully. You can now access all features of your account.",
-        });
+        toast.success("Your email has been verified successfully. You can now access all features of your account.");
         
         // Redirect to success page after a short delay
         setTimeout(() => {
@@ -39,11 +35,7 @@ function EmailVerificationForm() {
         const apiError = error as { response?: { data?: { message?: string } } };
         const errorMessage = apiError?.response?.data?.message || "Failed to verify email. Please try again.";
         setError(errorMessage);
-        toast({
-          variant: "destructive",
-          title: "Verification Failed",
-          description: errorMessage,
-        });
+        toast.error(errorMessage);
       }
     };
 

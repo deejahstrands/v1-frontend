@@ -41,33 +41,21 @@ function ResetPasswordForm() {
       setToken(tokenFromParams);
     } else {
       // If no token, redirect to forgot password page
-      toast({
-        variant: "destructive",
-        title: "Invalid Reset Link",
-        description: "This reset link is invalid or has expired. Please request a new password reset.",
-      });
+      toast.error("This reset link is invalid or has expired. Please request a new password reset.");
       router.push('/auth/forgot-password');
     }
   }, [searchParams, router, toast]);
 
   const handleSubmit = async (values: ResetPasswordFormData, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
     if (!token) {
-      toast({
-        variant: "destructive",
-        title: "Invalid Token",
-        description: "Reset token is missing. Please request a new password reset.",
-      });
+      toast.error("Reset token is missing. Please request a new password reset.");
       return;
     }
 
     try {
       await resetPassword(token, values.password);
       
-      toast({
-        variant: "success",
-        title: "Password Reset Successful",
-        description: "Your password has been successfully reset. You can now log in with your new password.",
-      });
+      toast.success("Your password has been successfully reset. You can now log in with your new password.");
       
       // Redirect to login page after successful reset
       setTimeout(() => {
@@ -77,11 +65,7 @@ function ResetPasswordForm() {
       const apiError = error as { response?: { data?: { message?: string } } };
       const errorMessage = apiError?.response?.data?.message || "There was an error resetting your password. Please try again.";
       
-      toast({
-        variant: "destructive",
-        title: "Reset Failed",
-        description: errorMessage,
-      });
+      toast.error(errorMessage);
     } finally {
       setSubmitting(false);
     }

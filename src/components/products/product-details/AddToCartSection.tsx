@@ -33,6 +33,8 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
   const removeFromWishlist = useWishlist(state => state.removeFromWishlist);
   const isInWishlist = useWishlist(state => state.isInWishlist);
 
+  const { toast } = useToast();
+
   // Handle hydration
   React.useEffect(() => {
     setIsHydrated(true);
@@ -54,23 +56,13 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
       consultation: consultation ?? undefined,
       delivery: selectedDelivery,
     });
-    toast({
-      variant: "success",
-      title: "Added to Cart",
-      description: `${product.title} has been added to your cart.`,
-    });
+    toast.success(`${product.title} has been added to your cart.`);
   };
-
-  const { toast } = useToast();
 
   const handleWishlistToggle = () => {
     if (isInWishlist(product.id)) {
       removeFromWishlist(product.id);
-      toast({
-        variant: "default",
-        title: "Removed from Wishlist",
-        description: `${product.title} has been removed from your wishlist.`,
-      });
+      toast.info(`${product.title} has been removed from your wishlist.`);
     } else {
       addToWishlist({
         productId: product.id,
@@ -79,11 +71,7 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
         image: product.image,
         category: product.category,
       });
-      toast({
-        variant: "success",
-        title: "Added to Wishlist",
-        description: `${product.title} has been added to your wishlist.`,
-      });
+      toast.success(`${product.title} has been added to your wishlist.`);
     }
   };
 

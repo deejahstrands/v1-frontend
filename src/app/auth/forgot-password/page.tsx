@@ -38,11 +38,7 @@ export default function ForgotPasswordPage() {
       const apiError = error as { response?: { data?: { message?: string } } };
       const errorMessage = apiError?.response?.data?.message || "There was an error sending the reset email. Please try again.";
       
-      toast({
-        variant: "destructive",
-        title: "Failed to Send",
-        description: errorMessage,
-      });
+      toast.error(errorMessage);
     } finally {
       setSubmitting(false);
     }

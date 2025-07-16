@@ -42,11 +42,7 @@ function AccountCreatedSuccessForm() {
 
   const handleResendEmail = async () => {
     if (!userEmail) {
-      toast({
-        variant: "destructive",
-        title: "Email Not Found",
-        description: "Unable to find your email address. Please try signing up again.",
-      });
+      toast.error("Unable to find your email address. Please try signing up again.");
       return;
     }
 
@@ -54,28 +50,16 @@ function AccountCreatedSuccessForm() {
     try {
       await resendVerification(userEmail);
       
-      toast({
-        variant: "success",
-        title: "Email Sent",
-        description: "Verification email has been resent to your inbox.",
-      });
+      toast.success("Verification email has been resent to your inbox.");
     } catch (error: unknown) {
       const apiError = error as ApiError;
       const errorMessage = apiError?.response?.data?.message || "There was an error sending the email. Please try again.";
       
       // Handle specific error cases
       if (apiError?.response?.data?.name === 'UserAlreadyVerifiedError') {
-        toast({
-          variant: "destructive",
-          title: "Already Verified",
-          description: "Your email is already verified. You can now log in to your account.",
-        });
+        toast.error("Your email is already verified. You can now log in to your account.");
       } else {
-        toast({
-          variant: "destructive",
-          title: "Failed to Resend",
-          description: errorMessage,
-        });
+        toast.error(errorMessage);
       }
     } finally {
       setIsResending(false);

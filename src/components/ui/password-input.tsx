@@ -53,10 +53,10 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
           </button>
         </div>
         {error && (
-          <p className="text-sm text-red-600">{error}</p>
+          <p className="text-[10px] text-red-600">{error}</p>
         )}
         {helperText && !error && (
-          <p className="text-sm text-gray-500">{helperText}</p>
+          <p className="text-[10px] text-gray-500">{helperText}</p>
         )}
       </div>
     );

@@ -29,20 +29,12 @@ export default function UserLoginPage() {
         password: values.password,
       });
       
-      toast({
-        variant: "success",
-        title: "Login Successful",
-        description: "Welcome back! You have been successfully logged in.",
-      });
+      toast.success("Welcome back! You have been successfully logged in.");
       
       // Redirect to home page or dashboard
       router.push('/');
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Login Failed",
-        description: error.response?.data?.message || "Invalid email or password. Please try again.",
-      });
+      toast.error(error.response?.data?.message || "Invalid email or password. Please try again.");
     } finally {
       setSubmitting(false);
     }
