@@ -49,7 +49,7 @@ export default function UserSignupPage() {
       {/* Left: Form Side */}
       <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-8 py-8 bg-white">
         <div className="w-full max-w-md mx-auto">
-          <div className="flex flex-col items-center mb-8">
+          <div className="flex flex-col items-center mb-2">
             <div className="w-14 h-14 bg-[#C9A898] rounded-full flex items-center justify-center mb-4">
               <span className="text-white font-bold text-lg">DS</span>
             </div>
@@ -141,7 +141,7 @@ export default function UserSignupPage() {
             Already have an account? <a href="/auth/login" className="font-semibold underline">Sign In</a>
           </div>
         </div>
-        <footer className="mt-8 text-xs text-gray-400 text-center w-full">
+        <footer className="mt-4 text-xs text-gray-400 text-center w-full">
           Copyright &copy; {new Date().getFullYear()} Deejah Strands
         </footer>
       </div>

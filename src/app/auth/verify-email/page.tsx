@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/store/use-auth';
 
@@ -14,9 +14,8 @@ function EmailVerificationForm() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const token = searchParams.get('token');
     const verifyEmailToken = async () => {
-      const token = searchParams.get('token');
-      
       if (!token) {
         setError('Invalid verification link. Please check your email for the correct link.');
         return;
@@ -40,7 +39,8 @@ function EmailVerificationForm() {
     };
 
     verifyEmailToken();
-  }, [searchParams, verifyEmail, toast, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   if (error) {
     return (
