@@ -2,6 +2,7 @@ import * as Accordion from '@radix-ui/react-accordion';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDelivery } from '@/store/use-delivery';
+import { Info } from 'lucide-react';
 
 interface DeliveryOption {
   label: string;
@@ -19,6 +20,7 @@ interface ProductDeliveryAccordionProps {
 
 const ProductDeliveryAccordion: React.FC<ProductDeliveryAccordionProps> = ({ delivery }) => {
   const [openType, setOpenType] = useState<string>('');
+  const [showProcessingInfo, setShowProcessingInfo] = useState(false);
   const setSelected = useDelivery(state => state.setSelected);
   const selected = useDelivery(state => state.selected);
 
@@ -43,8 +45,31 @@ const ProductDeliveryAccordion: React.FC<ProductDeliveryAccordionProps> = ({ del
         <Accordion.Item value={d.type} key={d.type} className="border-b border-gray-200">
           <Accordion.Header>
             <Accordion.Trigger className="flex w-full justify-between items-center px-4 py-3 text-left font-medium text-sm sm:text-base focus:outline-none">
-              <span>
+              <span className="flex items-center gap-2">
                 {d.type}
+                {d.type === 'Processing Time' && (
+                  <div className="relative">
+                    <div
+                      className="w-5 h-5 bg-black rounded-full flex items-center justify-center text-white text-xs hover:bg-gray-800 transition-colors cursor-pointer"
+                      onMouseEnter={() => setShowProcessingInfo(true)}
+                      onMouseLeave={() => setShowProcessingInfo(false)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowProcessingInfo(!showProcessingInfo);
+                      }}
+                    >
+                      <Info className="w-3 h-3" />
+                    </div>
+                    {showProcessingInfo && (
+                      <div className="absolute top-0 left-full ml-3 min-w-[176px] h-auto px-4 py-3 bg-[#98A2B3] text-white text-sm rounded-lg shadow-xl z-50">
+                        <div className="text-gray-100 leading-relaxed">
+                          Processing time refers to how long it takes to prepare your custom order after payment is made. It does not include shipping time.
+                        </div>
+                        <div className="absolute top-4 -left-2 w-0 h-0 border-t-2 border-b-2 border-r-2 border-l-0 border-transparent border-r-[#98A2B3]"></div>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {selected[d.type] && (
                   <span className="ml-2 text-xs sm:text-sm text-gray-500 font-normal">
                     (

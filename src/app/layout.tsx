@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { LayoutWrapper } from "@/components/common/layout-wrapper";
+import { LoginModalProvider } from "@/components/auth/login-modal-provider";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" data-theme="light">
       <body className={`${satoshi.variable} ${ethereal.variable} antialiased min-h-screen flex flex-col`}>
         <LayoutWrapper>{children}</LayoutWrapper>
+        <LoginModalProvider />
         <ToastContainer
           position="top-right"
           autoClose={5000}

@@ -143,14 +143,10 @@ export function Header() {
               {/* Mobile menu button */}
               <button
                 type="button"
-                className="lg:hidden p-2 text-tertiary hover:text-tertiary relative"
+                className="lg:hidden p-2 text-tertiary hover:text-tertiary"
                 onClick={() => setIsMobileMenuOpen(true)}
               >
-                <ShoppingBag className="h-5 w-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
-                )}
-                <Menu className="h-6 w-6 ml-2" />
+                <Menu className="h-6 w-6" />
               </button>
             </div>
           </div>

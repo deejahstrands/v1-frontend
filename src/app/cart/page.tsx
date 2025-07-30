@@ -1,10 +1,12 @@
 'use client'
 
-import { Banner } from '@/components/common/banner';
+import { BannerSection } from '@/components/common/banner-section';
+import { Breadcrumb } from '@/components/common/breadcrumb';
 import { SectionContainer } from '@/components/common/section-container';
 import React from 'react';
 import { useCart } from '@/store/use-cart';
 import CartItemCard from '@/components/common/cart/CartItemCard';
+import { EmptyCartState } from '@/components/cart/empty-cart-state';
 import type { CartItem } from '@/store/use-cart';
 
 export default function CartPage() {
@@ -22,21 +24,30 @@ export default function CartPage() {
 
   return (
     <div>
-      <Banner
+      <BannerSection
         title="SHOPPING CART"
         description="View all your products to be purchased here"
         bgImage="/images/bg2.svg"
+        breadcrumb={
+          <Breadcrumb
+            items={[
+              { label: 'Home', href: '/' },
+              { label: 'Cart' }
+            ]}
+          />
+        }
       />
+      
       <SectionContainer>
-        <div className="flex flex-col lg:flex-row gap-8 mt-8">
-          {/* Cart Items Side */}
-          <div className="flex-1 min-w-0">
-            <h2 className="text-xl md:text-2xl font-ethereal font-semibold mb-6">YOUR CART</h2>
-            <div className="space-y-6">
-              {items.length === 0 ? (
-                <div className="text-gray-500">Your cart is empty.</div>
-              ) : (
-                items.map((item) => (
+        {items.length === 0 ? (
+          <EmptyCartState />
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-8 mt-8">
+            {/* Cart Items Side */}
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl md:text-2xl font-ethereal font-semibold mb-6">YOUR CART</h2>
+              <div className="space-y-6">
+                {items.map((item) => (
                   <CartItemCard
                     key={item.productId}
                     item={item}
@@ -44,17 +55,17 @@ export default function CartPage() {
                     onIncrease={() => handleIncrease(item)}
                     onDecrease={() => handleDecrease(item)}
                   />
-                ))
-              )}
+                ))}
+              </div>
+            </div>
+            {/* Summary Side */}
+            <div className="w-full lg:w-[350px] flex-shrink-0">
+              <div className="bg-white rounded-xl p-6 shadow-sm sticky top-24">
+                Cart summary panel goes here
+              </div>
             </div>
           </div>
-          {/* Summary Side */}
-          <div className="w-full lg:w-[350px] flex-shrink-0">
-            <div className="bg-white rounded-xl p-6 shadow-sm sticky top-24">
-              Cart summary panel goes here
-            </div>
-          </div>
-        </div>
+        )}
       </SectionContainer>
     </div>
   );

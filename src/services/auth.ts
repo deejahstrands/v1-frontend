@@ -86,7 +86,7 @@ export const authService = {
 
   // Signup user
   async signup(credentials: SignupCredentials): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/auth/signup', credentials);
+    const response = await api.post<AuthResponse>('/auth/register', credentials);
     const { accessToken } = response.data;
     
     // Store token in cookie

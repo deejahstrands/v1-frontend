@@ -2,6 +2,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { Formik, Form, Field } from 'formik';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
@@ -46,7 +47,9 @@ export default function UserLoginPage() {
       <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-8 py-8 bg-white">
         <div className="w-full max-w-md mx-auto">
           <div className="flex flex-col items-center mb-8">
-            <Image src="/logo/auth-logo.svg" alt="Logo" width={56} height={56} className="mb-4" />
+            <Link href="/" className="cursor-pointer hover:opacity-80 transition-opacity">
+              <Image src="/logo/auth-logo.svg" alt="Logo" width={56} height={56} className="mb-4" />
+            </Link>
             <h2 className="text-2xl font-semibold text-center mb-1">Welcome back</h2>
             <p className="text-gray-500 text-center mb-6">Welcome back! Please enter your details.</p>
           </div>
@@ -123,7 +126,7 @@ export default function UserLoginPage() {
         {/* Main image card flush right */}
         <div className="relative z-10 w-full h-full flex items-center justify-end">
           <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-lg flex items-end">
-            <Image src="https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945494/03_cqknsn.png" alt="Login Visual" fill className="object-cover w-full h-full" />
+            <Image src="https://res.cloudinary.com/dhnanmyf3/image/upload/v1753709582/20_wrxtjv.png" alt="Login Visual" fill className="object-cover w-full h-full" />
             {/* Caption overlays on image card */}
             <div className="absolute bottom-0 left-0 right-0 z-20 p-6 backdrop-blur-2xl bg-secondary/30 text-white text-sm md:text-base rounded-b-2xl">
               <p>Explore our curated collections, and get personalized hair recommendations — all in one place.<br />Because you deserve a hair experience as flawless as you are.</p>

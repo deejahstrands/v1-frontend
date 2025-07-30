@@ -12,7 +12,7 @@ export default function HomePage() {
       <HeroSection
         data={{
           backgroundType: "video",
-          backgroundUrl: "https://res.cloudinary.com/dwpetnbf1/video/upload/v1750945562/19v_w20zdi.mp4",
+          backgroundUrl: "https://res.cloudinary.com/dhnanmyf3/video/upload/v1753709630/19v_fbxnd3.mp4",
           title: "LUXURY HAIR THAT SPEAKS FOR YOU",
           description: "Experience the finest raw and virgin hair — flawlessly customized for your look, lifestyle, and legacy.",
           shopNowLink: "/collections",

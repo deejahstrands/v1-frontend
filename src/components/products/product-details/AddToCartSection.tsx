@@ -4,9 +4,12 @@ import React, { useState } from 'react';
 import { useProductCustomization } from '@/store/use-product-customization';
 import { useConsultation } from '@/store/use-consultation';
 import { useDelivery } from '@/store/use-delivery';
+import { useMeasurements } from '@/store/use-measurements';
 import { useCart } from '@/store/use-cart';
 import { useWishlist } from '@/store/use-wishlist';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/store/use-auth';
+import { useLoginModal } from '@/hooks/use-login-modal';
 
 interface AddToCartSectionProps {
   product: {
@@ -26,12 +29,17 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
   const consultation = useConsultation(state => state.enabled ? state.data : undefined);
   const deliveryTotal = useDelivery(state => state.getTotalPrice());
   const selectedDelivery = useDelivery(state => state.selected);
+  const measurements = useMeasurements(state => state.data);
   const addToCart = useCart(state => state.addToCart);
   
   // Wishlist functionality
   const addToWishlist = useWishlist(state => state.addToWishlist);
   const removeFromWishlist = useWishlist(state => state.removeFromWishlist);
   const isInWishlist = useWishlist(state => state.isInWishlist);
+
+  // Auth and login modal
+  const { isAuthenticated } = useAuth();
+  const { openModal } = useLoginModal();
 
   const { toast } = useToast();
 
@@ -46,6 +54,25 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
   const totalPrice = singleTotal * quantity;
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      openModal("Add Item to Cart", () => {
+        // This will be called after successful login
+        addToCart({
+          productId: product.id,
+          basePrice,
+          customizations: selectedCustomizations,
+          customizationTotal,
+          totalPrice: singleTotal,
+          quantity,
+          consultation: consultation ?? undefined,
+          delivery: selectedDelivery,
+          measurements: measurements.hasMeasurements ? measurements : undefined,
+        });
+        toast.success(`${product.title} has been added to your cart.`);
+      });
+      return;
+    }
+
     addToCart({
       productId: product.id,
       basePrice,
@@ -55,11 +82,27 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
       quantity,
       consultation: consultation ?? undefined,
       delivery: selectedDelivery,
+      measurements: measurements.hasMeasurements ? measurements : undefined,
     });
     toast.success(`${product.title} has been added to your cart.`);
   };
 
   const handleWishlistToggle = () => {
+    if (!isAuthenticated) {
+      openModal("Add Item to Wishlist", () => {
+        // This will be called after successful login
+        addToWishlist({
+          productId: product.id,
+          title: product.title,
+          price: product.price,
+          image: product.image,
+          category: product.category,
+        });
+        toast.success(`${product.title} has been added to your wishlist.`);
+      });
+      return;
+    }
+
     if (isInWishlist(product.id)) {
       removeFromWishlist(product.id);
       toast.info(`${product.title} has been removed from your wishlist.`);

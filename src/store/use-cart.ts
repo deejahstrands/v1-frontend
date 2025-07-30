@@ -12,6 +12,14 @@ interface ConsultationData {
   description?: string
 }
 
+interface MeasurementsData {
+  hasMeasurements: string
+  earToEar: string
+  headCircumference: string
+  hairlinePictures: File | null
+  styleReference: File | null
+}
+
 interface CartItem {
   productId: string
   basePrice: number
@@ -21,6 +29,7 @@ interface CartItem {
   quantity: number
   consultation?: ConsultationData
   delivery?: { [type: string]: { label: string; price: number } }
+  measurements?: MeasurementsData
 }
 
 export type { CartItem };

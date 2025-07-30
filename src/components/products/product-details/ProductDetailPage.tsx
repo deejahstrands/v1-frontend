@@ -7,11 +7,11 @@ import ProductInfoPanel from "./ProductInfoPanel";
 import ProductTabs from "./ProductTabs";
 import { Product } from "@/store/use-products";
 import ProductCustomization from "./ProductCustomization";
-import ConsultationCard from "./ConsultationCard";
 import ProductDeliveryAccordion from "./ProductDeliveryAccordion";
 import AddToCartSection from "./AddToCartSection";
 import OthersAccordion from "@/components/common/others-accordion/OthersAccordion";
 import RelatedProductsSection from "./RelatedProductsSection";
+import { MeasurementsAndPreferences } from "./MeasurementsAndPreferences";
 
 const ProductImageCarousel = dynamic(() => import("./ProductImageCarousel"), { ssr: false });
 
@@ -32,18 +32,26 @@ export default function ProductDetailPage({ product }: { product: Product }) {
               <ProductTabs description={<div>{product.description}</div>} product={product} />
             </div>
           </div>
-          {/* Right Side: Product Info */}
+          {/* Right Side: Product Info with fixed height and internal scrolling */}
           <div className="lg:col-span-5">
-            <ProductInfoPanel product={product} />
-            <ProductCustomization customizations={product.customizations || []} />
-            <ConsultationCard />
-            <ProductDeliveryAccordion delivery={product.delivery || []} />
-            <AddToCartSection product={product} />
-            {/* ProductTabs (mobile only) */}
-            <div className="block lg:hidden mt-6">
-              <ProductTabs description={<div>{product.description}</div>} product={product} />
+            <div className="lg:sticky lg:top-8 lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto lg:pr-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="space-y-6">
+                <ProductInfoPanel product={product} />
+                <ProductCustomization customizations={product.customizations || []} />
+                {product.customization && (
+                  <div>
+                    <MeasurementsAndPreferences />
+                  </div>
+                )}
+                <ProductDeliveryAccordion delivery={product.delivery || []} />
+                <AddToCartSection product={product} />
+                {/* ProductTabs (mobile only) */}
+                <div className="block lg:hidden">
+                  <ProductTabs description={<div>{product.description}</div>} product={product} />
+                </div>
+                <OthersAccordion />
+              </div>
             </div>
-            <OthersAccordion />
           </div>
         </div>
       </SectionContainer>

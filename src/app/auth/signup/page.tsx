@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { Formik, Form } from 'formik';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
@@ -50,9 +51,11 @@ export default function UserSignupPage() {
       <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-8 py-8 bg-white">
         <div className="w-full max-w-md mx-auto">
           <div className="flex flex-col items-center mb-8">
-            <div className="w-14 h-14 bg-[#C9A898] rounded-full flex items-center justify-center mb-4">
-              <span className="text-white font-bold text-lg">DS</span>
-            </div>
+            <Link href="/" className="cursor-pointer hover:opacity-80 transition-opacity">
+              <div className="w-14 h-14 bg-[#C9A898] rounded-full flex items-center justify-center mb-4">
+                <span className="text-white font-bold text-lg">DS</span>
+              </div>
+            </Link>
             <h2 className="text-2xl font-semibold text-center mb-1">Welcome to Deejah Strands</h2>
             <p className="text-gray-500 text-center mb-6">Enter your details below to setup your account.</p>
           </div>
@@ -153,7 +156,7 @@ export default function UserSignupPage() {
         {/* Main image card flush right */}
         <div className="relative z-10 w-full h-full flex items-center justify-end">
                       <div className="relative w-full h-full overflow-hidden flex items-end">
-              <Image src="https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945539/16_nbayoa.jpg" alt="Signup Visual" fill className="object-cover w-full h-full" />
+              <Image src="https://res.cloudinary.com/dhnanmyf3/image/upload/v1753709757/16_gappbe.jpg" alt="Signup Visual" fill className="object-cover w-full h-full" />
               {/* Dark overlay for better pattern visibility */}
               <div className="absolute inset-0 bg-black/30 z-10"></div>
               {/* Content overlays on image card */}
