@@ -9,6 +9,7 @@ interface BannerSectionProps {
   breadcrumb?: React.ReactNode;
   bgImage?: string;
   className?: string;
+  disableAnimation?: boolean;
 }
 
 export function BannerSection({
@@ -17,7 +18,39 @@ export function BannerSection({
   breadcrumb,
   bgImage = "/images/banner.svg",
   className = "",
+  disableAnimation = false,
 }: BannerSectionProps) {
+  const BannerContent = (
+    <div className={`pt-6 lg:pt-10 ${className}`}>
+      <SectionContainer>
+        <div
+          className="relative rounded-2xl overflow-hidden shadow-lg min-h-[200px] md:min-h-[320px] flex items-end justify-center bg-black/70"
+          style={{
+            backgroundImage: `url('${bgImage}')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div className="relative z-10 w-full p-8 md:p-16 flex flex-col items-center justify-end text-center bg-black/40">
+            <h1 className="text-xl md:text-5xl font-ethereal font-semibold text-white mb-2 md:mb-4 drop-shadow-lg">
+              {title}
+            </h1>
+            <p className="text-xs md:text-lg text-white mb-4 max-w-2xl drop-shadow">
+              {description}
+            </p>
+            {breadcrumb && (
+              <div className="text-xs text-white/80">{breadcrumb}</div>
+            )}
+          </div>
+        </div>
+      </SectionContainer>
+    </div>
+  );
+
+  if (disableAnimation) {
+    return BannerContent;
+  }
+
   return (
     <div className={`pt-6 lg:pt-10 ${className}`}>
       <SectionContainer>

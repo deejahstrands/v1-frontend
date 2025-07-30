@@ -4,6 +4,7 @@ interface MeasurementsData {
   hasMeasurements: string;
   earToEar: string;
   headCircumference: string;
+  foreheadToNape: string;
   hairlinePictures: File | null;
   styleReference: File | null;
 }
@@ -20,6 +21,7 @@ const initialData: MeasurementsData = {
   hasMeasurements: '',
   earToEar: '',
   headCircumference: '',
+  foreheadToNape: '',
   hairlinePictures: null,
   styleReference: null,
 };

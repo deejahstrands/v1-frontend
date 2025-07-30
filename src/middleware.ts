@@ -21,7 +21,7 @@ export function middleware(request: NextRequest) {
   // User-only routes protection
   const userProtectedRoutes = ["/cart", "/account"];
   if (userProtectedRoutes.some((route) => pathname.startsWith(route))) {
-    const isUser = Boolean(request.cookies.get("user-auth-token"));
+    const isUser = Boolean(request.cookies.get("accessToken"));
     if (!isUser) {
       return NextResponse.redirect(new URL("/auth/login", request.url));
     }

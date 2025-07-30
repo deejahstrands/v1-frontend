@@ -9,6 +9,7 @@ interface DeliveryState {
   selected: { [type: string]: DeliveryOption };
   setSelected: (type: string, option: DeliveryOption) => void;
   getTotalPrice: () => number;
+  reset: () => void;
 }
 
 export const useDelivery = create<DeliveryState>((set, get) => ({
@@ -17,6 +18,7 @@ export const useDelivery = create<DeliveryState>((set, get) => ({
     selected: { ...state.selected, [type]: option },
   })),
   getTotalPrice: () => {
-    return Object.values(get().selected).reduce((sum, opt) => sum + (opt.price || 0), 0);
+    return Object.values(get().selected).reduce((sum, opt) => sum + opt.price, 0);
   },
+  reset: () => set({ selected: {} }),
 })); 

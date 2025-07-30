@@ -3,14 +3,22 @@
 import { BannerSection } from '@/components/common/banner-section';
 import { Breadcrumb } from '@/components/common/breadcrumb';
 import { SectionContainer } from '@/components/common/section-container';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '@/store/use-cart';
-import CartItemCard from '@/components/common/cart/CartItemCard';
+import { CartItemCard } from '@/components/cart/cart-item-card';
+import { CartTotalsSection } from '@/components/cart/cart-totals-section';
 import { EmptyCartState } from '@/components/cart/empty-cart-state';
+import { CartLoadingSkeleton } from '@/components/cart/cart-loading-skeleton';
 import type { CartItem } from '@/store/use-cart';
 
 export default function CartPage() {
   const { items, removeFromCart, addToCart } = useCart();
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Handle hydration
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const handleIncrease = (item: CartItem) => {
     addToCart({ ...item, quantity: item.quantity + 1 });
@@ -22,12 +30,18 @@ export default function CartPage() {
     }
   };
 
+  const handleProceedToCheckout = () => {
+    // TODO: Implement checkout logic
+    console.log('Proceeding to checkout...');
+  };
+
   return (
-    <div>
+    <div className="pb-8 lg:pb-12">
       <BannerSection
         title="SHOPPING CART"
         description="View all your products to be purchased here"
         bgImage="/images/bg2.svg"
+        disableAnimation={!isHydrated}
         breadcrumb={
           <Breadcrumb
             items={[
@@ -39,7 +53,9 @@ export default function CartPage() {
       />
       
       <SectionContainer>
-        {items.length === 0 ? (
+        {!isHydrated ? (
+          <CartLoadingSkeleton />
+        ) : items.length === 0 ? (
           <EmptyCartState />
         ) : (
           <div className="flex flex-col lg:flex-row gap-8 mt-8">
@@ -59,10 +75,8 @@ export default function CartPage() {
               </div>
             </div>
             {/* Summary Side */}
-            <div className="w-full lg:w-[350px] flex-shrink-0">
-              <div className="bg-white rounded-xl p-6 shadow-sm sticky top-24">
-                Cart summary panel goes here
-              </div>
+            <div className="w-full lg:w-[400px] flex-shrink-0 lg:border-l lg:border-gray-200 lg:pl-8">
+              <CartTotalsSection onProceedToCheckout={handleProceedToCheckout} />
             </div>
           </div>
         )}

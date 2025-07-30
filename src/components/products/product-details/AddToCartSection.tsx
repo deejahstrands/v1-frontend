@@ -10,6 +10,7 @@ import { useWishlist } from '@/store/use-wishlist';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/store/use-auth';
 import { useLoginModal } from '@/hooks/use-login-modal';
+import { useCartPrice } from '@/lib/price-calculations';
 
 interface AddToCartSectionProps {
   product: {
@@ -18,19 +19,23 @@ interface AddToCartSectionProps {
     title: string;
     image?: string;
     category?: string;
+    specifications?: { type: string; value: string }[];
   };
 }
 
 const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
   const [isHydrated, setIsHydrated] = useState(false);
-  const customizationTotal = useProductCustomization(state => state.getTotalPrice());
   const selectedCustomizations = useProductCustomization(state => state.selected);
   const consultation = useConsultation(state => state.enabled ? state.data : undefined);
-  const deliveryTotal = useDelivery(state => state.getTotalPrice());
   const selectedDelivery = useDelivery(state => state.selected);
   const measurements = useMeasurements(state => state.data);
   const addToCart = useCart(state => state.addToCart);
+  
+  // Store reset functions
+  const resetCustomization = useProductCustomization(state => state.reset);
+  const resetDelivery = useDelivery(state => state.reset);
+  const resetMeasurements = useMeasurements(state => state.reset);
   
   // Wishlist functionality
   const addToWishlist = useWishlist(state => state.addToWishlist);
@@ -48,10 +53,20 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
     setIsHydrated(true);
   }, []);
 
-  const basePrice = Number(product.price.replace(/[^0-9.-]+/g, ""));
-  const consultationPrice = consultation?.price || 0;
-  const singleTotal = basePrice + customizationTotal + consultationPrice + deliveryTotal;
+  // Use shared price calculation
+  const { basePrice, customizationTotal, totalPrice: singleTotal } = useCartPrice(product.price);
   const totalPrice = singleTotal * quantity;
+
+  const clearAllSelections = () => {
+    resetCustomization();
+    resetDelivery();
+    resetMeasurements();
+    setQuantity(1);
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleAddToCart = () => {
     if (!isAuthenticated) {
@@ -59,6 +74,8 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
         // This will be called after successful login
         addToCart({
           productId: product.id,
+          title: product.title,
+          image: product.image,
           basePrice,
           customizations: selectedCustomizations,
           customizationTotal,
@@ -67,14 +84,19 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
           consultation: consultation ?? undefined,
           delivery: selectedDelivery,
           measurements: measurements.hasMeasurements ? measurements : undefined,
+          specifications: product.specifications,
         });
         toast.success(`${product.title} has been added to your cart.`);
+        clearAllSelections();
+        scrollToTop();
       });
       return;
     }
 
     addToCart({
       productId: product.id,
+      title: product.title,
+      image: product.image,
       basePrice,
       customizations: selectedCustomizations,
       customizationTotal,
@@ -83,8 +105,11 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
       consultation: consultation ?? undefined,
       delivery: selectedDelivery,
       measurements: measurements.hasMeasurements ? measurements : undefined,
+      specifications: product.specifications,
     });
     toast.success(`${product.title} has been added to your cart.`);
+    clearAllSelections();
+    scrollToTop();
   };
 
   const handleWishlistToggle = () => {

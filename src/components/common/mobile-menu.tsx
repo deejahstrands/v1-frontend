@@ -4,9 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
-import { X, ChevronLeft, ChevronRight, User } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, User, Heart, ShoppingBag } from "lucide-react";
 import clsx from "clsx";
 import type { User as UserType } from "@/services/auth";
+import { useCart } from '@/store/use-cart';
+import { useLoginModal } from '@/hooks/use-login-modal';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -29,6 +31,28 @@ export function MobileMenu({
 }: MobileMenuProps) {
   const pathname = usePathname();
   const [showCategories, setShowCategories] = useState(false);
+  const cartCount = useCart(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
+  const { openModal } = useLoginModal();
+
+  const handleCartClick = (e: React.MouseEvent) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      openModal("View Cart", () => {
+        // After login, user can access cart
+        window.location.href = '/cart';
+      });
+    }
+  };
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      openModal("View Wishlist", () => {
+        // After login, user can access wishlist
+        window.location.href = '/account/wishlist';
+      });
+    }
+  };
 
   const handleClose = () => {
     setShowCategories(false);
@@ -124,9 +148,56 @@ export function MobileMenu({
                                 <ChevronRight className="h-5 w-5" />
                               </button>
                               
+                              {/* Cart and Wishlist Icons */}
+                              <div className="flex items-center justify-center space-x-4 mt-6">
+                                {isLoggedIn ? (
+                                  <>
+                                    <Link
+                                      href="/account/wishlist"
+                                      className="flex items-center justify-center w-12 h-12 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
+                                      onClick={handleClose}
+                                    >
+                                      <Heart className="h-6 w-6" />
+                                    </Link>
+                                    <Link
+                                      href="/cart"
+                                      className="flex items-center justify-center w-12 h-12 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg relative"
+                                      onClick={handleClose}
+                                    >
+                                      <ShoppingBag className="h-6 w-6" />
+                                      {cartCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">
+                                          {cartCount}
+                                        </span>
+                                      )}
+                                    </Link>
+                                  </>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={handleWishlistClick}
+                                      className="flex items-center justify-center w-12 h-12 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
+                                    >
+                                      <Heart className="h-6 w-6" />
+                                    </button>
+                                    <button
+                                      onClick={handleCartClick}
+                                      className="flex items-center justify-center w-12 h-12 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg relative"
+                                    >
+                                      <ShoppingBag className="h-6 w-6" />
+                                      {cartCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">
+                                          {cartCount}
+                                        </span>
+                                      )}
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+
                               {/* Login/Account Button */}
                               {isLoggedIn ? (
-                                <div className="space-y-2 mt-8">
+                                <div className="space-y-2 mt-6">
                                   <Link
                                     href="/account"
                                     className="flex items-center justify-center w-full px-3 py-3 text-base font-medium text-white bg-black hover:bg-gray-900 rounded-lg"
@@ -150,7 +221,7 @@ export function MobileMenu({
                               ) : (
                                 <Link
                                   href="/auth/login"
-                                  className="flex items-center justify-center w-full px-3 py-3 text-base font-medium text-white bg-black hover:bg-gray-900 rounded-lg mt-8"
+                                  className="flex items-center justify-center w-full px-3 py-3 text-base font-medium text-white bg-black hover:bg-gray-900 rounded-lg mt-6"
                                   onClick={handleClose}
                                 >
                                   <User className="h-5 w-5 mr-2" />

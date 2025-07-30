@@ -8,29 +8,33 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/store/use-auth";
 import { useLoginModal } from "@/hooks/use-login-modal";
+import { useCart } from "@/store/use-cart";
+import { useToast } from "@/hooks/use-toast";
 
 export function ProductCard({
   images,
   title,
   price,
   customization,
-  onAddToCart,
   onWishlist,
   isWishlisted,
   id,
+  specifications,
 }: {
   images: string[];
   title: string;
   price: string;
   customization: boolean;
-  onAddToCart?: () => void;
   onWishlist?: () => void;
   isWishlisted?: boolean;
   id: string;
+  specifications?: { type: string; value: string }[];
 }) {
   const [isHovered, setIsHovered] = useState(false);
   const { isAuthenticated } = useAuth();
   const { openModal } = useLoginModal();
+  const addToCart = useCart(state => state.addToCart);
+  const { toast } = useToast();
   
   // Use first image as default, second image on hover
   const defaultImage = images[0];
@@ -44,12 +48,37 @@ export function ProductCard({
     if (!isAuthenticated) {
       openModal("Add Item to Cart", () => {
         // This will be called after successful login
-        onAddToCart?.();
+        addProductToCart();
       });
       return;
     }
     
-    onAddToCart?.();
+    addProductToCart();
+  };
+
+  const addProductToCart = () => {
+    const basePrice = Number(price.replace(/[^0-9.-]+/g, ""));
+    
+    // Debug: Log specifications being passed to cart
+    console.log('ProductCard - Adding to cart with specifications:', specifications);
+    
+    addToCart({
+      productId: id,
+      title: title,
+      image: defaultImage,
+      basePrice: basePrice,
+      customizations: {},
+      customizationTotal: 0,
+      totalPrice: basePrice,
+      quantity: 1,
+      delivery: {
+        "Private Fitting": { label: "None", price: 0 },
+        "Processing Time": { label: "Default", price: 0 }
+      },
+      specifications: specifications
+    });
+    
+    toast.success(`${title} has been added to your cart.`);
   };
 
   const handleWishlist = (e: React.MouseEvent) => {

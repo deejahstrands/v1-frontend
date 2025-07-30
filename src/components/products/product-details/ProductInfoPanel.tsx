@@ -1,7 +1,7 @@
 import React from "react";
 import StarRating from "./StarRating";
 import Status from "./Status";
-import { useProductCustomization } from '@/store/use-product-customization';
+import { useProductDetailPrice } from '@/lib/price-calculations';
 
 interface Specification {
   type: string;
@@ -22,11 +22,8 @@ interface ProductInfoPanelProps {
 }
 
 const ProductInfoPanel: React.FC<ProductInfoPanelProps> = ({ product }) => {
-  const customizationTotal = useProductCustomization(state => state.getTotalPrice());
-  const basePrice = Number(product.price.replace(/[^0-9.-]+/g, ""));
-  const totalPrice = basePrice + customizationTotal;
-  const hasCustomization = customizationTotal > 0;
-
+  const { basePrice, totalPrice, hasCustomization } = useProductDetailPrice(product.price);
+  
   return (
     <div className="rounded-lg p-4 sm:p-6 space-y-4">
       {/* Product Name */}

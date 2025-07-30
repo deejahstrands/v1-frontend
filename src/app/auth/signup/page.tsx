@@ -144,7 +144,7 @@ export default function UserSignupPage() {
             Already have an account? <a href="/auth/login" className="font-semibold underline">Sign In</a>
           </div>
         </div>
-        <footer className="mt-8 text-xs text-gray-400 text-center w-full">
+        <footer className="mt-4 text-xs text-gray-400 text-center w-full">
           Copyright &copy; {new Date().getFullYear()} Deejah Strands
         </footer>
       </div>

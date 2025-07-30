@@ -1,5 +1,5 @@
 import * as Switch from '@radix-ui/react-switch';
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,21 +14,21 @@ const CONSULTATION_TYPES = [
 
 const schema = z.object({
   type: z.string().min(1, 'Select a consultation type'),
-  description: z.string().optional(),
 });
 
 type ConsultationFormValues = z.infer<typeof schema>;
 
 const ConsultationForm: React.FC<{ onSubmit: (data: ConsultationFormValues) => void }>
   = ({ onSubmit }) => {
-    const { control, register, handleSubmit, formState: { errors }, watch } = useForm<ConsultationFormValues>({
+    const { control, formState: { errors }, watch } = useForm<ConsultationFormValues>({
       resolver: zodResolver(schema),
-      defaultValues: { type: '', description: '' },
+      defaultValues: { type: '' },
     });
     const selectedType = watch('type');
     const selectedObj = CONSULTATION_TYPES.find(t => t.label === selectedType);
+    
     return (
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
+      <div className="space-y-4 mt-4">
         <div>
           <label className="block font-medium mb-1 text-sm">Consultation Type</label>
           <Controller
@@ -44,7 +44,10 @@ const ConsultationForm: React.FC<{ onSubmit: (data: ConsultationFormValues) => v
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-full bg-white min-w-[220px]">
                   {CONSULTATION_TYPES.map((c) => (
-                    <DropdownMenuItem key={c.label} onClick={() => field.onChange(c.label)}>
+                    <DropdownMenuItem key={c.label} onClick={() => {
+                      field.onChange(c.label);
+                      onSubmit({ type: c.label });
+                    }}>
                       {c.label} - ₦{c.price.toLocaleString()}
                     </DropdownMenuItem>
                   ))}
@@ -54,26 +57,22 @@ const ConsultationForm: React.FC<{ onSubmit: (data: ConsultationFormValues) => v
           />
           {errors.type && <span className="text-xs text-red-500">{errors.type.message}</span>}
         </div>
-        <div>
-          <label className="block font-medium mb-1 text-sm">Tell us about your hair goals (optional)</label>
-          <textarea
-            {...register('description')}
-            className="w-full border-[0.5px] border-[#E4E7EC] rounded-lg px-3 py-2 text-sm min-h-[100px]"
-            placeholder="Describe your desired look, lifestyle or any specific concern..."
-          />
-        </div>
-        {/* You can add a submit button if needed */}
-      </form>
+      </div>
     );
   };
 
 const ConsultationCard: React.FC = () => {
-  const [enabled, setEnabled] = useState(false);
+  const enabled = useConsultation(state => state.enabled);
   const setConsultation = useConsultation(state => state.setConsultation);
 
   const handleToggle = (checked: boolean) => {
-    setEnabled(checked);
-    if (!checked) setConsultation(false);
+    if (checked) {
+      // When turning on, don't set consultation data yet - wait for form submission
+      setConsultation(true);
+    } else {
+      // When turning off, clear the consultation
+      setConsultation(false);
+    }
   };
 
   const handleFormSubmit = (data: ConsultationFormValues) => {
@@ -81,7 +80,6 @@ const ConsultationCard: React.FC = () => {
     setConsultation(true, {
       type: data.type,
       price: typeObj?.price || 0,
-      description: data.description,
     });
   };
 

@@ -13,15 +13,18 @@ interface ConsultationData {
 }
 
 interface MeasurementsData {
-  hasMeasurements: string
-  earToEar: string
-  headCircumference: string
-  hairlinePictures: File | null
-  styleReference: File | null
+  hasMeasurements: string;
+  earToEar: string;
+  headCircumference: string;
+  foreheadToNape: string;
+  hairlinePictures: File | null;
+  styleReference: File | null;
 }
 
 interface CartItem {
   productId: string
+  title: string
+  image?: string
   basePrice: number
   customizations: { [type: string]: CustomizationOption }
   customizationTotal: number
@@ -30,6 +33,7 @@ interface CartItem {
   consultation?: ConsultationData
   delivery?: { [type: string]: { label: string; price: number } }
   measurements?: MeasurementsData
+  specifications?: { type: string; value: string }[]
 }
 
 export type { CartItem };
@@ -57,7 +61,6 @@ export const useCart = create<CartState>()(
     }),
     {
       name: 'cart-storage',
-      skipHydration: true,
     }
   )
 ) 

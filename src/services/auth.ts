@@ -115,7 +115,7 @@ export const authService = {
 
   // Verify email
   async verifyEmail(token: string): Promise<VerifyEmailResponse> {
-    const response = await api.patch<VerifyEmailResponse>('/auth/verify-email', { token });
+    const response = await api.patch<VerifyEmailResponse>(`/auth/verify-email?token=${token}`, undefined);
     return response.data;
   },
 
@@ -135,7 +135,7 @@ export const authService = {
       const token = getCookie('accessToken');
       if (!token) return null;
       
-      const response = await api.get<User>('/auth/me');
+      const response = await api.get<User>('/users/me');
       return response.data;
     } catch (error) {
       console.error('Error getting current user:', error);

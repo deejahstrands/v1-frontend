@@ -12,6 +12,7 @@ import { SectionContainer } from "./section-container";
 import { categories } from "@/data/categories";
 import { useCart } from '@/store/use-cart';
 import { useAuth } from '@/store/use-auth';
+import { useLoginModal } from '@/hooks/use-login-modal';
 
 const mainNavItems = [
   { label: "Home", href: "/" },
@@ -25,7 +26,28 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
+  const { openModal } = useLoginModal();
   const cartCount = useCart(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
+
+  const handleCartClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      openModal("View Cart", () => {
+        // After login, user can access cart
+        window.location.href = '/cart';
+      });
+    }
+  };
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      openModal("View Wishlist", () => {
+        // After login, user can access wishlist
+        window.location.href = '/account/wishlist';
+      });
+    }
+  };
 
   return (
     <>
@@ -125,15 +147,21 @@ export function Header() {
                   </>
                 ) : (
                   <>
-                    <Link href="/account/wishlist" className="p-2 text-tertiary hover:text-tertiary">
+                    <button
+                      onClick={handleWishlistClick}
+                      className="p-2 text-tertiary hover:text-tertiary"
+                    >
                       <Heart className="h-5 w-5" />
-                    </Link>
-                    <Link href="/cart" className="p-2 text-tertiary hover:text-tertiary relative">
+                    </button>
+                    <button
+                      onClick={handleCartClick}
+                      className="p-2 text-tertiary hover:text-tertiary relative"
+                    >
                       <ShoppingBag className="h-5 w-5" />
                       {cartCount > 0 && (
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
                       )}
-                    </Link>
+                    </button>
                     <Link href="/auth/login" className="hidden sm:inline-flex">
                       <Button variant="tertiary" className="w-full">Login</Button>
                     </Link>
