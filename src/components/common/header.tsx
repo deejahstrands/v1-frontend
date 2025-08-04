@@ -11,6 +11,7 @@ import { Button } from "./button";
 import { SectionContainer } from "./section-container";
 import { categories } from "@/data/categories";
 import { useCart } from '@/store/use-cart';
+import { useWishlist } from '@/store/use-wishlist';
 import { useAuth } from '@/store/use-auth';
 import { useLoginModal } from '@/hooks/use-login-modal';
 
@@ -28,6 +29,7 @@ export function Header() {
   const { isAuthenticated, user, logout } = useAuth();
   const { openModal } = useLoginModal();
   const cartCount = useCart(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
+  const wishlistCount = useWishlist(state => state.items.length);
 
   const handleCartClick = (e: React.MouseEvent) => {
     if (!isAuthenticated) {
@@ -118,8 +120,11 @@ export function Header() {
 
                 {isAuthenticated ? (
                   <>
-                    <Link href="/account/wishlist" className="p-2 text-tertiary hover:text-tertiary">
+                    <Link href="/account/wishlist" className="p-2 text-tertiary hover:text-tertiary relative">
                       <Heart className="h-5 w-5" />
+                      {wishlistCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{wishlistCount}</span>
+                      )}
                     </Link>
                     <Link href="/cart" className="p-2 text-tertiary hover:text-tertiary relative">
                       <ShoppingBag className="h-5 w-5" />
@@ -149,9 +154,12 @@ export function Header() {
                   <>
                     <button
                       onClick={handleWishlistClick}
-                      className="p-2 text-tertiary hover:text-tertiary"
+                      className="p-2 text-tertiary hover:text-tertiary relative"
                     >
                       <Heart className="h-5 w-5" />
+                      {wishlistCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{wishlistCount}</span>
+                      )}
                     </button>
                     <button
                       onClick={handleCartClick}

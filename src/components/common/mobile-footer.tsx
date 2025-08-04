@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { User, Search, Heart, ShoppingBag, Store } from "lucide-react";
 import { useCart } from '@/store/use-cart';
+import { useWishlist } from '@/store/use-wishlist';
 import { useLoginModal } from '@/hooks/use-login-modal';
 
 interface MobileFooterProps {
@@ -12,6 +13,7 @@ interface MobileFooterProps {
 
 export function MobileFooter({ isLoggedIn = false, onSearchClick }: MobileFooterProps) {
   const cartCount = useCart(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
+  const wishlistCount = useWishlist(state => state.items.length);
   const { openModal } = useLoginModal();
 
   const handleCartClick = (e: React.MouseEvent) => {
@@ -62,17 +64,23 @@ export function MobileFooter({ isLoggedIn = false, onSearchClick }: MobileFooter
         {isLoggedIn ? (
           <Link
             href="/account/wishlist"
-            className="flex flex-col items-center text-gray-600 hover:text-gray-900"
+            className="flex flex-col items-center text-gray-600 hover:text-gray-900 relative"
           >
             <Heart className="w-6 h-6" />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{wishlistCount}</span>
+            )}
             <span className="text-xs mt-1">Wishlist</span>
           </Link>
         ) : (
           <button
             onClick={handleWishlistClick}
-            className="flex flex-col items-center text-gray-600 hover:text-gray-900"
+            className="flex flex-col items-center text-gray-600 hover:text-gray-900 relative"
           >
             <Heart className="w-6 h-6" />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{wishlistCount}</span>
+            )}
             <span className="text-xs mt-1">Wishlist</span>
           </button>
         )}

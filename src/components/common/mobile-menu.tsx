@@ -8,6 +8,7 @@ import { X, ChevronLeft, ChevronRight, User, Heart, ShoppingBag } from "lucide-r
 import clsx from "clsx";
 import type { User as UserType } from "@/services/auth";
 import { useCart } from '@/store/use-cart';
+import { useWishlist } from '@/store/use-wishlist';
 import { useLoginModal } from '@/hooks/use-login-modal';
 
 interface MobileMenuProps {
@@ -32,6 +33,7 @@ export function MobileMenu({
   const pathname = usePathname();
   const [showCategories, setShowCategories] = useState(false);
   const cartCount = useCart(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
+  const wishlistCount = useWishlist(state => state.items.length);
   const { openModal } = useLoginModal();
 
   const handleCartClick = (e: React.MouseEvent) => {
@@ -154,10 +156,15 @@ export function MobileMenu({
                                   <>
                                     <Link
                                       href="/account/wishlist"
-                                      className="flex items-center justify-center w-12 h-12 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
+                                      className="flex items-center justify-center w-12 h-12 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg relative"
                                       onClick={handleClose}
                                     >
                                       <Heart className="h-6 w-6" />
+                                      {wishlistCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">
+                                          {wishlistCount}
+                                        </span>
+                                      )}
                                     </Link>
                                     <Link
                                       href="/cart"
@@ -176,9 +183,14 @@ export function MobileMenu({
                                   <>
                                     <button
                                       onClick={handleWishlistClick}
-                                      className="flex items-center justify-center w-12 h-12 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg"
+                                      className="flex items-center justify-center w-12 h-12 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg relative"
                                     >
                                       <Heart className="h-6 w-6" />
+                                      {wishlistCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">
+                                          {wishlistCount}
+                                        </span>
+                                      )}
                                     </button>
                                     <button
                                       onClick={handleCartClick}

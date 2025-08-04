@@ -244,7 +244,15 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease }: CartIte
               <span className="text-sm font-medium text-gray-700">Quantity:</span>
               <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                 <button
-                  onClick={onDecrease}
+                  onClick={() => {
+                    console.log('=== DECREASE BUTTON CLICKED ===');
+                    console.log('Current item:', {
+                      productId: item.productId,
+                      quantity: item.quantity,
+                      title: item.title
+                    });
+                    onDecrease();
+                  }}
                   className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:text-gray-300"
                   disabled={item.quantity <= 1}
                 >
@@ -254,7 +262,15 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease }: CartIte
                   {item.quantity}
                 </div>
                 <button
-                  onClick={onIncrease}
+                  onClick={() => {
+                    console.log('=== INCREASE BUTTON CLICKED ===');
+                    console.log('Current item:', {
+                      productId: item.productId,
+                      quantity: item.quantity,
+                      title: item.title
+                    });
+                    onIncrease();
+                  }}
                   className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700"
                 >
                   +

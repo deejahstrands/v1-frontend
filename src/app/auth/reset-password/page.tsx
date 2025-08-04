@@ -57,10 +57,8 @@ function ResetPasswordForm() {
       
       toast.success("Your password has been successfully reset. You can now log in with your new password.");
       
-      // Redirect to login page after successful reset
-      setTimeout(() => {
-        router.push('/auth/login');
-      }, 2000);
+      // Redirect to login page immediately after successful reset
+      router.push('/auth/login');
     } catch (error: unknown) {
       const apiError = error as { response?: { data?: { message?: string } } };
       const errorMessage = apiError?.response?.data?.message || "There was an error resetting your password. Please try again.";
