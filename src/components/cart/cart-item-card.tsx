@@ -4,6 +4,7 @@ import React from 'react';
 import { X, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { CartItem } from '@/store/use-cart';
+import Image from 'next/image';
 
 interface CartItemCardProps {
   item: CartItem;
@@ -174,8 +175,10 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease }: CartIte
         {/* Left Column: Product Image */}
         <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
           {item.image ? (
-            <img 
-              src={item.image} 
+            <Image
+              src={item.image}
+              width={96}
+              height={96}
               alt={item.title}
               className="w-full h-full object-cover"
             />
