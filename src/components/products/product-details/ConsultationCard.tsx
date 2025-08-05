@@ -62,25 +62,28 @@ const ConsultationForm: React.FC<{ onSubmit: (data: ConsultationFormValues) => v
   };
 
 const ConsultationCard: React.FC = () => {
-  const enabled = useConsultation(state => state.enabled);
-  const setConsultation = useConsultation(state => state.setConsultation);
+  const selectedConsultation = useConsultation(state => state.selectedConsultation);
+  const setSelectedConsultation = useConsultation(state => state.setSelectedConsultation);
+  const clearConsultation = useConsultation(state => state.clearConsultation);
+
+  const enabled = selectedConsultation !== null;
 
   const handleToggle = (checked: boolean) => {
-    if (checked) {
-      // When turning on, don't set consultation data yet - wait for form submission
-      setConsultation(true);
-    } else {
-      // When turning off, clear the consultation
-      setConsultation(false);
+    if (!checked) {
+      clearConsultation();
     }
   };
 
   const handleFormSubmit = (data: ConsultationFormValues) => {
     const typeObj = CONSULTATION_TYPES.find(t => t.label === data.type);
-    setConsultation(true, {
-      type: data.type,
-      price: typeObj?.price || 0,
-    });
+    if (typeObj) {
+      setSelectedConsultation({
+        id: data.type.toLowerCase().replace(/\s+/g, '-'),
+        name: data.type,
+        price: typeObj.price,
+        description: `Professional consultation service`
+      });
+    }
   };
 
   return (

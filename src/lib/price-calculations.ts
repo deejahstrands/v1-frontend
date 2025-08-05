@@ -14,7 +14,12 @@ export interface PriceBreakdown {
 export const usePriceCalculation = (productPrice: string, includeConsultation: boolean = false): PriceBreakdown => {
   const customizationTotal = useProductCustomization(state => state.getTotalPrice());
   const deliveryTotal = useDelivery(state => state.getTotalPrice());
-  const consultation = useConsultation(state => state.enabled ? state.data : undefined);
+  const selectedConsultation = useConsultation(state => state.selectedConsultation);
+  const consultation = selectedConsultation ? {
+    type: selectedConsultation.name,
+    price: selectedConsultation.price,
+    description: selectedConsultation.description
+  } : undefined;
   
   const basePrice = Number(productPrice.replace(/[^0-9.-]+/g, ""));
   const consultationPrice = includeConsultation ? (consultation?.price || 0) : 0;

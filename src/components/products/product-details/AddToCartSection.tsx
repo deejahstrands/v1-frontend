@@ -27,7 +27,12 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
   const [isHydrated, setIsHydrated] = useState(false);
   const selectedCustomizations = useProductCustomization(state => state.selected);
-  const consultation = useConsultation(state => state.enabled ? state.data : undefined);
+  const selectedConsultation = useConsultation(state => state.selectedConsultation);
+  const consultation = selectedConsultation ? {
+    type: selectedConsultation.name,
+    price: selectedConsultation.price,
+    description: selectedConsultation.description
+  } : undefined;
   const selectedDelivery = useDelivery(state => state.selected);
   const measurements = useMeasurements(state => state.data);
   const addToCart = useCart(state => state.addToCart);

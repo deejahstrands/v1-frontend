@@ -1,21 +1,24 @@
 import { create } from 'zustand';
 
-interface ConsultationData {
-  type: string;
+interface ConsultationType {
+  id: string;
+  name: string;
   price: number;
-  description?: string;
+  description: string;
 }
 
 interface ConsultationState {
-  enabled: boolean;
-  data: ConsultationData | null;
-  setConsultation: (enabled: boolean, data?: ConsultationData) => void;
+  selectedConsultation: ConsultationType | null;
+  setSelectedConsultation: (consultation: ConsultationType | null) => void;
   clearConsultation: () => void;
+  hasConsultation: () => boolean;
+  getConsultationPrice: () => number;
 }
 
-export const useConsultation = create<ConsultationState>((set) => ({
-  enabled: false,
-  data: null,
-  setConsultation: (enabled, data) => set({ enabled, data: enabled ? data || null : null }),
-  clearConsultation: () => set({ enabled: false, data: null }),
+export const useConsultation = create<ConsultationState>((set, get) => ({
+  selectedConsultation: null,
+  setSelectedConsultation: (consultation) => set({ selectedConsultation: consultation }),
+  clearConsultation: () => set({ selectedConsultation: null }),
+  hasConsultation: () => get().selectedConsultation !== null,
+  getConsultationPrice: () => get().selectedConsultation?.price || 0,
 })); 

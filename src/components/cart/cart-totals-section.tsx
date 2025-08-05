@@ -14,7 +14,12 @@ interface CartTotalsSectionProps {
 
 export function CartTotalsSection({ onProceedToCheckout }: CartTotalsSectionProps) {
   const { items } = useCart();
-  const consultation = useConsultation(state => state.enabled ? state.data : undefined);
+  const selectedConsultation = useConsultation(state => state.selectedConsultation);
+  const consultation = selectedConsultation ? {
+    type: selectedConsultation.name,
+    price: selectedConsultation.price,
+    description: selectedConsultation.description
+  } : undefined;
 
   const formatPrice = (price: number) => `₦${price.toLocaleString()}`;
 
