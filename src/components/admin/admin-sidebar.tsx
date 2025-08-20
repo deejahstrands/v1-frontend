@@ -14,6 +14,7 @@ import {
   MessageSquare,
   Settings,
   X,
+  FolderOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ const sidebarNavItems = [
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/customization", label: "Customization", icon: Palette },
+  { href: "/admin/categories", label: "Categories", icon: FolderOpen },
   { href: "/admin/collection", label: "Collection", icon: Star },
   { href: "/admin/discounts", label: "Discount & Deals", icon: Ticket },
   { href: "/admin/consultation", label: "Consultation", icon: MessageSquare },

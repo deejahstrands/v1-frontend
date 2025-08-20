@@ -54,9 +54,20 @@ export interface VerifyEmailResponse {
 
 // Cookie utility functions
 const setCookie = (name: string, value: string, days: number = 7) => {
+  console.log('🍪 Setting cookie:', { name, value: value.substring(0, 20) + '...', days });
   const expires = new Date();
   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/; secure; samesite=strict`;
+  // Remove secure flag for development and use lax samesite for better compatibility
+  const secureFlag = process.env.NODE_ENV === 'production' ? '; secure' : '';
+  const sameSite = process.env.NODE_ENV === 'production' ? '; samesite=strict' : '; samesite=lax';
+  const cookieString = `${name}=${value}; expires=${expires.toUTCString()}; path=/${secureFlag}${sameSite}`;
+  
+  console.log('🍪 Cookie string:', cookieString);
+  document.cookie = cookieString;
+  
+  // Verify cookie was set
+  const cookieValue = getCookie(name);
+  console.log('🍪 Cookie verification:', { name, valueSet: !!cookieValue, valueLength: cookieValue?.length });
 };
 
 const getCookie = (name: string): string | null => {
@@ -68,18 +79,23 @@ const getCookie = (name: string): string | null => {
 };
 
 const removeCookie = (name: string) => {
-  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
 };
 
 // Auth service functions
 export const authService = {
   // Login user
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    console.log('🔑 Auth service: Starting login');
     const response = await api.post<AuthResponse>('/auth/login', credentials);
     const { accessToken } = response.data;
     
+    console.log('🔑 Auth service: Login successful, setting cookie');
+    
     // Store token in cookie
     setCookie('accessToken', accessToken, 7); // 7 days
+    
+    console.log('🔑 Auth service: Cookie set, returning response');
     
     return response.data;
   },
@@ -132,13 +148,22 @@ export const authService = {
   // Get current user from token
   async getCurrentUser(): Promise<User | null> {
     try {
+      console.log('👤 Auth service: Getting current user');
       const token = getCookie('accessToken');
-      if (!token) return null;
+      console.log('👤 Auth service: Token from cookie:', { hasToken: !!token, tokenLength: token?.length });
       
-      const response = await api.get<User>('/users/me');
-      return response.data;
+      if (!token) {
+        console.log('👤 Auth service: No token found');
+        return null;
+      }
+      
+      console.log('👤 Auth service: Making API call to /users/me');
+      const response = await api.get<{ message: string; data: User }>('/users/me');
+      console.log('👤 Auth service: User API response:', response.data);
+      
+      return response.data.data; // Extract user data from nested structure
     } catch (error) {
-      console.error('Error getting current user:', error);
+      console.error('👤 Auth service: Error getting current user:', error);
       return null;
     }
   },
@@ -146,12 +171,15 @@ export const authService = {
   // Check if user is authenticated
   isAuthenticated(): boolean {
     const token = getCookie('accessToken');
+    console.log('🔍 Auth service: Checking if authenticated:', { hasToken: !!token, tokenLength: token?.length });
     return !!token;
   },
 
   // Get token
   getToken(): string | null {
-    return getCookie('accessToken');
+    const token = getCookie('accessToken');
+    console.log('🔑 Auth service: Getting token:', { hasToken: !!token, tokenLength: token?.length });
+    return token;
   },
 
   // Refresh token (if needed)

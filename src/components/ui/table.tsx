@@ -49,13 +49,13 @@ export function Table<T extends { id?: string | number }>({
                   {columns.map((col, idx) => (
                     <th
                       key={col.label + idx}
-                      className={`px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wider ${col.className || ""}`}
+                      className={`px-2 py-2 sm:px-4 sm:py-3 text-left text-xs xl:text-sm font-semibold text-gray-600 uppercase tracking-wider ${col.className || ""}`}
                     >
                       {col.label}
                     </th>
                   ))}
                   {actions && (
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Action</th>
+                    <th className="px-4 py-3 text-left text-xs xl:text-sm font-semibold text-gray-600 uppercase tracking-wider">Action</th>
                   )}
                 </tr>
               </thead>
@@ -78,7 +78,7 @@ export function Table<T extends { id?: string | number }>({
                         </td>
                       ))}
                       {actions && (
-                        <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm">{actions(row)}</td>
+                        <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm cursor-pointer">{actions(row)}</td>
                       )}
                     </tr>
                   ))

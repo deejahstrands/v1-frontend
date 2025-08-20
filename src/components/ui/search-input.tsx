@@ -1,24 +1,43 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 
 interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
+  onDebouncedChange?: (value: string) => void;
   placeholder?: string;
   className?: string;
+  debounceDelay?: number;
 }
 
 export const SearchInput: React.FC<SearchInputProps> = ({
   value,
   onChange,
+  onDebouncedChange,
   placeholder = "Search...",
   className = "",
+  debounceDelay = 300,
 }) => {
+  // Use useRef to store the timeout ID
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    console.log('SearchInput - New value:', newValue);
     onChange(newValue);
+    
+    // Call debounced change if provided
+    if (onDebouncedChange) {
+      // Clear previous timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      
+      // Set new timeout
+      timeoutRef.current = setTimeout(() => {
+        onDebouncedChange(newValue);
+      }, debounceDelay);
+    }
   };
 
   return (

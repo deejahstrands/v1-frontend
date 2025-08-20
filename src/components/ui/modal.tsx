@@ -46,10 +46,10 @@ export function Modal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 backdrop-blur-sm p-4 sm:p-6">
       <div 
         className={cn(
-          "bg-white rounded-2xl shadow-xl w-full relative animate-in fade-in-0 zoom-in-95 duration-200",
+          "bg-white rounded-2xl shadow-xl w-full relative animate-in fade-in-0 zoom-in-95 duration-200 max-h-[90vh] flex flex-col",
           sizeClasses[size],
           className
         )}
@@ -65,7 +65,9 @@ export function Modal({
             </svg>
           </button>
         )}
-        {children}
+        <div className="flex-1 overflow-y-auto">
+          {children}
+        </div>
       </div>
     </div>
   );

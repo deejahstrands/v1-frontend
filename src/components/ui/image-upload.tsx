@@ -13,6 +13,7 @@ interface ImageUploadProps {
   onFileSelect?: (file: File | null) => void;
   className?: string;
   error?: string;
+  existingImage?: string; // Add this prop for pre-filling existing images
 }
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
@@ -24,13 +25,23 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   maxDimensions = "800x400px",
   onFileSelect,
   className,
-  error
+  error,
+  existingImage
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Set existing image as preview when component mounts or existingImage changes
+  React.useEffect(() => {
+    if (existingImage && !selectedFile) {
+      setPreviewUrl(existingImage);
+    } else if (!existingImage && !selectedFile) {
+      setPreviewUrl(null);
+    }
+  }, [existingImage, selectedFile]);
 
   const validateFile = (file: File): string | null => {
     // Check file size
@@ -66,7 +77,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   }, [onFileSelect]);
 
   const handleRemoveFile = useCallback(() => {
-    if (previewUrl) {
+    if (previewUrl && selectedFile) {
       URL.revokeObjectURL(previewUrl);
     }
     setSelectedFile(null);
@@ -80,7 +91,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     if (onFileSelect) {
       onFileSelect(null);
     }
-  }, [previewUrl, onFileSelect]);
+  }, [previewUrl, selectedFile, onFileSelect]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -173,7 +184,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       </div>
 
       {/* Image Preview */}
-      {previewUrl && selectedFile && (
+      {previewUrl && (
         <div className="relative mt-4">
           <div className="relative inline-block">
             <Image

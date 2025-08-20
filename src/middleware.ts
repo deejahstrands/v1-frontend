@@ -6,16 +6,19 @@ export function middleware(request: NextRequest) {
 
   // Admin routes protection
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin-auth")) {
-    const token = request.cookies.get("admin-auth-token");
-    const isAdmin = Boolean(token);
+    const token = request.cookies.get("accessToken");
+    const isAuthenticated = Boolean(token);
 
     console.log(
-      `[Middleware] Admin check on '${pathname}'. Token found: ${!!token}. Redirecting: ${!isAdmin}`
+      `[Middleware] Admin check on '${pathname}'. Token found: ${!!token}. Redirecting: ${!isAuthenticated}`
     );
 
-    if (!isAdmin) {
+    if (!isAuthenticated) {
       return NextResponse.redirect(new URL("/admin-auth/login", request.url));
     }
+    
+    // Note: We'll need to check admin privileges in the admin layout or components
+    // since middleware can't make API calls to verify user roles
   }
 
   // User-only routes protection

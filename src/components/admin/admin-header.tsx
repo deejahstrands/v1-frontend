@@ -18,13 +18,18 @@ import {
 } from "@/components/ui/tooltip";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { Modal } from "@/components/ui/modal";
+import { useAuth } from "@/store/use-auth";
+import { User } from "@/services/auth";
 
 export function AdminHeader({
   setIsSidebarOpen,
+  currentUser,
 }: {
   setIsSidebarOpen: (isOpen: boolean) => void;
+  currentUser: User;
 }) {
   const router = useRouter();
+  const { logout } = useAuth();
   const [currentDate, setCurrentDate] = useState("");
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -43,7 +48,7 @@ export function AdminHeader({
   const handleLogout = async () => {
     setLoading(true);
     try {
-      await fetch("/api/admin/logout", { method: "POST" });
+      logout(); // This will clear remembered credentials
       router.push("/admin-auth/login");
       router.refresh();
     } catch (error) {
@@ -93,8 +98,8 @@ export function AdminHeader({
                     className="rounded-full"
                   />
                   <div className="hidden md:block">
-                    <p className="text-sm font-medium">Deejah Strands</p>
-                    <p className="text-xs text-gray-500">deejah@gmail.com</p>
+                    <p className="text-sm font-medium">{currentUser.firstName} {currentUser.lastName}</p>
+                    <p className="text-xs text-gray-500">{currentUser.email}</p>
                   </div>
                   <ChevronDown size={20} />
                 </button>
@@ -169,8 +174,8 @@ export function AdminHeader({
                 className="rounded-full"
               />
               <div className="hidden md:block">
-                <p className="text-sm font-medium">Deejah Strands</p>
-                <p className="text-xs text-gray-500">deejah@gmail.com</p>
+                <p className="text-sm font-medium">{currentUser.firstName} {currentUser.lastName}</p>
+                <p className="text-xs text-gray-500">{currentUser.email}</p>
               </div>
               <ChevronDown size={20} />
             </button>

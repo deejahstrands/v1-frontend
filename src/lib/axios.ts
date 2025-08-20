@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { handleTokenExpiration } from './auth-utils'
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://api.deejahstrands.co/api/v1'
 
@@ -28,21 +29,20 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    // Handle 401 errors (unauthorized) - refresh token or redirect to login
+    // Handle 401 errors (unauthorized) - token expired or invalid
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
-      try {
-        // Implement refresh token logic here
-        const refreshToken = localStorage.getItem('refreshToken')
-        if (refreshToken) {
-          // Call refresh token endpoint
-          // Update tokens
-          // Retry original request
-        }
-      } catch {
-        // Redirect to login
-        window.location.href = '/auth/login'
+      // Check if it's a token expired error
+      const errorMessage = error.response?.data?.message || ''
+      const isTokenExpired = errorMessage.toLowerCase().includes('token expired') || 
+                            errorMessage.toLowerCase().includes('expired') ||
+                            error.response?.data?.name === 'ExpiredTokenError'
+
+      if (isTokenExpired) {
+        // Use the utility function to handle token expiration
+        handleTokenExpiration('/admin-auth/login')
+        return Promise.reject(error)
       }
     }
 
