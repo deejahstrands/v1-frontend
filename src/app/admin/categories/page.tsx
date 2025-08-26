@@ -32,7 +32,6 @@ const filterConfigs = [
 ];
 
 export default function AdminCategoriesPage() {
-  console.log('🚀 AdminCategoriesPage component rendering');
 
   const router = useRouter();
   const { toast } = useToast();
@@ -72,80 +71,43 @@ export default function AdminCategoriesPage() {
     getActiveFilters,
   } = useCategoriesStore();
 
-  // Debug: Log the store values
-  console.log('🔍 Store values:', {
-    categories: categories,
-    categoriesLength: categories?.length,
-    totalPages: totalPages,
-    isLoading: isLoading
-  });
-  
-  // Debug: Log the raw store state
-  const storeState = useCategoriesStore.getState();
-  console.log('🔍 Raw store state:', {
-    categories: storeState.categories,
-    categoriesLength: storeState.categories?.length,
-    totalPages: storeState.totalPages,
-    isLoading: storeState.isLoading
-  });
 
   // Handle page change
   const handlePageChange = useCallback((page: number) => {
-    console.log('🔍 Page changed to:', page);
     setCurrentPage(page);
-    
-    // Only send parameters that are actually set
+
     const params: { page: number; limit: number; search?: string; status?: string } = { page, limit: 10 };
     if (filters.search) params.search = filters.search;
     if (filters.status) params.status = filters.status;
-    
+
     fetchCategoriesFromStore(params);
   }, [setCurrentPage, fetchCategoriesFromStore, filters]);
-  
+
   // Handle immediate search input change (for UI)
   const handleSearchChange = useCallback((value: string) => {
-    console.log('🔍 Search input changed:', value);
     setFilters({ search: value });
   }, [setFilters]);
-  
+
   // Handle debounced search with API call
   const handleDebouncedSearch = useCallback((value: string) => {
-    console.log('🔍 Debounced search triggered:', value);
-    
-    // Only send search if there's a value, otherwise fetch without search
+
     if (value.trim()) {
-      console.log('🔍 Searching for:', value.trim());
       fetchCategoriesFromStore({ search: value.trim(), page: 1 });
     } else {
-      // Clear search - fetch without search parameter
-      console.log('🔍 Clearing search, fetching all categories');
       fetchCategoriesFromStore({ page: 1, limit: 10 });
     }
   }, [fetchCategoriesFromStore]);
-  
-  // Handle status filter change
+
   const handleStatusFilterChange = useCallback((status: string) => {
-    console.log('🔍 Status filter changed:', status);
     setFilters({ status });
-    
-    // Only send status if it's set, otherwise fetch without status
+
     if (status) {
-      console.log('🔍 Filtering by status:', status);
       fetchCategoriesFromStore({ status, page: 1 });
     } else {
-      // Clear status filter - fetch without status parameter
-      console.log('🔍 Clearing status filter, fetching all categories');
       fetchCategoriesFromStore({ page: 1, limit: 10 });
     }
   }, [setFilters, fetchCategoriesFromStore]);
 
-  console.log('🎯 Categories page render:', {
-    categories,
-    totalPages,
-    currentPage,
-    isLoading,
-    filters
-  });
 
   const {
     subDropdown,
@@ -195,23 +157,23 @@ export default function AdminCategoriesPage() {
       } else if (modalMode === 'edit' && selectedCategory) {
         // For edit mode, only send the fields that actually changed
         const updateData: Partial<CreateCategoryData> = {};
-        
+
         if (categoryData.name !== selectedCategory.name) {
           updateData.name = categoryData.name;
         }
-        
+
         if (categoryData.description !== selectedCategory.description) {
           updateData.description = categoryData.description;
         }
-        
+
         if (categoryData.status !== selectedCategory.status) {
           updateData.status = categoryData.status;
         }
-        
+
         if (categoryData.coverImage !== selectedCategory.coverImage) {
           updateData.coverImage = categoryData.coverImage;
         }
-        
+
         // Only call update if there are actual changes
         if (Object.keys(updateData).length > 0) {
           await updateCategory(selectedCategory.id, updateData);
@@ -220,13 +182,13 @@ export default function AdminCategoriesPage() {
       }
 
       // Refresh the categories list with only necessary parameters
-      const refreshParams: { page: number; limit: number; search?: string; status?: string } = { 
-        page: currentPage, 
-        limit: 10 
+      const refreshParams: { page: number; limit: number; search?: string; status?: string } = {
+        page: currentPage,
+        limit: 10
       };
       if (filters.search) refreshParams.search = filters.search;
       if (filters.status) refreshParams.status = filters.status;
-      
+
       fetchCategoriesFromStore(refreshParams);
       // Don't close modal here - let the modal handle it after success
     } catch (error) {
@@ -248,15 +210,15 @@ export default function AdminCategoriesPage() {
       setIsDeleting(true);
       await deleteCategory(categoryToDelete.id);
       toast.success('Category deleted successfully!');
-      
+
       // Refresh the categories list with only necessary parameters
-      const refreshParams: { page: number; limit: number; search?: string; status?: string } = { 
-        page: currentPage, 
-        limit: 10 
+      const refreshParams: { page: number; limit: number; search?: string; status?: string } = {
+        page: currentPage,
+        limit: 10
       };
       if (filters.search) refreshParams.search = filters.search;
       if (filters.status) refreshParams.status = filters.status;
-      
+
       fetchCategoriesFromStore(refreshParams);
     } catch (error) {
       console.error('Error deleting category:', error);
@@ -375,7 +337,7 @@ export default function AdminCategoriesPage() {
                       } else {
                         // Clear the filter
                         setFilters({ [key]: '' });
-                        
+
                         // Refresh data when clearing search or status filter
                         if (key === 'search' || key === 'status') {
                           console.log('🔄 Clearing filter:', key, 'refreshing data');
@@ -419,7 +381,7 @@ export default function AdminCategoriesPage() {
                     if (subDropdown === 'status') {
                       handleStatusFilterChange(val);
                     } else {
-                    setFilters({ [subDropdown!]: val });
+                      setFilters({ [subDropdown!]: val });
                     }
                     setSubDropdown(null);
                     setIsFilterOpen(false);

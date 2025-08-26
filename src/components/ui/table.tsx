@@ -55,7 +55,7 @@ export function Table<T extends { id?: string | number }>({
                     </th>
                   ))}
                   {actions && (
-                    <th className="px-4 py-3 text-left text-xs xl:text-sm font-semibold text-gray-600 uppercase tracking-wider">Action</th>
+                    <th className="px-4 py-3 text-center text-xs xl:text-sm font-semibold text-gray-600 uppercase tracking-wider">Action</th>
                   )}
                 </tr>
               </thead>

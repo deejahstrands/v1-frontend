@@ -48,7 +48,7 @@ export const Button = React.forwardRef<
   return (
     <button
       ref={ref}
-      className={`${baseStyles} ${variantStyles} ${className}`.trim()}
+      className={`${baseStyles} ${variantStyles} ${className} cursor-pointer`.trim()}
       {...props}
     >
       {icon && <span className="mr-2 flex items-center">{icon}</span>}

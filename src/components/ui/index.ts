@@ -17,6 +17,9 @@ export { SubDropdown } from './sub-dropdown';
 export { Table } from './table';
 export { TableSkeleton } from './table-skeleton';
 export { Tooltip } from './tooltip';
+export { CustomizationTypeModal } from '../admin/customization/customization-type-modal';
+export { Checkbox } from './checkbox';
+export { PriceInput } from './price-input';
 
 // Export types
 export type { ConfirmationType } from './confirmation-modal';

@@ -13,6 +13,7 @@ interface ConfirmationModalProps {
   onConfirm: () => void;
   title: string;
   message: string;
+  deletionItems?: string[]; // Array of items that will be deleted
   type?: ConfirmationType;
   confirmText?: string;
   cancelText?: string;
@@ -59,6 +60,7 @@ export function ConfirmationModal({
   onConfirm,
   title,
   message,
+  deletionItems,
   type = 'delete',
   confirmText,
   cancelText = 'Cancel',
@@ -97,9 +99,28 @@ export function ConfirmationModal({
         {/* Header */}
         <div className={`flex items-center gap-3 p-4 rounded-lg ${bgColor} ${borderColor} border mb-4`}>
           {icon}
-          <div>
+          <div className="flex-1">
             <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
             <p className="text-sm text-gray-600 mt-1">{message}</p>
+            
+            {/* Deletion Items List */}
+            {deletionItems && deletionItems.length > 0 && (
+              <div className="mt-3">
+                <p className="text-sm font-medium text-gray-700 mb-2">
+                  ⚠️ This action will trigger cascading deletions:
+                </p>
+                <ul className="list-disc list-inside space-y-1">
+                  {deletionItems.map((item, index) => (
+                    <li key={index} className="text-sm text-gray-600 ml-2">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-sm text-gray-600 mt-2 font-medium">
+                  Note: This operation is irreversible. Once deleted, these items cannot be recovered.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -109,6 +130,7 @@ export function ConfirmationModal({
             type="button"
             variant="tertiary"
             onClick={onClose}
+            className="cursor-pointer border border-amber-700 text-amber-700"
             disabled={isLoading}
           >
             {cancelText}
@@ -119,6 +141,7 @@ export function ConfirmationModal({
             onClick={handleConfirm}
             disabled={isLoading}
             icon={isLoading ? undefined : type === 'delete' ? <Trash2 className="w-4 h-4" /> : undefined}
+            className="cursor-pointer"
           >
             {isLoading ? 'Processing...' : (confirmText || getDefaultConfirmText())}
           </Button>

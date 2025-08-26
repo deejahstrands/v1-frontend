@@ -80,7 +80,7 @@ export const Select: React.FC<SelectProps> = ({
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
-            "w-full px-3 py-2 rounded-lg border bg-[#F7F9FC] text-left transition-colors",
+            "w-full px-3 py-2 rounded-lg border bg-[#F7F9FC] text-left transition-colors cursor-pointer",
             "focus:outline-none focus:ring-2 focus:ring-[#4A85E4] focus:border-transparent",
             "hover:bg-[#F7F9FC]/80",
             error 
@@ -109,7 +109,7 @@ export const Select: React.FC<SelectProps> = ({
                 type="button"
                 onClick={() => handleSelect(option)}
                 className={cn(
-                  "w-full px-3 py-2 text-left hover:bg-[#F7F9FC] transition-colors",
+                  "w-full px-3 py-2 text-left hover:bg-[#F7F9FC] transition-colors cursor-pointer",
                   selectedOption?.value === option.value && "bg-[#F7F9FC] text-[#4A85E4] font-medium"
                 )}
               >
