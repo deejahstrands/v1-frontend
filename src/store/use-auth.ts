@@ -9,7 +9,6 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  authInitialized: boolean; // Track if initial auth check is complete
   
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -22,19 +21,17 @@ interface AuthState {
   resendVerification: (email: string) => Promise<void>;
   clearError: () => void;
   setUser: (user: User | null) => void;
-  setAuthInitialized: (initialized: boolean) => void;
   handleTokenExpiration: () => void;
 }
 
 export const useAuth = create<AuthState>()(
   devtools(
     persist(
-      (set, get) => ({
+      (set) => ({
         user: null,
         isAuthenticated: false,
         isLoading: false,
         error: null,
-        authInitialized: false, // Start as false, will be set to true after initial check
 
         login: async (credentials: LoginCredentials) => {
           console.log('🔐 Auth store: Starting login process');
@@ -51,14 +48,7 @@ export const useAuth = create<AuthState>()(
             });
             
             console.log('🔐 Auth store: State updated after login');
-            
-            // Log the current state after update
-            const currentState = get();
-            console.log('🔐 Auth store: Current state after login:', {
-              user: currentState.user?.email,
-              isAuthenticated: currentState.isAuthenticated,
-              authInitialized: currentState.authInitialized
-            });
+
           } catch (error: any) {
             console.error('🔐 Auth store: Login error:', error);
             set({
@@ -183,28 +173,21 @@ export const useAuth = create<AuthState>()(
           set({ isLoading: true });
           try {
             const user = await authService.getCurrentUser();
-            console.log('🔐 Auth store: getCurrentUser result', { 
-              hasUser: !!user, 
-              userEmail: user?.email,
-              isAdmin: user?.isAdmin 
-            });
+
             
             if (user) {
               set({
                 user,
                 isAuthenticated: true,
                 isLoading: false,
-                authInitialized: true, // Mark auth as initialized
               });
-              console.log('🔐 Auth store: User set successfully');
             } else {
               set({
                 user: null,
                 isAuthenticated: false,
                 isLoading: false,
-                authInitialized: true, // Mark auth as initialized
               });
-              console.log('🔐 Auth store: No user found, auth cleared');
+
             }
           } catch (error: any) {
             console.error('🔐 Auth store: getCurrentUser error:', error);
@@ -223,9 +206,8 @@ export const useAuth = create<AuthState>()(
               user: null,
               isAuthenticated: false,
               isLoading: false,
-              authInitialized: true, // Mark auth as initialized even on error
             });
-            console.log('🔐 Auth store: Auth cleared due to error');
+;
           }
         },
 
@@ -244,11 +226,6 @@ export const useAuth = create<AuthState>()(
           });
         },
 
-        setAuthInitialized: (initialized: boolean) => {
-          console.log('🔐 Auth store: setAuthInitialized called', { initialized });
-          set({ authInitialized: initialized });
-        },
-
         handleTokenExpiration: () => {
           console.log('🔐 Auth store: handleTokenExpiration called');
           
@@ -265,25 +242,12 @@ export const useAuth = create<AuthState>()(
       }),
       {
         name: 'auth-store',
-        // Persist user, auth state, and initialization flag
+        // Persist user and auth state
         partialize: (state) => {
-          console.log('🔐 Auth store: Persisting state', {
-            user: state.user?.email,
-            isAuthenticated: state.isAuthenticated,
-            authInitialized: state.authInitialized
-          });
           return {
             user: state.user,
             isAuthenticated: state.isAuthenticated,
-            authInitialized: state.authInitialized,
           };
-        },
-        onRehydrateStorage: () => (state) => {
-          console.log('🔐 Auth store: Rehydrating from storage', {
-            user: state?.user?.email,
-            isAuthenticated: state?.isAuthenticated,
-            authInitialized: state?.authInitialized
-          });
         },
       },
     ),

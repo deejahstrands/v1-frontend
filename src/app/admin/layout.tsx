@@ -16,17 +16,9 @@ export default function AdminLayout({
 }) {
   const router = useRouter();
   const { toast } = useToast();
-  const { user, isAuthenticated, isLoading, authInitialized } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Debug auth state
-  console.log('🔐 Admin layout auth state:', {
-    authInitialized,
-    isLoading,
-    isAuthenticated,
-    hasUser: !!user,
-    userIsAdmin: user?.isAdmin
-  });
 
   // Track when the layout mounts
   useEffect(() => {
@@ -37,22 +29,22 @@ export default function AdminLayout({
   }, []);
 
   useEffect(() => {
-    // Only redirect if auth has been initialized and we're sure the user is not authenticated
-    if (authInitialized && !isLoading && !isAuthenticated) {
+    // Simple auth check - redirect if not authenticated
+    if (!isLoading && !isAuthenticated) {
       console.log('🚫 Admin layout: User not authenticated, redirecting to login');
       toast.error("Authentication required. Please login.");
       router.push("/admin-auth/login");
       return;
     }
 
-    // Check admin privileges once we have user data and auth is initialized
-    if (authInitialized && !isLoading && user && !user.isAdmin) {
+    // Check admin privileges
+    if (!isLoading && user && !user.isAdmin) {
       console.log('🚫 Admin layout: User is not admin, redirecting to login');
       toast.error("Access denied. Admin privileges required.");
       router.push("/admin-auth/login");
       return;
     }
-  }, [authInitialized, isLoading, isAuthenticated, user, router, toast]);
+  }, [isLoading, isAuthenticated, user, router, toast]);
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -63,18 +55,14 @@ export default function AdminLayout({
     return () => document.body.classList.remove('overflow-hidden');
   }, [isSidebarOpen]);
 
-  // Show loading state while auth is being checked
-  if (!authInitialized || isLoading) {
-    console.log('⏳ Admin layout showing loading state:', {
-      authInitialized,
-      isLoading,
-      isAuthenticated
-    });
+  // Show loading state only while actually loading
+  if (isLoading) {
+    console.log('⏳ Admin layout showing loading state');
     return (
       <div className="flex min-h-screen w-full bg-gray-50 items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Verifying access...</p>
+          <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
     );
