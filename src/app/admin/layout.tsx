@@ -16,22 +16,40 @@ export default function AdminLayout({
 }) {
   const router = useRouter();
   const { toast } = useToast();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, getCurrentUser } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
 
-  // Track when the layout mounts
+  // Initialize auth on mount
   useEffect(() => {
-    console.log('🏗️ Admin layout mounted');
-    return () => {
-      console.log('🏗️ Admin layout unmounted');
+    const initializeAuth = async () => {
+      try {
+        // Check if we have a token
+        const token = document.cookie.split('; ').find(row => row.startsWith('accessToken='))?.split('=')[1];
+
+        if (token && !isAuthenticated) {
+          await getCurrentUser();
+        }
+      } catch (error) {
+        console.error('❌ Admin layout: Failed to initialize auth:', error);
+      } finally {
+        setIsInitializing(false);
+      }
     };
-  }, []);
+
+    initializeAuth();
+  }, [getCurrentUser, isAuthenticated]);
 
   useEffect(() => {
+    // Don't check auth until initialization is complete
+    if (isInitializing) {
+      return;
+    }
+
     // Simple auth check - redirect if not authenticated
     if (!isLoading && !isAuthenticated) {
-      console.log('🚫 Admin layout: User not authenticated, redirecting to login');
+      ;
       toast.error("Authentication required. Please login.");
       router.push("/admin-auth/login");
       return;
@@ -39,12 +57,11 @@ export default function AdminLayout({
 
     // Check admin privileges
     if (!isLoading && user && !user.isAdmin) {
-      console.log('🚫 Admin layout: User is not admin, redirecting to login');
       toast.error("Access denied. Admin privileges required.");
       router.push("/admin-auth/login");
       return;
     }
-  }, [isLoading, isAuthenticated, user, router, toast]);
+  }, [isInitializing, isLoading, isAuthenticated, user, router, toast]);
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -55,9 +72,8 @@ export default function AdminLayout({
     return () => document.body.classList.remove('overflow-hidden');
   }, [isSidebarOpen]);
 
-  // Show loading state only while actually loading
-  if (isLoading) {
-    console.log('⏳ Admin layout showing loading state');
+  // Show loading state while initializing or loading
+  if (isInitializing || isLoading) {
     return (
       <div className="flex min-h-screen w-full bg-gray-50 items-center justify-center">
         <div className="text-center">
@@ -70,11 +86,10 @@ export default function AdminLayout({
 
   // Don't render admin content if user is not authenticated or not admin
   if (!isAuthenticated || !user || !user.isAdmin) {
-    console.log('🚫 Admin layout: Not rendering content - not authenticated or not admin');
     return null;
   }
 
-  console.log('✅ Admin layout: Rendering admin content for user:', user.email);
+
 
   return (
     <div className="flex min-h-screen w-full bg-gray-50">

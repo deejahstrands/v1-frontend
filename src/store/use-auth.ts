@@ -1,15 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
-import { authService, LoginCredentials, SignupCredentials, User } from '@/services/auth';
-import { handleTokenExpiration } from '@/lib/auth-utils';
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
+import {
+  authService,
+  LoginCredentials,
+  SignupCredentials,
+  User,
+} from "@/services/auth";
+import { handleTokenExpiration } from "@/lib/auth-utils";
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  
+
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>;
   signup: (credentials: SignupCredentials) => Promise<void>;
@@ -34,26 +39,22 @@ export const useAuth = create<AuthState>()(
         error: null,
 
         login: async (credentials: LoginCredentials) => {
-          console.log('🔐 Auth store: Starting login process');
           set({ isLoading: true, error: null });
           try {
             const response = await authService.login(credentials);
-            console.log('🔐 Auth store: Login response received:', response);
-            
+
             set({
               user: response.user,
               isAuthenticated: true,
               isLoading: false,
               error: null,
             });
-            
-            console.log('🔐 Auth store: State updated after login');
-
           } catch (error: any) {
-            console.error('🔐 Auth store: Login error:', error);
             set({
               isLoading: false,
-              error: error.response?.data?.message || 'Login failed. Please try again.',
+              error:
+                error.response?.data?.message ||
+                "Login failed. Please try again.",
             });
             throw error;
           }
@@ -72,7 +73,9 @@ export const useAuth = create<AuthState>()(
           } catch (error: any) {
             set({
               isLoading: false,
-              error: error.response?.data?.message || 'Signup failed. Please try again.',
+              error:
+                error.response?.data?.message ||
+                "Signup failed. Please try again.",
             });
             throw error;
           }
@@ -89,7 +92,9 @@ export const useAuth = create<AuthState>()(
           } catch (error: any) {
             set({
               isLoading: false,
-              error: error.response?.data?.message || 'Failed to resend verification email.',
+              error:
+                error.response?.data?.message ||
+                "Failed to resend verification email.",
             });
             throw error;
           }
@@ -106,7 +111,9 @@ export const useAuth = create<AuthState>()(
           } catch (error: any) {
             set({
               isLoading: false,
-              error: error.response?.data?.message || 'Failed to send password reset email.',
+              error:
+                error.response?.data?.message ||
+                "Failed to send password reset email.",
             });
             throw error;
           }
@@ -123,7 +130,8 @@ export const useAuth = create<AuthState>()(
           } catch (error: any) {
             set({
               isLoading: false,
-              error: error.response?.data?.message || 'Failed to reset password.',
+              error:
+                error.response?.data?.message || "Failed to reset password.",
             });
             throw error;
           }
@@ -140,41 +148,36 @@ export const useAuth = create<AuthState>()(
           } catch (error: any) {
             set({
               isLoading: false,
-              error: error.response?.data?.message || 'Failed to verify email.',
+              error: error.response?.data?.message || "Failed to verify email.",
             });
             throw error;
           }
         },
 
         logout: () => {
-          console.log('🔐 Auth store: logout called');
           authService.logout();
-          
+
           // Clear remembered credentials from localStorage
-          if (typeof window !== 'undefined') {
+          if (typeof window !== "undefined") {
             try {
-              localStorage.removeItem('admin_remembered_credentials');
-              console.log('🔐 Auth store: Cleared remembered credentials');
+              localStorage.removeItem("admin_remembered_credentials");
             } catch (error) {
-              console.error('🔐 Auth store: Error clearing remembered credentials:', error);
+              console.error("Error clearing remembered credentials:", error);
             }
           }
-          
+
           set({
             user: null,
             isAuthenticated: false,
             error: null,
           });
-          console.log('🔐 Auth store: logout completed');
         },
 
         getCurrentUser: async () => {
-          console.log('🔐 Auth store: getCurrentUser called');
           set({ isLoading: true });
           try {
             const user = await authService.getCurrentUser();
 
-            
             if (user) {
               set({
                 user,
@@ -187,27 +190,26 @@ export const useAuth = create<AuthState>()(
                 isAuthenticated: false,
                 isLoading: false,
               });
-
             }
           } catch (error: any) {
-            console.error('🔐 Auth store: getCurrentUser error:', error);
-            
             // Check if it's a token expiration error
-            const isTokenExpired = error.response?.status === 401 && 
-              (error.response?.data?.message?.toLowerCase().includes('token expired') ||
-               error.response?.data?.name === 'ExpiredTokenError')
-            
+            const isTokenExpired =
+              error.response?.status === 401 &&
+              (error.response?.data?.message
+                ?.toLowerCase()
+                .includes("token expired") ||
+                error.response?.data?.name === "ExpiredTokenError");
+
             if (isTokenExpired) {
               // Use the utility function to handle token expiration
-              handleTokenExpiration('/admin-auth/login')
+              handleTokenExpiration("/admin-auth/login");
             }
-            
+
             set({
               user: null,
               isAuthenticated: false,
               isLoading: false,
             });
-;
           }
         },
 
@@ -216,10 +218,6 @@ export const useAuth = create<AuthState>()(
         },
 
         setUser: (user: User | null) => {
-          console.log('🔐 Auth store: setUser called', { 
-            userEmail: user?.email, 
-            isAdmin: user?.isAdmin 
-          });
           set({
             user,
             isAuthenticated: !!user,
@@ -227,21 +225,19 @@ export const useAuth = create<AuthState>()(
         },
 
         handleTokenExpiration: () => {
-          console.log('🔐 Auth store: handleTokenExpiration called');
-          
           // Clear auth state
           set({
             user: null,
             isAuthenticated: false,
             error: null,
           });
-          
+
           // Use the utility function to handle token expiration
-          handleTokenExpiration('/admin-auth/login')
+          handleTokenExpiration("/admin-auth/login");
         },
       }),
       {
-        name: 'auth-store',
+        name: "auth-store",
         // Persist user and auth state
         partialize: (state) => {
           return {
@@ -249,8 +245,8 @@ export const useAuth = create<AuthState>()(
             isAuthenticated: state.isAuthenticated,
           };
         },
-      },
+      }
     ),
-    { name: 'auth-store' },
-  ),
-); 
+    { name: "auth-store" }
+  )
+);
