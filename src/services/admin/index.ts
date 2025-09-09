@@ -52,6 +52,18 @@ export type {
   ProcessingTimesResponse
 } from './processing-time.service';
 
+export { wigUnitService } from './wig-unit.service';
+export type {
+  WigUnit,
+  WigUnitCustomization,
+  WigUnitCustomizationOption,
+  CreateWigUnitData,
+  UpdateWigUnitData,
+  WigUnitsResponse,
+  WigUnitResponse,
+  DeleteWigUnitResponse
+} from './wig-unit.service';
+
 //export { userService } from './user.service';
 //export { orderService } from './order.service';
 //export { consultationService } from './consultation.service';

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -107,11 +108,35 @@ export function WigUnitModal({
     setIsSubmitting(true);
 
     try {
-      await onSave({
-        name: formData.name.trim(),
-        description: formData.description.trim() || undefined,
-        basePrice: Number(formData.basePrice),
-      });
+      const dataToSave: any = {};
+      
+      // For edit mode, only include changed fields
+      if (mode === 'edit' && unit) {
+        if (formData.name.trim() !== unit.name) {
+          dataToSave.name = formData.name.trim();
+        }
+        const currentDescription = formData.description.trim();
+        const originalDescription = unit.description || '';
+        if (currentDescription !== originalDescription) {
+          // Only include description if it's not empty
+          if (currentDescription) {
+            dataToSave.description = currentDescription;
+          }
+        }
+        if (Number(formData.basePrice) !== unit.basePrice) {
+          dataToSave.basePrice = Number(formData.basePrice);
+        }
+      } else {
+        // For add mode, send all fields
+        dataToSave.name = formData.name.trim();
+        const description = formData.description.trim();
+        if (description) {
+          dataToSave.description = description;
+        }
+        dataToSave.basePrice = Number(formData.basePrice);
+      }
+
+      await onSave(dataToSave);
     } catch (error) {
       // Error is handled by the parent component
       console.error('Error saving wig unit:', error);

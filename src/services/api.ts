@@ -11,7 +11,7 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    // Get token from cookies or localStorage
+    // Get token from cookies
     const token =
       typeof window !== "undefined"
         ? document.cookie
@@ -22,10 +22,6 @@ api.interceptors.request.use(
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      console.log(
-        "🌐 API Request: No token found, request will be unauthenticated"
-      );
     }
     return config;
   },
@@ -41,13 +37,16 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
-      // Clear token but don't redirect automatically
-      // Let individual components handle their own redirect logic
+      // Clear token and redirect to appropriate login
       if (typeof window !== "undefined") {
         document.cookie =
           "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-        // Don't redirect here - let components decide where to go
-        // window.location.href = '/auth/login';
+        
+        // Redirect to admin login if on admin route, otherwise user login
+        const isAdminRoute = window.location.pathname.startsWith('/admin');
+        const loginUrl = isAdminRoute ? '/admin-auth/login' : '/auth/login';
+        
+        window.location.href = loginUrl;
       }
     }
     return Promise.reject(error);

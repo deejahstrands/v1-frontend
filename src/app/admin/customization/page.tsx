@@ -3,66 +3,29 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Table, TableColumn } from '@/components/ui/table';
-import { SearchInput } from '@/components/ui/search-input';
 import { Plus, Edit, Trash2, Settings } from "lucide-react";
 import { Pagination } from '@/components/ui/pagination';
 import { Button } from '@/components/common/button';
-import { useToast } from '@/hooks/use-toast';
-import { useDebounce } from '@/hooks/use-debounce';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { WigUnitModal } from '@/components/admin/customization/wig-unit-modal';
-
-// Wig Unit interface
-interface WigUnit {
-  id: string;
-  name: string;
-  description: string;
-  basePrice: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-// Mock data for demonstration
-const mockWigUnits: WigUnit[] = [
-  {
-    id: '1',
-    name: 'Straight',
-    description: 'Different types of lace for wigs',
-    basePrice: 3000000,
-    createdAt: '2024-01-01T00:00:00.000Z',
-    updatedAt: '2024-01-01T00:00:00.000Z'
-  },
-  {
-    id: '2',
-    name: 'Curly',
-    description: '',
-    basePrice: 2500000,
-    createdAt: '2024-01-02T00:00:00.000Z',
-    updatedAt: '2024-01-02T00:00:00.000Z'
-  },
-  {
-    id: '3',
-    name: 'Bob',
-    description: '',
-    basePrice: 3000000,
-    createdAt: '2024-01-03T00:00:00.000Z',
-    updatedAt: '2024-01-03T00:00:00.000Z'
-  }
-];
-
-
+import { useWigUnitManagement } from '@/hooks/admin/use-wig-unit-management';
+import { WigUnit } from '@/services/admin/wig-unit.service';
 
 export default function CustomizationPage() {
-  const { toast } = useToast();
   const router = useRouter();
 
-  // Local state
-  const [wigUnits, setWigUnits] = useState<WigUnit[]>(mockWigUnits);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
-  const [isLoading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  // Use the wig unit management hook
+  const {
+    wigUnits,
+    isLoading,
+    isDeleting,
+    currentPage,
+    totalPages,
+    handlePageChange,
+    createWigUnit,
+    updateWigUnit,
+    deleteWigUnit,
+  } = useWigUnitManagement();
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -72,32 +35,6 @@ export default function CustomizationPage() {
   // Confirmation modal states
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [unitToDelete, setUnitToDelete] = useState<WigUnit | null>(null);
-
-  // Debounced search
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
-
-  // Filter units based on search
-  const filteredUnits = wigUnits.filter(unit =>
-    unit.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-    unit.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-  );
-
-  // Pagination
-  const totalPages = Math.ceil(filteredUnits.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedUnits = filteredUnits.slice(startIndex, endIndex);
-
-  // Handle search
-  const handleSearch = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(1);
-  };
-
-  // Handle page change
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
 
   // Handle add unit
   const handleAddUnit = () => {
@@ -133,19 +70,10 @@ export default function CustomizationPage() {
   const handleConfirmDelete = async () => {
     if (!unitToDelete) return;
 
-    setIsDeleting(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      setWigUnits(prev => prev.filter(unit => unit.id !== unitToDelete.id));
-      toast.success(`${unitToDelete.name} deleted successfully!`);
+    const success = await deleteWigUnit(unitToDelete.id);
+    if (success) {
       setIsDeleteModalOpen(false);
       setUnitToDelete(null);
-    } catch {
-      toast.error('Failed to delete wig unit');
-    } finally {
-      setIsDeleting(false);
     }
   };
 
@@ -153,38 +81,23 @@ export default function CustomizationPage() {
   const handleSaveUnit = async (unitData: { name: string; description?: string; basePrice: number }) => {
     try {
       if (modalMode === 'add') {
-        // Add new unit
-        const newUnit: WigUnit = {
-          id: Date.now().toString(),
+        await createWigUnit({
           name: unitData.name,
           description: unitData.description || '',
           basePrice: unitData.basePrice,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-
-        setWigUnits(prev => [...prev, newUnit]);
-        toast.success('Wig unit created successfully!');
+        });
       } else if (selectedUnit) {
-        // Edit existing unit
-        setWigUnits(prev => prev.map(unit =>
-          unit.id === selectedUnit.id
-            ? {
-              ...unit,
-              name: unitData.name,
-              description: unitData.description || '',
-              basePrice: unitData.basePrice,
-              updatedAt: new Date().toISOString()
-            }
-            : unit
-        ));
-        toast.success('Wig unit updated successfully!');
+        await updateWigUnit(selectedUnit.id, {
+          name: unitData.name,
+          description: unitData.description || '',
+          basePrice: unitData.basePrice,
+        });
       }
 
       setIsModalOpen(false);
       setSelectedUnit(undefined);
     } catch {
-      // Error is handled by the parent component
+      // Error is handled by the hook
     }
   };
 
@@ -216,7 +129,7 @@ export default function CustomizationPage() {
       accessor: 'basePrice',
       render: (row) => (
         <span className="text-sm text-gray-600">
-          ₦{(row.basePrice / 1000000).toFixed(1)}M
+          ₦{row.basePrice.toLocaleString()}
         </span>
       )
     },
@@ -272,26 +185,11 @@ export default function CustomizationPage() {
         </div>
       </div>
 
-      {/* Search Section */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
-        <h3 className="font-medium mb-3">Filter & Search</h3>
-        <SearchInput
-          value={searchTerm}
-          onChange={handleSearch}
-          placeholder="Search Types"
-          className="w-full"
-        />
-        {isLoading && (
-          <div className="mt-2 text-sm text-gray-500">
-            Searching...
-          </div>
-        )}
-      </div>
 
       {/* Table with pagination in footer */}
       <Table
         columns={columns}
-        data={paginatedUnits}
+        data={wigUnits}
         isLoading={isLoading}
         footerContent={
           totalPages > 1 && (

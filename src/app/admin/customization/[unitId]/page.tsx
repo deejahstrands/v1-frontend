@@ -1,21 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Settings } from 'lucide-react';
 import { Button } from '@/components/common/button';
 import { TypeCheckbox } from '@/components/admin/customization/type-checkbox';
 import { PriceInput } from '@/components/ui/price-input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { customizationTypes } from '@/data/customization-types';
-import { customizationOptions } from '@/data/customization-options';
-
-interface WigUnit {
-    id: string;
-    name: string;
-    description: string;
-    basePrice: number;
-}
+import { useWigUnitManagement } from '@/hooks/admin/use-wig-unit-management';
+import { customizationTypeService, CustomizationType, CustomizationOption } from '@/services/admin/customization-type.service';
 
 interface SelectedOption {
     optionId: string;
@@ -23,50 +17,130 @@ interface SelectedOption {
     price: string;
 }
 
-// Mock wig unit data
-const mockWigUnits: WigUnit[] = [
-    {
-        id: '1',
-        name: 'Straight',
-        description: 'Different types of lace for wigs',
-        basePrice: 3000000
-    },
-    {
-        id: '2',
-        name: 'Curly',
-        description: 'Curly hair texture',
-        basePrice: 2500000
-    },
-    {
-        id: '3',
-        name: 'Bob',
-        description: 'Bob cut style',
-        basePrice: 3000000
-    }
-];
-
 export default function WigCustomizationPage() {
     const params = useParams();
     const router = useRouter();
     const unitId = params.unitId as string;
 
-      // State
-  const [wigUnit, setWigUnit] = useState<WigUnit | null>(null);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  const [selectedOptions, setSelectedOptions] = useState<SelectedOption[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [openTypeId, setOpenTypeId] = useState<string | null>(null);
+    // Use the wig unit management hook
+    const {
+        currentWigUnit: wigUnit,
+        isLoading: isLoadingUnit,
+        updateWigUnit,
+        getWigUnit,
+    } = useWigUnitManagement();
+
+    // State for customization types and options
+    const [customizationTypes, setCustomizationTypes] = useState<CustomizationType[]>([]);
+    const [customizationOptions, setCustomizationOptions] = useState<CustomizationOption[]>([]);
+    const [isLoadingCustomizationTypes, setIsLoadingCustomizationTypes] = useState(false);
+    const [, setIsLoadingCustomizationOptions] = useState(false);
+
+    // State
+    const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+    const [selectedOptions, setSelectedOptions] = useState<SelectedOption[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [openTypeId, setOpenTypeId] = useState<string | null>(null);
+
+    // Ref to prevent multiple calls
+    const loadedUnitId = useRef<string | null>(null);
+    const loadedOptions = useRef<Set<string>>(new Set());
+    const loadedTypes = useRef<boolean>(false);
 
     // Load wig unit data
     useEffect(() => {
-        const unit = mockWigUnits.find(u => u.id === unitId);
-        if (unit) {
-            setWigUnit(unit);
-        } else {
-            // Redirect if unit not found
-            router.push('/admin/customization');
+        if (unitId && loadedUnitId.current !== unitId) {
+            loadedUnitId.current = unitId;
+            getWigUnit(unitId);
         }
-    }, [unitId, router]);
+    }, [unitId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Load customization types
+    useEffect(() => {
+        const loadCustomizationTypes = async () => {
+            if (loadedTypes.current) return;
+            
+            setIsLoadingCustomizationTypes(true);
+            try {
+                const response = await customizationTypeService.getCustomizationTypes();
+                setCustomizationTypes(response.data);
+                loadedTypes.current = true;
+            } catch (error) {
+                console.error('Error loading customization types:', error);
+            } finally {
+                setIsLoadingCustomizationTypes(false);
+            }
+        };
+
+        loadCustomizationTypes();
+    }, []);
+
+    // Load customization options when types are selected
+    useEffect(() => {
+        const loadCustomizationOptions = async () => {
+            if (selectedTypes.length === 0) return;
+
+            // Check if we've already loaded options for these types
+            const typesKey = selectedTypes.sort().join(',');
+            if (loadedOptions.current.has(typesKey)) return;
+
+            setIsLoadingCustomizationOptions(true);
+            try {
+                const allOptions: CustomizationOption[] = [];
+                
+                for (const typeId of selectedTypes) {
+                    const response = await customizationTypeService.getCustomizationTypeWithOptions(typeId);
+                    if (response.data.options) {
+                        // Add typeId to each option so we can filter by type later
+                        const optionsWithTypeId = response.data.options.map(option => ({
+                            ...option,
+                            typeId: typeId
+                        }));
+                        allOptions.push(...optionsWithTypeId);
+                    }
+                }
+                
+                setCustomizationOptions(allOptions);
+                loadedOptions.current.add(typesKey);
+            } catch (error) {
+                console.error('Error loading customization options:', error);
+            } finally {
+                setIsLoadingCustomizationOptions(false);
+            }
+        };
+
+        loadCustomizationOptions();
+    }, [selectedTypes]);
+
+    // Auto-fill existing customizations when wig unit is loaded
+    useEffect(() => {
+        if (wigUnit && wigUnit.customizations) {
+            const existingTypes: string[] = [];
+            const existingOptions: SelectedOption[] = [];
+
+            wigUnit.customizations.forEach((customization: any) => {
+                if (customization.options && customization.options.length > 0) {
+                    // Find the type ID for this customization
+                    const type = customizationTypes.find(t => t.name === customization.typeName);
+                    if (type) {
+                        existingTypes.push(type.id);
+                        
+                        // Add the options
+                        customization.options.forEach((option: any) => {
+                            existingOptions.push({
+                                optionId: option.customizationId,
+                                typeId: type.id,
+                                price: option.price.toString()
+                            });
+                        });
+                    }
+                }
+            });
+
+            setSelectedTypes(existingTypes);
+            setSelectedOptions(existingOptions);
+        }
+    }, [wigUnit, customizationTypes]);
 
       // Handle type selection
   const handleTypeChange = (typeId: string, checked: boolean) => {
@@ -122,7 +196,7 @@ export default function WigCustomizationPage() {
     // Get options for a specific type
     const getOptionsForType = (typeId: string) => {
         return customizationOptions.filter(opt =>
-            opt.customizationTypeId === typeId && opt.status === 'active'
+            opt.status === 'active' && (opt as any).typeId === typeId
         );
     };
 
@@ -139,25 +213,24 @@ export default function WigCustomizationPage() {
 
     // Handle save
     const handleSave = async () => {
+        if (!wigUnit) return;
+        
         setIsLoading(true);
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Transform selected options to the format expected by the API
+            const customizations = selectedOptions.map(opt => ({
+                customizationId: opt.optionId,
+                price: getNumericPrice(opt.price)
+            }));
 
-                  console.log('Saving customization:', {
-        unitId,
-        selectedTypes,
-        selectedOptions: selectedOptions.map(opt => ({
-          ...opt,
-          numericPrice: getNumericPrice(opt.price)
-        }))
-      });
+            await updateWigUnit(wigUnit.id, {
+                customizations
+            });
 
-            // Show success message or redirect
-            alert('Customization saved successfully!');
+            // Redirect to customization page
+            router.push('/admin/customization');
         } catch (error) {
             console.error('Error saving customization:', error);
-            alert('Failed to save customization');
         } finally {
             setIsLoading(false);
         }
@@ -168,7 +241,7 @@ export default function WigCustomizationPage() {
         router.push('/admin/customization');
     };
 
-    if (!wigUnit) {
+    if (isLoadingUnit || !wigUnit) {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
@@ -220,14 +293,22 @@ export default function WigCustomizationPage() {
                             Available Customization Types
                         </h2>
                         <div className="space-y-3">
-                            {customizationTypes.map((type) => (
-                                <TypeCheckbox
-                                    key={type.id}
-                                    type={type}
-                                    checked={selectedTypes.includes(type.id)}
-                                    onCheckedChange={(checked) => handleTypeChange(type.id, checked)}
-                                />
-                            ))}
+                            {isLoadingCustomizationTypes ? (
+                                <div className="space-y-2">
+                                    {[1, 2, 3].map((i) => (
+                                        <div key={i} className="h-12 bg-gray-200 rounded animate-pulse"></div>
+                                    ))}
+                                </div>
+                            ) : (
+                                customizationTypes.map((type) => (
+                                    <TypeCheckbox
+                                        key={type.id}
+                                        type={type}
+                                        checked={selectedTypes.includes(type.id)}
+                                        onCheckedChange={(checked) => handleTypeChange(type.id, checked)}
+                                    />
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>
