@@ -6,10 +6,12 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   helperText?: string;
   required?: boolean;
+  icon?: React.ReactNode;
+  iconPosition?: 'left' | 'right';
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, helperText, id, name, required, ...props }, ref) => {
+  ({ className, label, error, helperText, id, name, required, icon, iconPosition = 'left', ...props }, ref) => {
     const inputId = id || name || `input-${label?.toLowerCase().replace(/\s+/g, '-')}`;
 
     return (
@@ -20,21 +22,35 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {required && <span className="text-red-500 ml-1">*</span>}
           </label>
         )}
-        <input
-          id={inputId}
-          name={name}
-          className={cn(
-            "w-full px-3 py-2 rounded-lg border bg-[#F7F9FC] transition-colors",
-            "focus:outline-none focus:ring-2 focus:ring-[#4A85E4] focus:border-transparent",
-            "placeholder:text-gray-400",
-            error 
-              ? "border-red-300 focus:ring-red-500" 
-              : "border-[#E9EAEB] hover:border-[#4A85E4]",
-            className
+        <div className="relative">
+          {icon && iconPosition === 'left' && (
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              {icon}
+            </div>
           )}
-          ref={ref}
-          {...props}
-        />
+          <input
+            id={inputId}
+            name={name}
+            className={cn(
+              "w-full px-3 py-2 rounded-lg border bg-[#F7F9FC] transition-colors",
+              "focus:outline-none focus:ring-2 focus:ring-[#4A85E4] focus:border-transparent",
+              "placeholder:text-gray-400",
+              icon && iconPosition === 'left' ? 'pl-10' : '',
+              icon && iconPosition === 'right' ? 'pr-10' : '',
+              error 
+                ? "border-red-300 focus:ring-red-500" 
+                : "border-[#E9EAEB] hover:border-[#4A85E4]",
+              className
+            )}
+            ref={ref}
+            {...props}
+          />
+          {icon && iconPosition === 'right' && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+              {icon}
+            </div>
+          )}
+        </div>
         {error && (
           <p className="text-[10px] text-red-600">{error}</p>
         )}

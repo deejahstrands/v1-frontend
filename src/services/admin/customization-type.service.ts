@@ -40,6 +40,31 @@ export interface CustomizationTypesResponse {
   };
 }
 
+export interface CustomizationOption {
+  id: string;
+  name: string;
+  description: string;
+  status: 'active' | 'inactive';
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface CustomizationTypeWithOptions {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  options: CustomizationOption[];
+}
+
+export interface CustomizationTypeWithOptionsResponse {
+  message: string;
+  data: CustomizationTypeWithOptions;
+}
+
 class CustomizationTypeService {
   private baseUrl = '/admin/customization/types';
 
@@ -62,6 +87,14 @@ class CustomizationTypeService {
     const url = `${this.baseUrl}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     
     const response = await api.get(url);
+    return response.data;
+  }
+
+  /**
+   * Get customization type with options by ID
+   */
+  async getCustomizationTypeWithOptions(typeId: string): Promise<CustomizationTypeWithOptionsResponse> {
+    const response = await api.get(`${this.baseUrl}/${typeId}`);
     return response.data;
   }
 

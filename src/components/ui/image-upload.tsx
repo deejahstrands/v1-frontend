@@ -36,7 +36,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
   // Set existing image as preview when component mounts or existingImage changes
   React.useEffect(() => {
-    if (existingImage && !selectedFile) {
+    if (existingImage) {
       setPreviewUrl(existingImage);
     } else if (!existingImage && !selectedFile) {
       setPreviewUrl(null);
@@ -77,7 +77,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   }, [onFileSelect]);
 
   const handleRemoveFile = useCallback(() => {
-    if (previewUrl && selectedFile) {
+    // Only revoke URL if it's a blob URL (from file selection)
+    if (previewUrl && selectedFile && previewUrl.startsWith('blob:')) {
       URL.revokeObjectURL(previewUrl);
     }
     setSelectedFile(null);

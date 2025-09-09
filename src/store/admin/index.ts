@@ -25,3 +25,11 @@ export type {
 // Users
 export { useUsers } from "./use-users";
 export type { UserStore } from "./use-users";
+
+// Products
+export { useProductsStore } from "./use-products";
+export type {
+  AdminProduct,
+  CreateProductData,
+  UpdateProductData,
+} from "@/services/admin";

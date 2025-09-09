@@ -170,7 +170,7 @@ const AdminLoginPage = () => {
              <button
                type="submit"
                disabled={isSubmitting || isLoading}
-               className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50"
+               className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 cursor-pointer"
              >
                {isSubmitting || isLoading ? "Signing in..." : "Continue"}
              </button>

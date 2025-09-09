@@ -25,7 +25,33 @@ export type {
   CustomizationOptionsResponse
 } from './customization-option.service';
 
-//export { productService } from './product.service';
+export { productService } from './product.service';
+export type {
+  AdminProduct,
+  CreateProductData,
+  UpdateProductData,
+  ProductResponse,
+  ProductsResponse
+} from './product.service';
+
+export { fittingService } from './fitting.service';
+export type {
+  PrivateFitting,
+  CreateFittingData,
+  UpdateFittingData,
+  FittingResponse,
+  FittingsResponse
+} from './fitting.service';
+
+export { processingTimeService } from './processing-time.service';
+export type {
+  ProcessingTime,
+  CreateProcessingTimeData,
+  UpdateProcessingTimeData,
+  ProcessingTimeResponse,
+  ProcessingTimesResponse
+} from './processing-time.service';
+
 //export { userService } from './user.service';
 //export { orderService } from './order.service';
 //export { consultationService } from './consultation.service';

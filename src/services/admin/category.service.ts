@@ -66,6 +66,15 @@ class CategoryService {
   }
 
   /**
+   * Get all categories without pagination (for dropdowns)
+   */
+  async getAllCategories(): Promise<{ message: string; data: { id: string; name: string }[] }> {
+    // Get all categories by not sending page and limit parameters
+    const response = await api.get(this.baseUrl);
+    return response.data;
+  }
+
+  /**
    * Get a single category by ID
    */
   async getCategory(id: string): Promise<CategoryResponse> {

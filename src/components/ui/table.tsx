@@ -23,7 +23,8 @@ export type TableProps<T> = {
   emptyMessage?: string;
 };
 
-export function Table<T extends { id?: string | number }>({
+export function 
+Table<T extends { id?: string | number }>({
   columns,
   data,
   actions,
@@ -73,12 +74,12 @@ export function Table<T extends { id?: string | number }>({
                   data.map((row, rowIdx) => (
                     <tr key={row.id ?? rowIdx} className="hover:bg-gray-50 transition-colors">
                       {columns.map((col, colIdx) => (
-                        <td key={col.label + colIdx} className={`px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm ${col.className || ""}`}>
+                        <td key={col.label + colIdx} className={`px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-xs xl:text-sm ${col.className || ""}`}>
                           {col.render ? col.render(row) : (row as any)[col.accessor]}
                         </td>
                       ))}
                       {actions && (
-                        <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm cursor-pointer">{actions(row)}</td>
+                        <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-xs xl:text-sm cursor-pointer">{actions(row)}</td>
                       )}
                     </tr>
                   ))

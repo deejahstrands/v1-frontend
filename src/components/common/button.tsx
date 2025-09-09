@@ -25,7 +25,7 @@ export const Button = React.forwardRef<
   ref
 ) {
   const baseStyles =
-    "inline-flex items-center justify-center px-4 py-2 rounded-md font-medium text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
+    "inline-flex items-center justify-center px-4 py-2 rounded-md font-medium text-sm transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2";
   const variantStyles =
     variant === "primary"
       ? "bg-primary text-black hover:bg-primary/90 focus:ring-primary"
