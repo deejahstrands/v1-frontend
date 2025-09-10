@@ -34,7 +34,8 @@ const sidebarNavItems = [
   { href: "/admin/categories", label: "Categories", icon: FolderOpen },
   { href: "/admin/collection", label: "Collection", icon: Star },
   { href: "/admin/discounts", label: "Discount & Deals", icon: Ticket },
-  { href: "/admin/consultation", label: "Consultation", icon: MessageSquare },
+  { href: "/admin/consultation", label: "Consultation", icon: MessageSquare, hasSubItems: true },
+  { href: "/admin/consultation/types", label: "Types", icon: Settings, parent: "consultation" },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
@@ -49,12 +50,18 @@ export function AdminSidebar({
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
 
   const isCustomizationExpanded = pathname.startsWith('/admin/customization');
+  const isConsultationExpanded = pathname.startsWith('/admin/consultation');
 
   useEffect(() => {
+    const expandedMenus = [];
     if (isCustomizationExpanded) {
-      setExpandedMenus(['customization']);
+      expandedMenus.push('customization');
     }
-  }, [isCustomizationExpanded]);
+    if (isConsultationExpanded) {
+      expandedMenus.push('consultation');
+    }
+    setExpandedMenus(expandedMenus);
+  }, [isCustomizationExpanded, isConsultationExpanded]);
 
   const toggleMenu = (menuKey: string) => {
 
@@ -109,7 +116,7 @@ export function AdminSidebar({
 
 
             if (hasSubItems) {
-              const menuKey = 'customization';
+              const menuKey = label.toLowerCase();
               const isExpanded = expandedMenus.includes(menuKey);
               const isInParentSection = pathname.startsWith(href);
               const ChevronIcon = isExpanded ? ChevronUp : ChevronDown;
@@ -154,7 +161,7 @@ export function AdminSidebar({
                       >
                         <div className="ml-6 space-y-1 pt-2">
                           {sidebarNavItems
-                            .filter(item => item.parent === 'customization')
+                            .filter(item => item.parent === menuKey)
                             .map(subItem => {
                               const isSubItemActive = pathname === subItem.href;
                               return (

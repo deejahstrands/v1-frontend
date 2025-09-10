@@ -64,6 +64,16 @@ export type {
   DeleteWigUnitResponse
 } from './wig-unit.service';
 
+export { consultationTypeService } from './consultation-type.service';
+export type {
+  ConsultationType,
+  CreateConsultationTypeData,
+  UpdateConsultationTypeData,
+  ConsultationTypesResponse,
+  ConsultationTypeResponse,
+  DeleteConsultationTypeResponse
+} from './consultation-type.service';
+
 //export { userService } from './user.service';
 //export { orderService } from './order.service';
 //export { consultationService } from './consultation.service';
