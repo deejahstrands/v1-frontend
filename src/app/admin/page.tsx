@@ -1,6 +1,7 @@
 "use client";
 
 import { StatsCards } from "@/components/admin/overview/stats-cards";
+import { QuickActions } from "@/components/admin/overview/quick-actions";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +37,7 @@ export default function AdminDashboardPage() {
         </DropdownMenu>
       </div>
       <StatsCards />
+      <QuickActions />
     </div>
   );
 } 
