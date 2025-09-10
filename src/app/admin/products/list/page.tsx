@@ -584,8 +584,8 @@ export default function ProductsListPage() {
         title="Delete Product"
         message={`Are you sure you want to delete the product "${productToDelete?.name}"?`}
         deletionItems={[
-          "This action cannot be undone",
-          "All product data will be permanently removed"
+          "With attachments: soft delete (recoverable)",
+          "No attachments: permanent deletion"
         ]}
         type="delete"
         confirmText="Delete"

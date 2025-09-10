@@ -32,7 +32,7 @@ const sidebarNavItems = [
   { href: "/admin/customization/types", label: "Types", icon: Palette, parent: "customization" },
   { href: "/admin/customization/options", label: "Options", icon: Palette, parent: "customization" },
   { href: "/admin/categories", label: "Categories", icon: FolderOpen },
-  { href: "/admin/collection", label: "Collection", icon: Star },
+  { href: "/admin/collections", label: "Collection", icon: Star },
   { href: "/admin/discounts", label: "Discount & Deals", icon: Ticket },
   { href: "/admin/consultation", label: "Consultation", icon: MessageSquare, hasSubItems: true },
   { href: "/admin/consultation/types", label: "Types", icon: Settings, parent: "consultation" },

@@ -19,6 +19,7 @@ interface SelectProps {
   helperText?: string;
   className?: string;
   required?: boolean;
+  disabled?: boolean;
 }
 
 export const Select: React.FC<SelectProps> = ({
@@ -30,7 +31,8 @@ export const Select: React.FC<SelectProps> = ({
   error,
   helperText,
   className,
-  required
+  required,
+  disabled = false
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState<SelectOption | null>(
@@ -78,11 +80,13 @@ export const Select: React.FC<SelectProps> = ({
       <div className="relative" ref={dropdownRef}>
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          disabled={disabled}
           className={cn(
-            "w-full px-3 py-2 rounded-lg border bg-[#F7F9FC] text-left transition-colors cursor-pointer",
+            "w-full px-3 py-2 rounded-lg border bg-[#F7F9FC] text-left transition-colors",
+            disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
             "focus:outline-none focus:ring-2 focus:ring-[#4A85E4] focus:border-transparent",
-            "hover:bg-[#F7F9FC]/80",
+            !disabled && "hover:bg-[#F7F9FC]/80",
             error 
               ? "border-red-300 focus:ring-red-500" 
               : "border-[#E9EAEB]",
@@ -101,7 +105,7 @@ export const Select: React.FC<SelectProps> = ({
           />
         </button>
 
-        {isOpen && (
+        {isOpen && !disabled && (
           <div className="absolute z-50 w-full mt-1 bg-white border border-[#E9EAEB] rounded-lg shadow-lg max-h-60 overflow-auto">
             {options.map((option) => (
               <button

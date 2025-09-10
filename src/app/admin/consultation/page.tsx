@@ -27,7 +27,7 @@ const mockConsultations = [
     consultationType: 'In-Studio',
     date: '2025-05-01T09:00:00Z',
     orderId: '#23456',
-    status: 'confirmed',
+    status: 'scheduled',
   },
   {
     id: '3',
@@ -99,8 +99,7 @@ export default function ConsultationPage() {
 
   // Handle view
   const handleView = (consultation: any) => {
-    // TODO: Navigate to consultation details
-    console.log('View consultation:', consultation);
+    router.push(`/admin/consultation/${consultation.id}`);
   };
 
   // Table columns
@@ -150,7 +149,7 @@ export default function ConsultationPage() {
       render: (row) => {
         const statusColors = {
           pending: 'bg-yellow-100 text-yellow-800',
-          confirmed: 'bg-green-100 text-green-800',
+          scheduled: 'bg-green-100 text-green-800',
           canceled: 'bg-red-100 text-red-800',
           completed: 'bg-blue-100 text-blue-800',
         };
@@ -229,7 +228,7 @@ export default function ConsultationPage() {
             options={[
               { label: 'All Status', value: 'all' },
               { label: 'Pending', value: 'pending' },
-              { label: 'Confirmed', value: 'confirmed' },
+              { label: 'Scheduled', value: 'scheduled' },
               { label: 'Canceled', value: 'canceled' },
               { label: 'Completed', value: 'completed' },
             ]}
