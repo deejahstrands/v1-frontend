@@ -32,6 +32,7 @@ export default function CreateCollectionPage() {
     };
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingCollection, setIsLoadingCollection] = useState(false);
     const [isLoadingProducts, setIsLoadingProducts] = useState(false);
     const [isUploadingImage, setIsUploadingImage] = useState(false);
     const [formData, setFormData] = useState({
@@ -102,30 +103,36 @@ export default function CreateCollectionPage() {
 
     // Load collection data for edit mode
     useEffect(() => {
-        if (mode === 'edit' && collectionId) {
-            // TODO: Load collection data for editing
-            // For now, using mock data
-            setCurrentCollection({
-                id: collectionId,
-                name: 'Summer Sale 2025',
-                description: 'Latest summer collection',
-                status: 'active',
-                featured: true,
-                thumbnail: '/dummy/avatar.svg',
-                noOfProducts: 3,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                deletedAt: null,
-            });
+        const loadCollectionForEdit = async () => {
+            if (mode === 'edit' && collectionId) {
+                setIsLoadingCollection(true);
+                try {
+                    const response = await collectionService.getCollectionWithProducts(collectionId);
+                    const collection = response.data;
 
-            setFormData({
-                name: 'Summer Sale 2025',
-                description: 'Latest summer collection',
-                status: 'active',
-                featured: true,
-                thumbnail: '/dummy/avatar.svg',
-            });
-        }
+                    setCurrentCollection(collection);
+                    setFormData({
+                        name: collection.name,
+                        description: collection.description,
+                        status: collection.status,
+                        featured: collection.featured,
+                        thumbnail: collection.thumbnail,
+                    });
+
+                    // Set selected products from the collection
+                    if (collection.products && collection.products.length > 0) {
+                        setSelectedProducts(collection.products.map(p => p.id));
+                    }
+                } catch (error) {
+                    console.error('Error loading collection for edit:', error);
+                    alert('Failed to load collection data. Please try again.');
+                } finally {
+                    setIsLoadingCollection(false);
+                }
+            }
+        };
+
+        loadCollectionForEdit();
     }, [mode, collectionId]);
 
     // Use availableProducts directly since filtering is done on the server
@@ -219,6 +226,20 @@ export default function CreateCollectionPage() {
     // Get selected products for display
     const selectedProductsList = availableProducts.filter(p => selectedProducts.includes(p.id));
 
+    // Show loading state when loading collection for edit
+    if (isLoadingCollection) {
+        return (
+            <div className="w-full mx-auto max-w-7xl px-4 py-6">
+                <div className="flex items-center justify-center min-h-96">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+                        <p className="text-gray-600">Loading collection data...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="w-full mx-auto max-w-7xl px-4 py-6">
             {/* Header */}
@@ -261,10 +282,10 @@ export default function CreateCollectionPage() {
                         </Button>
                         <Button
                             onClick={handleSubmit}
-                            disabled={isLoading || isUploadingImage}
+                            disabled={isLoading || isUploadingImage || isLoadingCollection}
                             className="!bg-black text-white"
                         >
-                            {isLoading ? 'Saving...' : isUploadingImage ? 'Uploading...' : 'Save'}
+                            {isLoading ? 'Saving...' : isUploadingImage ? 'Uploading...' : isLoadingCollection ? 'Loading...' : 'Save'}
                         </Button>
                     </div>
                 </div>
