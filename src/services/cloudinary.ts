@@ -70,6 +70,56 @@ class CloudinaryService {
   }
 
   /**
+   * Upload video to Cloudinary
+   * @param file - The video file to upload
+   * @param folder - Optional folder path in Cloudinary
+   * @returns Promise with upload response
+   */
+  async uploadVideo(file: File, folder?: string): Promise<CloudinaryUploadResponse> {
+    try {
+      // Validate file
+      if (!file.type.startsWith('video/')) {
+        throw new Error('File must be a video');
+      }
+
+      // Check file size (max 50MB)
+      if (file.size > 50 * 1024 * 1024) {
+        throw new Error('File size must be less than 50MB');
+      }
+
+      // Create form data
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', this.config.uploadPreset);
+      formData.append('resource_type', 'video');
+      
+      if (folder) {
+        formData.append('folder', folder);
+      }
+
+      // Upload to Cloudinary
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${this.config.cloudName}/video/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Upload failed');
+      }
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error('Cloudinary video upload error:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get optimized image URL with transformations
    * @param publicId - The public ID of the image
    * @param transformations - Optional transformations object

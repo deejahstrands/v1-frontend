@@ -152,7 +152,7 @@ export function ProductCard({
         </div>
         <div className="p-4 flex flex-col gap-2">
           <div className="font-medium text-xs md:text-base xl:text-lg">
-            <span className="hover:underline text-inherit">
+            <span className="hover:underline text-inherit capitalize">
               {title}
             </span>
           </div>

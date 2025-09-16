@@ -1,7 +1,6 @@
 "use client";
 
 import { SectionHeader } from "@/components/common/section-header";
-import { products } from "@/data/products";
 import { ProductCard } from "@/components/common/product-card";
 import { SectionContainer } from "@/components/common/section-container";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -9,14 +8,94 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { motion } from "motion/react";
+import { useCollections } from "@/store/use-collections";
 
 export function DeejahStrandsCollectionSection() {
     const prevRef = useRef<HTMLButtonElement>(null);
     const nextRef = useRef<HTMLButtonElement>(null);
     const prevMobileRef = useRef<HTMLButtonElement>(null);
     const nextMobileRef = useRef<HTMLButtonElement>(null);
+
+    const {
+        featuredCollection,
+        featuredLoading,
+        featuredError,
+        fetchFeaturedCollection
+    } = useCollections();
+
+    useEffect(() => {
+        fetchFeaturedCollection();
+    }, [fetchFeaturedCollection]);
+
+    if (featuredLoading) {
+        return (
+            <motion.section
+                className="py-10 lg:py-16"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{
+                    duration: 0.8,
+                    ease: [0.25, 0.46, 0.45, 0.94]
+                }}
+            >
+                <SectionContainer>
+                    <SectionHeader
+                        title="Loading Collection..."
+                        description="Please wait while we fetch the featured collection."
+                        buttonText="See More"
+                        buttonHref="/collections"
+                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-8">
+                        {[...Array(4)].map((_, idx) => (
+                            <div key={idx} className="bg-gray-200 animate-pulse rounded-lg aspect-square" />
+                        ))}
+                    </div>
+                </SectionContainer>
+            </motion.section>
+        );
+    }
+
+    if (featuredError) {
+        return (
+            <motion.section
+                className="py-10 lg:py-16"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{
+                    duration: 0.8,
+                    ease: [0.25, 0.46, 0.45, 0.94]
+                }}
+            >
+                <SectionContainer>
+                    <SectionHeader
+                        title="Deejah Strands Collection"
+                        description="Unable to load the featured collection at this time."
+                        buttonText="See More"
+                        buttonHref="/collections"
+                    />
+                </SectionContainer>
+            </motion.section>
+        );
+    }
+
+    const products = featuredCollection?.products || [];
+
+    // Filter out products with missing required data
+    const validProducts = products.filter(product =>
+        product &&
+        product.id &&
+        product.name &&
+        typeof product.basePrice === 'number'
+    );
+
+    // Don't render the section if there are no valid products
+    if (validProducts.length === 0) {
+        return null;
+    }
 
     return (
         <motion.section
@@ -41,8 +120,8 @@ export function DeejahStrandsCollectionSection() {
                     }}
                 >
                     <SectionHeader
-                        title="Deejah Strands Collection"
-                        description="Explore our most loved wigs and bundles—rated by real Deejah beauties."
+                        title={featuredCollection?.name || "Deejah Strands Collection"}
+                        description={featuredCollection?.description || "Explore our most loved wigs and bundles—rated by real Deejah beauties."}
                         buttonText="See More"
                         buttonHref="/collections"
                     />
@@ -102,7 +181,7 @@ export function DeejahStrandsCollectionSection() {
                             swiper.navigation.update();
                         }}
                     >
-                        {products.map((product, index) => (
+                        {validProducts.map((product, index) => (
                             <SwiperSlide key={product.id}>
                                 <motion.div
                                     initial={{ opacity: 0, y: 30 }}
@@ -117,10 +196,10 @@ export function DeejahStrandsCollectionSection() {
                                 >
                                     <ProductCard
                                         id={product.id}
-                                        images={product.images}
-                                        title={product.title}
-                                        price={product.price}
-                                        customization={product.customization}
+                                        images={product.thumbnail ? [product.thumbnail] : ['/images/placeholder-product.jpg']}
+                                        title={product.name || 'Product'}
+                                        price={`₦${(product.basePrice || 0).toLocaleString()}`}
+                                        customization={product.customization || false}
                                     />
                                 </motion.div>
                             </SwiperSlide>

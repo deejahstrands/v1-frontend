@@ -21,7 +21,29 @@ interface SingleCategoryResponse {
   name: string;
   description: string;
   status: 'active' | 'inactive';
-  products?: Array<{ id: string; name: string; image?: string }>; // Make products optional with proper typing
+  noOfProducts: number;
+  products?: {
+    data: Array<{
+      id: string;
+      name: string;
+      thumbnail?: string;
+      basePrice: number;
+      status: string;
+      visibility: string;
+      featured?: boolean;
+      quantityAvailable: number;
+    }>;
+    meta: {
+      page: number;
+      limit: number | null;
+      totalItems: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+      nextPage: number | null;
+      prevPage: number | null;
+    };
+  };
 }
 
 export default function CategoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -250,7 +272,7 @@ export default function CategoryDetailPage({ params }: { params: Promise<{ id: s
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Products:</span>
                 <span className="text-sm font-medium text-gray-900">
-                  {category.products?.length || 0}
+                  {category.products?.data?.length || 0}
                 </span>
               </div>
             </div>
@@ -293,9 +315,9 @@ export default function CategoryDetailPage({ params }: { params: Promise<{ id: s
             </div>
 
             {/* Products List */}
-            {category.products && category.products.length > 0 ? (
+            {category.products?.data && category.products.data.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {category.products.map((product) => (
+                {category.products.data.map((product) => (
                   <div
                     key={product.id}
                     className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-gray-300 transition-colors"
@@ -303,7 +325,7 @@ export default function CategoryDetailPage({ params }: { params: Promise<{ id: s
                     {/* Product Image */}
                     <div className="w-full h-32 mb-3 rounded-lg overflow-hidden">
                       <Image
-                        src={product.image || '/dummy/avatar.svg'}
+                        src={product.thumbnail || '/dummy/avatar.svg'}
                         alt={product.name}
                         width={200}
                         height={128}
@@ -311,10 +333,31 @@ export default function CategoryDetailPage({ params }: { params: Promise<{ id: s
                       />
                     </div>
 
-                    {/* Product Name */}
-                    <h3 className="text-sm font-medium text-gray-900 text-center line-clamp-2">
-                      {product.name}
-                    </h3>
+                    {/* Product Info */}
+                    <div className="text-center">
+                      <h3 className="text-sm font-medium text-gray-900 mb-1 line-clamp-2">
+                        {product.name}
+                      </h3>
+                      <p className="text-xs text-gray-500 mb-1">
+                        ₦{product.basePrice.toLocaleString()}
+                      </p>
+                      <div className="flex items-center justify-center gap-2">
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          product.status === 'available' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {product.status}
+                        </span>
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          product.visibility === 'published' 
+                            ? 'bg-blue-100 text-blue-800' 
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {product.visibility}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -354,7 +397,7 @@ export default function CategoryDetailPage({ params }: { params: Promise<{ id: s
           createdAt: selectedCategory.createdAt,
           updatedAt: selectedCategory.updatedAt,
           deletedAt: selectedCategory.deletedAt,
-          noOfProducts: selectedCategory.products?.length || 0
+          noOfProducts: selectedCategory.products?.data?.length || 0
         } : undefined}
         onSave={handleSaveCategory}
       />

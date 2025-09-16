@@ -6,6 +6,7 @@ import { LoginModalProvider } from "@/components/auth/login-modal-provider";
 import { LoadingScreen } from "@/components/common/loading-screen";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { StructuredData, organizationSchema, websiteSchema } from '@/components/seo/structured-data';
 
 const satoshi = localFont({
   src: [
@@ -37,8 +38,79 @@ const ethereal = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Deejah Strands",
-  description: "Luxury in hairs",
+  title: {
+    template: '%s | Deejah Strands',
+    default: 'Deejah Strands - Luxury Hair & Wigs | Premium Raw & Virgin Hair'
+  },
+  description: "Experience the finest raw and virgin hair — flawlessly customized for your look, lifestyle, and legacy. Shop premium wigs, closures, frontals, and bundles at Deejah Strands.",
+  keywords: [
+    'luxury hair',
+    'virgin hair',
+    'raw hair',
+    'wigs',
+    'lace wigs',
+    'closures',
+    'frontals',
+    'hair bundles',
+    'custom wigs',
+    'Nigerian hair brand',
+    'premium hair extensions',
+    'HD lace wigs',
+    'body wave',
+    'straight hair',
+    'curly hair',
+    'hair customization'
+  ],
+  authors: [{ name: 'Deejah Strands' }],
+  creator: 'Deejah Strands',
+  publisher: 'Deejah Strands',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://deejahstrands.co'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Deejah Strands - Luxury Hair & Wigs | Premium Raw & Virgin Hair',
+    description: 'Experience the finest raw and virgin hair — flawlessly customized for your look, lifestyle, and legacy. Shop premium wigs, closures, frontals, and bundles.',
+    url: 'https://deejahstrands.co',
+    siteName: 'Deejah Strands',
+    images: [
+      {
+        url: '/logo/logo-white.svg',
+        width: 1200,
+        height: 630,
+        alt: 'Deejah Strands - Luxury Hair & Wigs',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Deejah Strands - Luxury Hair & Wigs | Premium Raw & Virgin Hair',
+    description: 'Experience the finest raw and virgin hair — flawlessly customized for your look, lifestyle, and legacy.',
+    images: ['/logo/logo-white.svg'],
+    creator: '@deejahstrands',
+    site: '@deejahstrands',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -86,6 +158,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <LoadingScreen />
         <LayoutWrapper>{children}</LayoutWrapper>
         <LoginModalProvider />
+        <StructuredData data={organizationSchema} />
+        <StructuredData data={websiteSchema} />
         <ToastContainer
           position="top-right"
           autoClose={5000}

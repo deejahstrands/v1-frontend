@@ -9,10 +9,10 @@ import { MobileMenu } from "./mobile-menu";
 import { SearchModal } from "./search-modal";
 import { Button } from "./button";
 import { SectionContainer } from "./section-container";
-import { categories } from "@/data/categories";
 import { useCart } from '@/store/use-cart';
 import { useWishlist } from '@/store/use-wishlist';
 import { useAuth } from '@/store/use-auth';
+import { useCategories } from '@/store/use-categories';
 import { useLoginModal } from '@/hooks/use-login-modal';
 
 const mainNavItems = [
@@ -28,6 +28,7 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
   const { openModal } = useLoginModal();
+  const { categories } = useCategories();
   const cartCount = useCart(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
   const wishlistCount = useWishlist(state => state.items.length);
 
@@ -95,8 +96,8 @@ export function Header() {
                 <div className="absolute left-0 top-full w-48 py-2 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   {categories.map((category) => (
                     <Link
-                      key={category.name}
-                      href={`/shop/category/${encodeURIComponent(category.name)}`}
+                      key={category.id}
+                      href={`/shop/category/${category.id}`}
                       className="block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                     >
                       {category.name}
@@ -196,7 +197,7 @@ export function Header() {
         mainNavItems={mainNavItems}
         categories={categories.map(cat => ({
           label: cat.name,
-          href: `/shop?category=${encodeURIComponent(cat.name)}`
+          href: `/shop/category/${cat.id}`
         }))}
         isLoggedIn={isAuthenticated}
         user={user}

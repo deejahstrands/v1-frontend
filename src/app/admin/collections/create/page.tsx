@@ -35,12 +35,14 @@ export default function CreateCollectionPage() {
     const [isLoadingCollection, setIsLoadingCollection] = useState(false);
     const [isLoadingProducts, setIsLoadingProducts] = useState(false);
     const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const [isUploadingVideo, setIsUploadingVideo] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         description: '',
         status: 'active' as 'active' | 'inactive',
         featured: false,
         thumbnail: '',
+        video: '',
     });
 
     const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
@@ -117,6 +119,7 @@ export default function CreateCollectionPage() {
                         status: collection.status,
                         featured: collection.featured,
                         thumbnail: collection.thumbnail,
+                        video: (collection as any).video || '',
                     });
 
                     // Set selected products from the collection
@@ -157,6 +160,20 @@ export default function CreateCollectionPage() {
             alert('Failed to upload image. Please try again.');
         } finally {
             setIsUploadingImage(false);
+        }
+    };
+
+    // Handle video upload
+    const handleVideoUpload = async (file: File) => {
+        setIsUploadingVideo(true);
+        try {
+            const response = await cloudinaryService.uploadVideo(file, 'collections');
+            handleInputChange('video', response.secure_url);
+        } catch (error) {
+            console.error('Error uploading video:', error);
+            alert('Failed to upload video. Please try again.');
+        } finally {
+            setIsUploadingVideo(false);
         }
     };
 
@@ -282,10 +299,10 @@ export default function CreateCollectionPage() {
                         </Button>
                         <Button
                             onClick={handleSubmit}
-                            disabled={isLoading || isUploadingImage || isLoadingCollection}
+                            disabled={isLoading || isUploadingImage || isUploadingVideo || isLoadingCollection}
                             className="!bg-black text-white"
                         >
-                            {isLoading ? 'Saving...' : isUploadingImage ? 'Uploading...' : isLoadingCollection ? 'Loading...' : 'Save'}
+                            {isLoading ? 'Saving...' : isUploadingImage ? 'Uploading Image...' : isUploadingVideo ? 'Uploading Video...' : isLoadingCollection ? 'Loading...' : 'Save'}
                         </Button>
                     </div>
                 </div>
@@ -307,6 +324,72 @@ export default function CreateCollectionPage() {
                                 }
                             }}
                             existingImage={formData.thumbnail}
+                        />
+                    </div>
+
+                    {/* Collection Video */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Collection Video (Optional)
+                        </label>
+                        <p className="text-sm text-gray-500 mb-3">
+                            Upload a video for the hero section and collection showcase
+                        </p>
+                        
+                        {formData.video ? (
+                            <div className="space-y-3">
+                                <div className="relative">
+                                    <video
+                                        src={formData.video}
+                                        className="w-full h-48 object-cover rounded-lg"
+                                        controls
+                                    />
+                                    <button
+                                        onClick={() => handleInputChange('video', '')}
+                                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 cursor-pointer"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <button
+                                    onClick={() => document.getElementById('video-upload')?.click()}
+                                    disabled={isUploadingVideo}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isUploadingVideo ? 'Uploading...' : 'Replace Video'}
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                                <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                <div className="mt-4">
+                                    <button
+                                        onClick={() => document.getElementById('video-upload')?.click()}
+                                        disabled={isUploadingVideo}
+                                        className="text-indigo-600 hover:text-indigo-500 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {isUploadingVideo ? 'Uploading...' : 'Upload a video'}
+                                    </button>
+                                    <p className="text-sm text-gray-500 mt-1">MP4, MOV, AVI up to 50MB</p>
+                                </div>
+                            </div>
+                        )}
+                        
+                        <input
+                            id="video-upload"
+                            type="file"
+                            accept="video/*"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                    handleVideoUpload(file);
+                                }
+                            }}
+                            className="hidden"
                         />
                     </div>
 
@@ -495,10 +578,10 @@ export default function CreateCollectionPage() {
                 </Button>
                 <Button
                     onClick={handleSubmit}
-                    disabled={isLoading}
+                    disabled={isLoading || isUploadingImage || isUploadingVideo}
                     className="!bg-black text-white"
                 >
-                    {isLoading ? 'Saving...' : 'Save'}
+                    {isLoading ? 'Saving...' : isUploadingImage ? 'Uploading Image...' : isUploadingVideo ? 'Uploading Video...' : 'Save'}
                 </Button>
             </div>
         </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Bell, ChevronDown, Menu, LogOut, CalendarIcon } from "lucide-react";
+import { Bell, ChevronDown, Menu, LogOut, CalendarIcon, Home } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
@@ -65,6 +65,23 @@ export function AdminHeader({
           <div className="flex-1"></div>
 
           <div className="flex items-center gap-4">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => router.push('/')}
+                    className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-none cursor-pointer"
+                  >
+                    <Home className="h-4 w-4" />
+                    <span className="text-sm font-medium hidden xl:inline">Go Home</span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Go to main website</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
             <div className="hidden lg:flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2">
               <CalendarIcon className="h-5 w-5 text-gray-600" />
               <span className="text-sm font-medium">{currentDate}</span>
@@ -151,6 +168,14 @@ export function AdminHeader({
       <div className="flex-1"></div>
 
       <div className="flex items-center gap-4">
+        <button
+          onClick={() => router.push('/')}
+          className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-none"
+        >
+          <Home className="h-4 w-4" />
+          <span className="text-sm font-medium">Home</span>
+        </button>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="text-gray-600 hover:text-gray-900 focus-visible:outline-none">
