@@ -1,8 +1,10 @@
 'use client';
 
-import React from 'react';
-import { X, Edit } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Edit, Eye, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Modal } from '@/components/ui/modal';
+import { EditCartModal } from './edit-cart-modal';
 import type { CartItem } from '@/store/use-cart';
 import Image from 'next/image';
 
@@ -11,13 +13,20 @@ interface CartItemCardProps {
   onRemove: () => void;
   onIncrease: () => void;
   onDecrease: () => void;
+  onEdit?: () => void; // Callback to refresh cart data after edit
 }
 
-export function CartItemCard({ item, onRemove, onIncrease, onDecrease }: CartItemCardProps) {
+export function CartItemCard({ item, onRemove, onIncrease, onDecrease, onEdit }: CartItemCardProps) {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const formatPrice = (price: number) => `₦${price.toLocaleString()}`;
   
-  // Debug: Log cart item data to check images
-  console.log('Cart Item Data:', item);
+  const handleDeleteConfirm = () => {
+    onRemove();
+    setShowDeleteModal(false);
+  };
+
   
   const renderCustomizations = () => {
     const customizations = Object.entries(item.customizations);
@@ -38,13 +47,6 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease }: CartIte
   };
 
   const renderSpecifications = () => {
-    // Debug: Log specifications data
-    console.log('Specifications check:', {
-      hasCustomizations: Object.keys(item.customizations).length > 0,
-      customizations: item.customizations,
-      specifications: item.specifications,
-      specificationsLength: item.specifications?.length
-    });
     
     // Only show specifications if there are no customizations
     if (Object.keys(item.customizations).length > 0) return null;
@@ -93,21 +95,56 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease }: CartIte
           <div>HEAD MEASUREMENT - EAR TO EAR: {item.measurements.earToEar}&rdquo;</div>
           <div>HEAD MEASUREMENT - HEAD CIRCUMFERENCE: {item.measurements.headCircumference}&quot;</div>
           <div>HEAD MEASUREMENT - FOREHEAD TO NAPE: {item.measurements.foreheadToNape || 'N/A'}&quot;</div>
-          <div className="flex items-center gap-2">
-            <span>FRONT AND SIDE PICTURES OF YOUR HAIR LINE:</span>
-            {item.measurements.hairlinePictures && (
-              <div className="w-6 h-6 bg-gray-200 rounded flex items-center justify-center">
-                <span className="text-xs">IMG</span>
-              </div>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <span>HOW YOU WOULD LIKE THE WIG STYLED - PICTURE REFERENCE:</span>
-            {item.measurements.styleReference && (
-              <div className="w-6 h-6 bg-gray-200 rounded flex items-center justify-center">
-                <span className="text-xs">IMG</span>
-              </div>
-            )}
+          <div className="space-y-2">
+            <div>
+              <span className="block text-sm font-medium mb-2">FRONT AND SIDE PICTURES OF YOUR HAIR LINE:</span>
+              {item.measurements.hairlinePictures && item.measurements.hairlinePictures.length > 0 ? (
+                <div className="flex gap-2 flex-wrap">
+                  {item.measurements.hairlinePictures.map((picture, index) => (
+                    <div key={index} className="relative group cursor-pointer">
+                      <Image
+                        src={typeof picture === 'string' ? picture : URL.createObjectURL(picture)}
+                        alt={`Hairline picture ${index + 1}`}
+                        width={60}
+                        height={60}
+                        className="w-15 h-15 object-cover rounded border hover:opacity-75 transition-opacity"
+                        onClick={() => setSelectedImage(typeof picture === 'string' ? picture : URL.createObjectURL(picture))}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Eye className="w-4 h-4 text-white drop-shadow" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-gray-500 text-sm">No images uploaded</span>
+              )}
+            </div>
+            
+            <div>
+              <span className="block text-sm font-medium mb-2">HOW YOU WOULD LIKE THE WIG STYLED - PICTURE REFERENCE:</span>
+              {item.measurements.styleReference && item.measurements.styleReference.length > 0 ? (
+                <div className="flex gap-2 flex-wrap">
+                  {item.measurements.styleReference.map((reference, index) => (
+                    <div key={index} className="relative group cursor-pointer">
+                      <Image
+                        src={typeof reference === 'string' ? reference : URL.createObjectURL(reference)}
+                        alt={`Style reference ${index + 1}`}
+                        width={60}
+                        height={60}
+                        className="w-15 h-15 object-cover rounded border hover:opacity-75 transition-opacity"
+                        onClick={() => setSelectedImage(typeof reference === 'string' ? reference : URL.createObjectURL(reference))}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Eye className="w-4 h-4 text-white drop-shadow" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-gray-500 text-sm">No images uploaded</span>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -169,7 +206,8 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease }: CartIte
   };
 
   return (
-    <div className="bg-white p-6 space-y-4">
+    <>
+      <div className="bg-white p-6 space-y-4">
       {/* Two-column layout: Image on left, details on right */}
       <div className="flex gap-6">
         {/* Left Column: Product Image */}
@@ -197,16 +235,22 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease }: CartIte
               {item.title}
             </h3>
             <button
-              onClick={onRemove}
-              className="text-gray-400 hover:text-red-500 transition-colors p-1"
+              onClick={() => setShowDeleteModal(true)}
+              className="text-gray-400 hover:text-red-500 transition-colors p-1 cursor-pointer"
+              title="Remove item from cart"
             >
-              <X className="w-5 h-5" />
+              <Trash2 className="w-5 h-5" />
             </button>
           </div>
 
           {/* Edit Options Button */}
           <div className="mb-4">
-            <Button variant="outline" size="sm" className="text-xs">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="text-xs cursor-pointer"
+              onClick={() => setShowEditModal(true)}
+            >
               <Edit className="w-3 h-3 mr-1" />
               Edit Options
             </Button>
@@ -245,12 +289,7 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease }: CartIte
               <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                 <button
                   onClick={() => {
-                    console.log('=== DECREASE BUTTON CLICKED ===');
-                    console.log('Current item:', {
-                      productId: item.productId,
-                      quantity: item.quantity,
-                      title: item.title
-                    });
+                   
                     onDecrease();
                   }}
                   className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:text-gray-300"
@@ -263,12 +302,7 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease }: CartIte
                 </div>
                 <button
                   onClick={() => {
-                    console.log('=== INCREASE BUTTON CLICKED ===');
-                    console.log('Current item:', {
-                      productId: item.productId,
-                      quantity: item.quantity,
-                      title: item.title
-                    });
+                    
                     onIncrease();
                   }}
                   className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700"
@@ -292,11 +326,84 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease }: CartIte
           <div className="flex justify-between items-center pt-2 border-t border-gray-100">
             <span className="font-medium text-gray-900">TOTAL</span>
             <span className="font-semibold text-lg text-gray-900">
-              {formatPrice(item.totalPrice * item.quantity)}
+              {formatPrice(item.totalPrice)}
             </span>
           </div>
         </div>
       </div>
-    </div>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal 
+        open={showDeleteModal} 
+        onClose={() => setShowDeleteModal(false)}
+        size="sm"
+        className="p-6"
+      >
+        <div className="text-center">
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+            <Trash2 className="h-6 w-6 text-red-600" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Remove Item from Cart
+          </h3>
+          <p className="text-sm text-gray-500 mb-6">
+            Are you sure you want to remove &ldquo;{item.title}&rdquo; from your cart? This action cannot be undone.
+          </p>
+          <div className="flex gap-3 justify-center">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteModal(false)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleDeleteConfirm}
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+            >
+              Remove Item
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Edit Cart Modal */}
+      {item.apiData?.cartItemId && (
+        <EditCartModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          cartItemId={item.apiData.cartItemId}
+          onSave={() => {
+            if (onEdit) onEdit();
+          }}
+        />
+      )}
+
+      {/* Image Modal */}
+      {selectedImage && (
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+        onClick={() => setSelectedImage(null)}
+      >
+        <div className="relative max-w-3xl max-h-[90vh] w-full h-full">
+          <button
+            onClick={() => setSelectedImage(null)}
+            className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 hover:bg-gray-100 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <Image
+            src={selectedImage!}
+            alt="Full size image"
+            fill
+            className="object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      </div>
+    )}
+    </>
   );
 } 

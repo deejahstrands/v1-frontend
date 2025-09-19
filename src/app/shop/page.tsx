@@ -3,7 +3,7 @@ import ShopClient from './shop-client';
 import { StructuredData, storeSchema } from '@/components/seo/structured-data';
 
 export const metadata: Metadata = {
-  title: 'Shop | All Categories',
+  title: 'Shop | Deejah Strands',
   description: 'Browse our complete collection of premium wigs, closures, frontals, and hair extensions. Find luxury hair pieces in all textures, lengths, and styles.',
   keywords: [
     'shop hair online',
@@ -17,7 +17,20 @@ export const metadata: Metadata = {
     'luxury wig store',
     'Nigerian hair shop',
     'raw hair shop',
-    'virgin hair shop'
+    'virgin hair shop',
+    'Bone Straight Hair Shop',
+    'Curly Hair Shop',
+    'Wavy Hair Shop',
+    'Straight Hair Shop',
+    'Wavy Hair Shop',
+    'Curly Hair Shop',
+    'Bone Straight Hair Shop',
+    'Human hair wig online store in Nigeria',
+    'premium human hair wigs Nigeria',
+    'premium human hair wigs online',
+    'premium human hair wigs store',
+    'premium human hair wigs shop',
+    'premium human hair wigs Nigeria',
   ],
   openGraph: {
     title: 'Shop Premium Hair & Wigs - Deejah Strands',

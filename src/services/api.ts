@@ -37,14 +37,22 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
-      // Clear token and redirect to appropriate login
-      if (typeof window !== "undefined") {
+      // Don't redirect if this is a login request (let the login form handle the error)
+      const isLoginRequest = error.config?.url?.includes('/auth/login') || 
+                            error.config?.url?.includes('/auth/register');
+      
+      if (!isLoginRequest && typeof window !== "undefined") {
+        // Clear token and redirect to appropriate login
         document.cookie =
           "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
         
         // Redirect to admin login if on admin route, otherwise user login
         const isAdminRoute = window.location.pathname.startsWith('/admin');
-        const loginUrl = isAdminRoute ? '/admin-auth/login' : '/auth/login';
+        const currentPath = window.location.pathname + window.location.search;
+        const returnUrl = encodeURIComponent(currentPath);
+        const loginUrl = isAdminRoute 
+          ? `/admin-auth/login?returnUrl=${returnUrl}` 
+          : `/auth/login?returnUrl=${returnUrl}`;
         
         window.location.href = loginUrl;
       }

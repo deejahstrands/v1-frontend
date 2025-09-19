@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import { SearchInput } from "@/components/ui/search-input";
@@ -10,18 +12,17 @@ import { SectionContainer } from "@/components/common/section-container";
 import * as Slider from "@radix-ui/react-slider";
 import { useProductGrid } from "@/store/use-product-grid";
 import { motion, AnimatePresence } from "motion/react";
-import { categories } from "@/data/categories";
+import { useCategories } from "@/store/use-categories";
+import { useProducts } from "@/store/use-products";
 import PriceDropdown from "./PriceDropdown";
 import CategoriesDropdown from "./CategoriesDropdown";
 
 const SORT_OPTIONS = [
-  { label: "Relevance", value: "relevance" },
   { label: "Featured", value: "featured" },
-  { label: "Best Selling", value: "best-selling" },
-  { label: "Alphabetically, A - Z", value: "az" },
-  { label: "Alphabetically, Z - A", value: "za" },
-  { label: "Price, Low to High", value: "price-asc" },
-  { label: "Price, High to Low", value: "price-desc" },
+  { label: "Name A-Z", value: "name" },
+  { label: "Name Z-A", value: "-name" },
+  { label: "Price Low to High", value: "price" },
+  { label: "Price High to Low", value: "-price" },
 ];
 
 const GRID_OPTIONS = [
@@ -30,7 +31,7 @@ const GRID_OPTIONS = [
   { value: 2, icon: Rows2 },
 ];
 
-const PRICE_MIN = 350000;
+const PRICE_MIN = 5000;
 const PRICE_MAX = 1600000;
 
 export const FilterBar = () => {
@@ -40,17 +41,49 @@ export const FilterBar = () => {
   const [sort, setSort] = useState(SORT_OPTIONS[0].value);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [priceDraft, setPriceDraft] = useState<[number, number]>(price);
-  // Category filter state
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  // Category filter state (single selection)
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
-  // TODO: Replace with real product count
-  const productCount = 120;
+  // Stores
+  const {
+    categories,
+    loading: categoriesLoading,
+    fetchActiveCategories
+  } = useCategories();
+
+  const {
+    totalItems: productCount,
+    fetchProducts,
+    setFilters
+  } = useProducts();
+
+  // Fetch categories on mount (avoid duplicate calls)
+  useEffect(() => {
+    if (categories.length === 0 && !categoriesLoading) {
+      fetchActiveCategories();
+    }
+  }, [categories.length, categoriesLoading, fetchActiveCategories]);
+
+  // Initial products fetch on mount
+  useEffect(() => {
+    fetchProducts({ limit: 12 });
+  }, []); // Remove fetchProducts dependency to prevent re-fetching
+
 
   // Debounced search handler using useRef
   const debouncedSearchRef = useRef(
-    debounce((value: string) => {
-      // TODO: Trigger search/filter logic here
-      console.log('Debounced search:', value);
+    debounce((searchValue: string) => {
+      // Apply filters with new search value immediately
+      const filters = {
+        search: searchValue || undefined,
+        priceFrom: price[0] !== PRICE_MIN ? price[0] : undefined,
+        priceTo: price[1] !== PRICE_MAX ? price[1] : undefined,
+        categoryId: selectedCategory || undefined,
+        sortBy: sort !== SORT_OPTIONS[0].value ? (sort as any) : undefined,
+      };
+
+      setFilters(filters);
+      fetchProducts(filters);
     }, 400)
   );
 
@@ -62,11 +95,36 @@ export const FilterBar = () => {
   // Handlers
   const handleApplyPrice = () => {
     setPrice(priceDraft);
-    // TODO: Trigger filter update
     setMobileOpen(false);
+
+    // Apply filters with new price values immediately
+    const filters = {
+      search: search || undefined,
+      priceFrom: priceDraft[0] !== PRICE_MIN ? priceDraft[0] : undefined,
+      priceTo: priceDraft[1] !== PRICE_MAX ? priceDraft[1] : undefined,
+      categoryId: selectedCategory || undefined,
+      sortBy: sort !== SORT_OPTIONS[0].value ? (sort as any) : undefined,
+    };
+
+    setFilters(filters);
+    fetchProducts(filters);
   };
-  const handleResetPrice = () => {
-    setPriceDraft([PRICE_MIN, PRICE_MAX]);
+
+  // Handle sort change
+  const handleSortChange = (newSort: string) => {
+    setSort(newSort);
+
+    // Apply filters with new sort value immediately
+    const filters = {
+      search: search || undefined,
+      priceFrom: price[0] !== PRICE_MIN ? price[0] : undefined,
+      priceTo: price[1] !== PRICE_MAX ? price[1] : undefined,
+      categoryId: selectedCategory || undefined,
+      sortBy: newSort !== SORT_OPTIONS[0].value ? (newSort as any) : undefined,
+    };
+
+    setFilters(filters);
+    fetchProducts(filters);
   };
 
   // Format price for display
@@ -76,12 +134,38 @@ export const FilterBar = () => {
   const { grid, setGrid } = useProductGrid();
 
   // Handlers for categories
-  const handleCategoryToggle = (cat: string) => {
-    setSelectedCategories((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-    );
+  const handleCategorySelect = (categoryId: string) => {
+    const newCategory = categoryId === selectedCategory ? "" : categoryId;
+    setSelectedCategory(newCategory);
+
+    // Apply filters with the new category value immediately
+    const filters = {
+      search: search || undefined,
+      priceFrom: price[0] !== PRICE_MIN ? price[0] : undefined,
+      priceTo: price[1] !== PRICE_MAX ? price[1] : undefined,
+      categoryId: newCategory || undefined,
+      sortBy: sort !== SORT_OPTIONS[0].value ? (sort as any) : undefined,
+    };
+
+    setFilters(filters);
+    fetchProducts(filters);
   };
-  const handleResetCategories = () => setSelectedCategories([]);
+
+  const handleResetCategory = () => {
+    setSelectedCategory("");
+
+    // Apply filters without category
+    const filters = {
+      search: search || undefined,
+      priceFrom: price[0] !== PRICE_MIN ? price[0] : undefined,
+      priceTo: price[1] !== PRICE_MAX ? price[1] : undefined,
+      categoryId: undefined,
+      sortBy: sort !== SORT_OPTIONS[0].value ? (sort as any) : undefined,
+    };
+
+    setFilters(filters);
+    fetchProducts(filters);
+  };
 
   useEffect(() => {
     if (mobileOpen) {
@@ -100,6 +184,13 @@ export const FilterBar = () => {
       <div className="hidden lg:flex flex-col gap-2">
         <div className="flex items-center justify-between gap-4 bg-tertiary rounded-xl px-4 py-3 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
+            {/* Search Input */}
+            <SearchInput 
+              value={search} 
+              onChange={handleSearchInput} 
+              placeholder="Search for hairs..." 
+              className="min-w-[280px]" 
+            />
             {/* Price Dropdown */}
             <PriceDropdown
               value={priceDraft}
@@ -112,9 +203,9 @@ export const FilterBar = () => {
             {/* Categories Dropdown */}
             <CategoriesDropdown
               categories={categories}
-              selected={selectedCategories}
-              onToggle={handleCategoryToggle}
-              onReset={handleResetCategories}
+              selected={selectedCategory ? [selectedCategory] : []}
+              onToggle={handleCategorySelect}
+              onReset={handleResetCategory}
             />
           </div>
           <div className="flex items-center gap-4 min-w-[320px] justify-end">
@@ -130,7 +221,7 @@ export const FilterBar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="p-4 bg-white border border-gray-200">
                 {SORT_OPTIONS.map(option => (
-                  <DropdownMenuItem key={option.value} onClick={() => setSort(option.value)}>
+                  <DropdownMenuItem key={option.value} onClick={() => handleSortChange(option.value)}>
                     {option.label}
                   </DropdownMenuItem>
                 ))}
@@ -157,18 +248,33 @@ export const FilterBar = () => {
           </div>
         </div>
         {/* Selected Filters Row */}
-        {(selectedCategories.length > 0 || price[0] !== PRICE_MIN || price[1] !== PRICE_MAX) && (
+        {(selectedCategory || price[0] !== PRICE_MIN || price[1] !== PRICE_MAX) && (
           <div className="flex flex-wrap gap-2 mt-2">
-            {selectedCategories.map(cat => (
-              <span key={cat} className="px-3 py-1 rounded-full bg-black text-white text-xs flex items-center gap-1">
-                {cat}
-                <button onClick={() => handleCategoryToggle(cat)} className="ml-1 text-white hover:text-primary">×</button>
+            {selectedCategory && (
+              <span className="px-3 py-1 rounded-full bg-black text-white text-xs flex items-center gap-1">
+                {categories.find(c => c.id === selectedCategory)?.name || selectedCategory}
+                <button onClick={() => handleCategorySelect(selectedCategory)} className="ml-1 text-white hover:text-primary cursor-pointer">×</button>
               </span>
-            ))}
+            )}
             {(price[0] !== PRICE_MIN || price[1] !== PRICE_MAX) && (
               <span className="px-3 py-1 rounded-full bg-black text-white text-xs flex items-center gap-1">
                 ₦{price[0].toLocaleString()} - ₦{price[1].toLocaleString()}
-                <button onClick={() => setPrice([PRICE_MIN, PRICE_MAX])} className="ml-1 text-white hover:text-primary">×</button>
+                <button onClick={() => {
+                  setPrice([PRICE_MIN, PRICE_MAX]);
+                  setPriceDraft([PRICE_MIN, PRICE_MAX]);
+
+                  // Apply filters without price range
+                  const filters = {
+                    search: search || undefined,
+                    priceFrom: undefined,
+                    priceTo: undefined,
+                    categoryId: selectedCategory || undefined,
+                    sortBy: sort !== SORT_OPTIONS[0].value ? (sort as any) : undefined,
+                  };
+
+                  setFilters(filters);
+                  fetchProducts(filters);
+                }} className="ml-1 text-white hover:text-primary cursor-pointer">×</button>
               </span>
             )}
           </div>
@@ -180,7 +286,7 @@ export const FilterBar = () => {
           <SearchInput value={search} onChange={handleSearchInput} placeholder="Search for hairs..." className="w-full" />
         </div>
         <div className="col-span-2 flex items-center">
-          <Button variant="tertiary" className="p-2 w-full" onClick={() => setMobileOpen(true)}>
+          <Button variant="tertiary" className="p-2 w-full cursor-pointer" onClick={() => setMobileOpen(true)}>
             <FilterIcon className="w-5 h-5 mx-auto" />
           </Button>
         </div>
@@ -209,7 +315,7 @@ export const FilterBar = () => {
                 <span className="block text-sm font-medium mb-2">Sort By</span>
                 <div className="flex gap-2 overflow-x-auto pb-2">
                   {SORT_OPTIONS.map(option => (
-                    <Button key={option.value} variant={sort === option.value ? "primary" : "tertiary"} className="whitespace-nowrap px-3 py-1 text-xs" onClick={() => setSort(option.value)}>
+                    <Button key={option.value} variant={sort === option.value ? "primary" : "tertiary"} className="whitespace-nowrap px-3 py-1 text-xs" onClick={() => handleSortChange(option.value)}>
                       {option.label}
                     </Button>
                   ))}
@@ -223,11 +329,11 @@ export const FilterBar = () => {
                 <div className="flex gap-2 overflow-x-auto pb-2 whitespace-nowrap">
                   {categories.map(cat => (
                     <button
-                      key={cat.name}
+                      key={cat.id}
                       type="button"
-                      onClick={() => handleCategoryToggle(cat.name)}
+                      onClick={() => handleCategorySelect(cat.id)}
                       className={`whitespace-nowrap px-3 py-1 text-xs rounded-full font-medium transition-colors
-                        ${selectedCategories.includes(cat.name)
+                        ${selectedCategory === cat.id
                           ? "bg-primary text-white border border-primary"
                           : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-100"}
                       `}
@@ -261,12 +367,37 @@ export const FilterBar = () => {
                   <Slider.Thumb className="block w-5 h-5 bg-white border-2 border-primary rounded-full shadow transition-colors focus:outline-none focus:ring-2 focus:ring-primary" />
                 </Slider.Root>
                 <div className="flex gap-2 mt-2">
-                  <Button variant="tertiary" className="px-2 py-1 text-xs" onClick={handleResetPrice}>Reset</Button>
+                  <Button
+                    variant="tertiary"
+                    className="px-2 py-1 text-xs cursor-pointer flex-1"
+                    onClick={() => {
+                      setPriceDraft([PRICE_MIN, PRICE_MAX]);
+                      setPrice([PRICE_MIN, PRICE_MAX]);
+
+                      // Apply filters without price range immediately
+                      const filters = {
+                        search: search || undefined,
+                        priceFrom: undefined,
+                        priceTo: undefined,
+                        categoryId: selectedCategory || undefined,
+                        sortBy: sort !== SORT_OPTIONS[0].value ? (sort as any) : undefined,
+                      };
+
+                      setFilters(filters);
+                      fetchProducts(filters);
+                    }}
+                  >
+                    Reset
+                  </Button>
+                  <Button
+                    variant="primary"
+                    className="px-2 py-1 text-xs cursor-pointer flex-1"
+                    onClick={handleApplyPrice}
+                  >
+                    Apply Price
+                  </Button>
                 </div>
               </div>
-              {/* Horizontal line after price row */}
-              <hr className="my-3 border-gray-200" />
-              <Button variant="primary" className="w-full mt-4" onClick={handleApplyPrice}>Apply Filters</Button>
             </div>
           </motion.div>
         )}

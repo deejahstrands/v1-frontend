@@ -17,15 +17,19 @@ export default function CollectionsClient() {
     fetchFeaturedCollection
   } = useCollections();
 
-  // Frontend pagination state
+  // Backend pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
   useEffect(() => {
-    fetchFeaturedCollection();
-  }, [fetchFeaturedCollection]);
+    fetchFeaturedCollection({
+      page: currentPage,
+      limit: itemsPerPage
+    });
+  }, [fetchFeaturedCollection, currentPage]);
 
-  const products = featuredCollection?.products || [];
+  const products = featuredCollection?.products?.data || [];
+  const meta = featuredCollection?.products?.meta;
   
   // Filter out products with missing required data
   const validProducts = products.filter(product => 
@@ -35,12 +39,10 @@ export default function CollectionsClient() {
     typeof product.basePrice === 'number'
   );
 
-  // Frontend pagination calculations
-  const totalItems = validProducts.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentProducts = validProducts.slice(startIndex, endIndex);
+  // Use backend pagination data
+  const totalItems = meta?.totalItems || 0;
+  const totalPages = meta?.totalPages || 1;
+  const currentProducts = validProducts; // All products from current page
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -150,7 +152,7 @@ export default function CollectionsClient() {
         {totalPages > 1 && (
           <Pagination
             totalPages={totalPages}
-            currentPage={currentPage}
+            currentPage={meta?.page || currentPage}
             onPageChange={handlePageChange}
             className="mt-12"
           />

@@ -86,16 +86,13 @@ const removeCookie = (name: string) => {
 export const authService = {
   // Login user
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    console.log('🔑 Auth service: Starting login');
+
     const response = await api.post<AuthResponse>('/auth/login', credentials);
     const { accessToken } = response.data;
     
-    console.log('🔑 Auth service: Login successful, setting cookie');
     
     // Store token in cookie
     setCookie('accessToken', accessToken, 7); // 7 days
-    
-    console.log('🔑 Auth service: Cookie set, returning response');
     
     return response.data;
   },
@@ -148,18 +145,13 @@ export const authService = {
   // Get current user from token
   async getCurrentUser(): Promise<User | null> {
     try {
-      console.log('👤 Auth service: Getting current user');
       const token = getCookie('accessToken');
-      console.log('👤 Auth service: Token from cookie:', { hasToken: !!token, tokenLength: token?.length });
       
       if (!token) {
-        console.log('👤 Auth service: No token found');
         return null;
       }
       
-      console.log('👤 Auth service: Making API call to /users/me');
       const response = await api.get<{ message: string; data: User }>('/users/me');
-      console.log('👤 Auth service: User API response:', response.data);
       
       return response.data.data; // Extract user data from nested structure
     } catch (error) {
@@ -171,15 +163,13 @@ export const authService = {
   // Check if user is authenticated
   isAuthenticated(): boolean {
     const token = getCookie('accessToken');
-    console.log('🔍 Auth service: Checking if authenticated:', { hasToken: !!token, tokenLength: token?.length });
     return !!token;
   },
 
   // Get token
   getToken(): string | null {
     const token = getCookie('accessToken');
-    console.log('🔑 Auth service: Getting token:', { hasToken: !!token, tokenLength: token?.length });
-    return token;
+      return token;
   },
 
   // Refresh token (if needed)

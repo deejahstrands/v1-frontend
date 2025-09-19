@@ -20,6 +20,7 @@ interface AuthState {
   signup: (credentials: SignupCredentials) => Promise<void>;
   logout: () => void;
   getCurrentUser: () => Promise<void>;
+  initializeAuth: () => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (token: string, password: string) => Promise<void>;
   verifyEmail: (token: string) => Promise<void>;
@@ -209,6 +210,42 @@ export const useAuth = create<AuthState>()(
               user: null,
               isAuthenticated: false,
               isLoading: false,
+            });
+          }
+        },
+
+        initializeAuth: async () => {
+          // Check if we have a token
+          const hasToken = authService.isAuthenticated();
+          
+          if (hasToken) {
+            // Silently fetch user profile without loading state
+            try {
+              const user = await authService.getCurrentUser();
+              if (user) {
+                set({
+                  user,
+                  isAuthenticated: true,
+                });
+              } else {
+                set({
+                  user: null,
+                  isAuthenticated: false,
+                });
+              }
+            } catch {
+              // If token is invalid, clear it
+              authService.logout();
+              set({
+                user: null,
+                isAuthenticated: false,
+              });
+            }
+          } else {
+            // No token, ensure state is cleared
+            set({
+              user: null,
+              isAuthenticated: false,
             });
           }
         },

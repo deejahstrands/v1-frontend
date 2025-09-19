@@ -5,7 +5,7 @@ import Breadcrumb from "./Breadcrumb";
 import dynamic from "next/dynamic";
 import ProductInfoPanel from "./ProductInfoPanel";
 import ProductTabs from "./ProductTabs";
-import { Product } from "@/store/use-products";
+// import { DetailedProduct } from "@/types/product";
 import ProductCustomization from "./ProductCustomization";
 import ProductDeliveryAccordion from "./ProductDeliveryAccordion";
 import AddToCartSection from "./AddToCartSection";
@@ -15,7 +15,58 @@ import { MeasurementsAndPreferences } from "./MeasurementsAndPreferences";
 
 const ProductImageCarousel = dynamic(() => import("./ProductImageCarousel"), { ssr: false });
 
-export default function ProductDetailPage({ product }: { product: Product }) {
+interface ProductDetailPageProps {
+  product: {
+    id: string;
+    title: string;
+    name: string;
+    price: string;
+    basePrice: number;
+    images: string[];
+    description: string;
+    customization: boolean;
+    customizations?: Array<{
+      typeId: string;
+      typeName: string;
+      type: string;
+      description: string;
+      options: Array<{
+        itemCustomizationId: string;
+        customizationId: string;
+        name: string;
+        label: string;
+        description: string;
+        price: number;
+        status: string;
+      }>;
+    }>;
+    privateFittings?: Array<{
+      productFittingOptionId: string;
+      fittingOptionId: string;
+      name: string;
+      price: number;
+    }>;
+    processingTimes?: Array<{
+      productProcessingTimeId: string;
+      processingTimeId: string;
+      label: string;
+      price: number;
+    }>;
+    productSpecifications?: Record<string, string>;
+    category?: string;
+    delivery?: Array<{
+      type: string;
+      options: Array<Record<string, unknown>>;
+    }>;
+    specifications?: Array<{
+      type: string;
+      value: string;
+    }>;
+    [key: string]: unknown;
+  };
+}
+
+export default function ProductDetailPage({ product }: ProductDetailPageProps) {
   return (
     <div className="bg-tertiary my-8 pb-8">
       <SectionContainer>
@@ -37,13 +88,15 @@ export default function ProductDetailPage({ product }: { product: Product }) {
             <div className="lg:sticky lg:top-8 lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto lg:pr-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               <div className="space-y-6">
                 <ProductInfoPanel product={product} />
-                <ProductCustomization customizations={product.customizations || []} />
-                {product.customization && (
+                {product.customizations && product.customizations.length > 0 && (
+                  <ProductCustomization customizations={product.customizations} />
+                )}
+                {product.customizations && product.customizations.length > 0 && (
                   <div>
                     <MeasurementsAndPreferences />
                   </div>
                 )}
-                <ProductDeliveryAccordion delivery={product.delivery || []} />
+                <ProductDeliveryAccordion delivery={(product.delivery as Array<{ type: string; options: Array<{ label: string; price: number; }> }>) || []} />
                 <AddToCartSection product={product} />
                 {/* ProductTabs (mobile only) */}
                 <div className="block lg:hidden">

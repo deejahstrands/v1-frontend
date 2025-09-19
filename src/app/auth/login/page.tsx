@@ -10,13 +10,14 @@ import { Button } from '@/components/ui/button';
 import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/store/use-auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function UserLoginPage() {
   const { toast } = useToast();
   const { login, isLoading, clearError } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Clear error on component mount
   useEffect(() => {
@@ -32,8 +33,10 @@ export default function UserLoginPage() {
       
       toast.success("Welcome back! You have been successfully logged in.");
       
-      // Redirect to home page or dashboard
-      router.push('/');
+      // Redirect to return URL or home page
+      const returnUrl = searchParams.get('returnUrl');
+      const redirectTo = returnUrl ? decodeURIComponent(returnUrl) : '/';
+      router.push(redirectTo);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Invalid email or password. Please try again.");
     } finally {

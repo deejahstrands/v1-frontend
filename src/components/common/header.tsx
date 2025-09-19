@@ -112,7 +112,7 @@ export function Header() {
               <div className="hidden lg:flex items-center space-x-4">
                 <button
                   type="button"
-                  className="p-2 text-tertiary hover:text-tertiary"
+                  className="p-2 text-tertiary hover:text-tertiary cursor-pointer"
                   onClick={() => setIsSearchOpen(true)}
                   aria-label="Search"
                 >
@@ -134,7 +134,7 @@ export function Header() {
                       )}
                     </Link>
                     <div className="relative group">
-                      <button className="p-2 text-tertiary hover:text-tertiary flex items-center gap-1">
+                      <button className="p-2 text-tertiary hover:text-tertiary flex items-center gap-1 cursor-pointer">
                         <User className="h-5 w-5" />
                         <span className="text-sm hidden sm:block">{user?.firstName || 'Account'}</span>
                       </button>
@@ -144,7 +144,7 @@ export function Header() {
                         </Link>
                         <button
                           onClick={logout}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 cursor-pointer"
                         >
                           Logout
                         </button>
@@ -155,7 +155,7 @@ export function Header() {
                   <>
                     <button
                       onClick={handleWishlistClick}
-                      className="p-2 text-tertiary hover:text-tertiary relative"
+                      className="p-2 text-tertiary hover:text-tertiary relative cursor-pointer"
                     >
                       <Heart className="h-5 w-5" />
                       {wishlistCount > 0 && (
@@ -164,7 +164,7 @@ export function Header() {
                     </button>
                     <button
                       onClick={handleCartClick}
-                      className="p-2 text-tertiary hover:text-tertiary relative"
+                      className="p-2 text-tertiary hover:text-tertiary relative cursor-pointer"
                     >
                       <ShoppingBag className="h-5 w-5" />
                       {cartCount > 0 && (
@@ -172,7 +172,7 @@ export function Header() {
                       )}
                     </button>
                     <Link href="/auth/login" className="hidden sm:inline-flex">
-                      <Button variant="tertiary" className="w-full">Login</Button>
+                      <Button variant="tertiary" className="w-full cursor-pointer">Login</Button>
                     </Link>
                   </>
                 )}
@@ -180,7 +180,7 @@ export function Header() {
               {/* Mobile menu button */}
               <button
                 type="button"
-                className="lg:hidden p-2 text-tertiary hover:text-tertiary"
+                className="lg:hidden p-2 text-tertiary hover:text-tertiary cursor-pointer"
                 onClick={() => setIsMobileMenuOpen(true)}
               >
                 <Menu className="h-6 w-6" />

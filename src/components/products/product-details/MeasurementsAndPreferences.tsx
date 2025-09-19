@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
-import { ImageUpload } from '@/components/ui/image-upload';
+import { MultiImageUpload } from '@/components/ui/multi-image-upload';
 import { useMeasurements } from '@/store/use-measurements';
 
 interface MeasurementsAndPreferencesProps {
@@ -30,9 +30,9 @@ export const MeasurementsAndPreferences: React.FC<MeasurementsAndPreferencesProp
     }
   };
 
-  const handleFileSelect = (field: 'hairlinePictures' | 'styleReference', file: File | null) => {
-    setField(field, file);
-    // Clear error when user selects a file
+  const handleFilesChange = (field: 'hairlinePictures' | 'styleReference', files: (File | string)[]) => {
+    setField(field, files);
+    // Clear error when user selects files
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
@@ -86,21 +86,25 @@ export const MeasurementsAndPreferences: React.FC<MeasurementsAndPreferencesProp
           )}
 
           {/* Hairline Pictures */}
-          <ImageUpload
+          <MultiImageUpload
             label="Front and side pictures of your hairline"
             helperText="(your images will not be shared or used for promotional activities)"
             acceptedTypes="PNG, JPG"
             maxDimensions="800x400px"
-            onFileSelect={(file) => handleFileSelect('hairlinePictures', file)}
+            maxFiles={3}
+            files={data.hairlinePictures}
+            onFilesChange={(files) => handleFilesChange('hairlinePictures', files)}
             error={errors.hairlinePictures}
           />
 
           {/* Style Reference */}
-          <ImageUpload
+          <MultiImageUpload
             label="How would you like the wig styled - picture reference"
             acceptedTypes="PNG, JPG"
             maxDimensions="800x400px"
-            onFileSelect={(file) => handleFileSelect('styleReference', file)}
+            maxFiles={3}
+            files={data.styleReference}
+            onFilesChange={(files) => handleFilesChange('styleReference', files)}
             error={errors.styleReference}
           />
         </div>

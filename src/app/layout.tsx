@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { LayoutWrapper } from "@/components/common/layout-wrapper";
 import { LoginModalProvider } from "@/components/auth/login-modal-provider";
+import { AuthProvider } from "@/components/providers/auth-provider";
 import { LoadingScreen } from "@/components/common/loading-screen";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -156,8 +157,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
         <LoadingScreen />
-        <LayoutWrapper>{children}</LayoutWrapper>
-        <LoginModalProvider />
+        <AuthProvider>
+          <LayoutWrapper>{children}</LayoutWrapper>
+          <LoginModalProvider />
+        </AuthProvider>
         <StructuredData data={organizationSchema} />
         <StructuredData data={websiteSchema} />
         <ToastContainer

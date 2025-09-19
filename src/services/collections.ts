@@ -4,7 +4,8 @@ import {
   CollectionResponse, 
   FeaturedCollectionResponse,
   CollectionsResponse,
-  GetCollectionsParams 
+  GetCollectionsParams,
+  GetFeaturedCollectionParams 
 } from '@/types/collection';
 
 class CollectionsService {
@@ -39,8 +40,22 @@ class CollectionsService {
   /**
    * Get featured collection
    */
-  async getFeaturedCollection(): Promise<FeaturedCollectionResponse> {
-    const response = await api.get(`${this.baseUrl}/featured`);
+  async getFeaturedCollection(params?: GetFeaturedCollectionParams): Promise<FeaturedCollectionResponse> {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.customization !== undefined) queryParams.append('customization', params.customization.toString());
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.featured !== undefined) queryParams.append('featured', params.featured.toString());
+    if (params?.priceFrom) queryParams.append('priceFrom', params.priceFrom.toString());
+    if (params?.priceTo) queryParams.append('priceTo', params.priceTo.toString());
+    if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
+    if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+    if (params?.page) queryParams.append('page', params.page.toString());
+
+    const url = `${this.baseUrl}/featured${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    
+    const response = await api.get(url);
     return response.data;
   }
 

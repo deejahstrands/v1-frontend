@@ -5,6 +5,7 @@ import { Breadcrumb } from '@/components/common/breadcrumb';
 import { SectionContainer } from '@/components/common/section-container';
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/store/use-cart';
+import { useAuth } from '@/store/use-auth';
 import { CartItemCard } from '@/components/cart/cart-item-card';
 import { CartTotalsSection } from '@/components/cart/cart-totals-section';
 import { EmptyCartState } from '@/components/cart/empty-cart-state';
@@ -12,46 +13,55 @@ import { CartLoadingSkeleton } from '@/components/cart/cart-loading-skeleton';
 import type { CartItem } from '@/store/use-cart';
 
 export default function CartPage() {
-  const { items, removeFromCart, addToCart, clearCartStorage } = useCart();
+  const {
+    items,
+    loading,
+    error,
+    totalPrice,
+    fetchCart,
+    updateCartItem,
+    removeCartItem,
+    addToCart,
+    removeFromCart
+  } = useCart();
+  const { isAuthenticated } = useAuth();
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Handle hydration
+  // Handle hydration and fetch cart
   useEffect(() => {
     setIsHydrated(true);
-  }, []);
+    if (isAuthenticated) {
+      fetchCart();
+    }
+  }, [isAuthenticated, fetchCart]);
 
   const handleIncrease = (item: CartItem) => {
-    console.log('=== HANDLE INCREASE CALLED ===');
-    console.log('Item to increase:', {
-      productId: item.productId,
-      currentQuantity: item.quantity,
-      newQuantity: item.quantity + 1,
-      title: item.title
-    });
-    addToCart({ ...item, quantity: item.quantity + 1 });
+    if (isAuthenticated && item.apiData?.cartItemId) {
+      // Use backend API for authenticated users
+      updateCartItem(item.apiData.cartItemId, item.quantity + 1);
+    } else {
+      // Fallback to local cart for unauthenticated users
+      console.log('=== HANDLE INCREASE CALLED (LOCAL) ===');
+      addToCart({ ...item, quantity: item.quantity + 1 });
+    }
   };
 
   const handleDecrease = (item: CartItem) => {
-    console.log('=== HANDLE DECREASE CALLED ===');
-    console.log('Item to decrease:', {
-      productId: item.productId,
-      currentQuantity: item.quantity,
-      newQuantity: item.quantity - 1,
-      title: item.title
-    });
     if (item.quantity > 1) {
-      addToCart({ ...item, quantity: item.quantity - 1 });
+      if (isAuthenticated && item.apiData?.cartItemId) {
+        // Use backend API for authenticated users
+        updateCartItem(item.apiData.cartItemId, item.quantity - 1);
+      } else {
+        // Fallback to local cart for unauthenticated users
+        console.log('=== HANDLE DECREASE CALLED (LOCAL) ===');
+        addToCart({ ...item, quantity: item.quantity - 1 });
+      }
     }
   };
 
   const handleProceedToCheckout = () => {
     // TODO: Implement checkout logic
     console.log('Proceeding to checkout...');
-  };
-
-  const handleClearCart = () => {
-    clearCartStorage();
-    console.log('Cart cleared');
   };
 
   return (
@@ -70,10 +80,20 @@ export default function CartPage() {
           />
         }
       />
-      
+
       <SectionContainer>
-        {!isHydrated ? (
+        {!isHydrated || loading ? (
           <CartLoadingSkeleton />
+        ) : error ? (
+          <div className="text-center py-8">
+            <p className="text-red-500 mb-4">Error loading cart: {error}</p>
+            <button
+              onClick={() => fetchCart()}
+              className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+            >
+              Try Again
+            </button>
+          </div>
         ) : items.length === 0 ? (
           <EmptyCartState />
         ) : (
@@ -83,12 +103,6 @@ export default function CartPage() {
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl md:text-2xl font-ethereal font-semibold">YOUR CART</h2>
                 <div className="flex gap-2">
-                  <button
-                    onClick={handleClearCart}
-                    className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
-                  >
-                    Clear Cart (Debug)
-                  </button>
                   <div className="px-3 py-1 text-sm bg-blue-500 text-white rounded">
                     Items: {items.length}
                   </div>
@@ -96,18 +110,24 @@ export default function CartPage() {
               </div>
               <div className="space-y-6">
                 {items.map((item, index) => {
-                  console.log(`Rendering cart item ${index}:`, {
-                    productId: item.productId,
-                    quantity: item.quantity,
-                    title: item.title
-                  });
                   return (
                     <CartItemCard
                       key={`${item.productId}-${index}`}
                       item={item}
-                      onRemove={() => removeFromCart(item.productId)}
+                      onRemove={() => {
+                        if (isAuthenticated && item.apiData?.cartItemId) {
+                          removeCartItem(item.apiData.cartItemId);
+                        } else {
+                          removeFromCart(item.productId);
+                        }
+                      }}
                       onIncrease={() => handleIncrease(item)}
                       onDecrease={() => handleDecrease(item)}
+                      onEdit={() => {
+                        if (isAuthenticated) {
+                          fetchCart(); // Refresh cart data after edit
+                        }
+                      }}
                     />
                   );
                 })}
@@ -115,7 +135,10 @@ export default function CartPage() {
             </div>
             {/* Summary Side */}
             <div className="w-full lg:w-[400px] flex-shrink-0 lg:border-l lg:border-gray-200 lg:pl-8">
-              <CartTotalsSection onProceedToCheckout={handleProceedToCheckout} />
+              <CartTotalsSection 
+                onProceedToCheckout={handleProceedToCheckout} 
+                backendTotal={isAuthenticated ? totalPrice : undefined}
+              />
             </div>
           </div>
         )}

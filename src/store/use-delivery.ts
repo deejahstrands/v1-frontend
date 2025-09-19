@@ -3,6 +3,8 @@ import { create } from 'zustand';
 interface DeliveryOption {
   label: string;
   price: number;
+  productProcessingTimeId?: string;
+  productFittingOptionId?: string;
 }
 
 interface DeliveryState {

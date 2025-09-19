@@ -82,7 +82,7 @@ export function DeejahStrandsCollectionSection() {
         );
     }
 
-    const products = featuredCollection?.products || [];
+    const products = featuredCollection?.products?.data || [];
 
     // Filter out products with missing required data
     const validProducts = products.filter(product =>

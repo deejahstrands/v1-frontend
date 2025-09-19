@@ -11,6 +11,7 @@ import { useLoginModal } from "@/hooks/use-login-modal";
 import { useCart } from "@/store/use-cart";
 import { useWishlist } from "@/store/use-wishlist";
 import { useToast } from "@/hooks/use-toast";
+import { cartService } from "@/services/cart";
 
 export function ProductCard({
   images,
@@ -54,29 +55,40 @@ export function ProductCard({
     addProductToCart();
   };
 
-  const addProductToCart = () => {
+  const addProductToCart = async () => {
     const basePrice = Number(price.replace(/[^0-9.-]+/g, ""));
     
-    // Debug: Log specifications being passed to cart
-    console.log('ProductCard - Adding to cart with specifications:', specifications);
-    
-    addToCart({
-      productId: id,
-      title: title,
-      image: defaultImage,
-      basePrice: basePrice,
-      customizations: {},
-      customizationTotal: 0,
-      totalPrice: basePrice,
-      quantity: 1,
-      delivery: {
-        "Private Fitting": { label: "None", price: 0 },
-        "Processing Time": { label: "Default", price: 0 }
-      },
-      specifications: specifications
-    });
-    
-    toast.success(`${title} has been added to your cart.`);
+    try {
+      // Call API for authenticated users
+      if (isAuthenticated) {
+        await cartService.addToCart({
+          productId: id,
+          quantity: 1
+        });
+      }
+      
+      // Always add to local cart store for UI consistency
+      addToCart({
+        productId: id,
+        title: title,
+        image: defaultImage,
+        basePrice: basePrice,
+        customizations: {},
+        customizationTotal: 0,
+        totalPrice: basePrice,
+        quantity: 1,
+        delivery: {
+          "Private Fitting": { label: "None", price: 0 },
+          "Processing Time": { label: "Default", price: 0 }
+        },
+        specifications: specifications
+      });
+      
+      toast.success(`${title} has been added to your cart.`);
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+      toast.error("Failed to add item to cart. Please try again.");
+    }
   };
 
   const handleWishlist = (e: React.MouseEvent) => {
@@ -112,7 +124,7 @@ export function ProductCard({
   };
 
   return (
-    <Link href={`/shop/${id}`} className="block">
+    <Link href={`/products/${id}`} className="block">
       <motion.div 
         className="bg-white rounded-2xl overflow-hidden transition-shadow duration-200 hover:shadow-lg hover:shadow-[#4A85E4]/20 cursor-pointer"
         onHoverStart={() => setIsHovered(true)}

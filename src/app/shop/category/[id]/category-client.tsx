@@ -38,7 +38,7 @@ export default function CategoryClient({ params }: CategoryClientProps) {
 
   useEffect(() => {
     if (categoryId) {
-      fetchCategoryWithProducts(categoryId, { page: 1, limit: 12, status: 'active' });
+      fetchCategoryWithProducts(categoryId, { page: 1, limit: 12 });
     }
     
     return () => {
@@ -48,7 +48,7 @@ export default function CategoryClient({ params }: CategoryClientProps) {
 
   const handlePageChange = (page: number) => {
     if (categoryId) {
-      fetchCategoryWithProducts(categoryId, { page, limit: 12, status: 'active' });
+      fetchCategoryWithProducts(categoryId, { page, limit: 12 });
     }
   };
 

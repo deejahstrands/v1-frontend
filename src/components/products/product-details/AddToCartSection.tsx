@@ -1,6 +1,13 @@
 'use client'
 
 import React, { useState } from 'react';
+
+interface CustomizationOption {
+  itemCustomizationId: string;
+  label: string;
+  name?: string;
+  price?: number;
+}
 import { useProductCustomization } from '@/store/use-product-customization';
 import { useConsultation } from '@/store/use-consultation';
 import { useDelivery } from '@/store/use-delivery';
@@ -11,6 +18,9 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/store/use-auth';
 import { useLoginModal } from '@/hooks/use-login-modal';
 import { useCartPrice } from '@/lib/price-calculations';
+import { uploadService } from '@/services/upload';
+import { cartService } from '@/services/cart';
+import { authService } from '@/services/auth';
 
 interface AddToCartSectionProps {
   product: {
@@ -26,6 +36,7 @@ interface AddToCartSectionProps {
 const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const selectedCustomizations = useProductCustomization(state => state.selected);
   const selectedConsultation = useConsultation(state => state.selectedConsultation);
   const consultation = selectedConsultation ? {
@@ -73,48 +84,135 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleAddToCart = () => {
+  const prepareCartData = async () => {
+    setIsUploading(true);
+    try {
+      // Upload images if measurements exist
+      let measurementsData = undefined;
+      if (measurements.hasMeasurements) {
+        const hairlineFiles = measurements.hairlinePictures.filter((file): file is File => file instanceof File);
+        const hairlineImages = hairlineFiles.length > 0 
+          ? await uploadService.uploadFiles(hairlineFiles)
+          : [];
+        
+        const styleFiles = measurements.styleReference.filter((file): file is File => file instanceof File);
+        const styleImages = styleFiles.length > 0
+          ? await uploadService.uploadFiles(styleFiles)
+          : [];
+
+        measurementsData = {
+          earToEar: measurements.earToEar,
+          headCircumference: measurements.headCircumference,
+          harlineImages: hairlineImages, // Note: API uses 'harlineImages' (typo in API)
+          wigStyleImages: styleImages
+        };
+      }
+
+      // Get customization IDs (filter out null values)
+      const customizationIds = Object.values(selectedCustomizations)
+        .filter(option => option !== null)
+        .map(option => option!.itemCustomizationId)
+        .filter(id => id !== undefined);
+
+      // Get delivery IDs
+      const processingTimeId = selectedDelivery['Processing Time']?.productProcessingTimeId;
+      const fittingOptionId = selectedDelivery['Private Fitting']?.productFittingOptionId;
+
+      return {
+        productId: product.id,
+        quantity,
+        ...(customizationIds.length > 0 && { customizations: customizationIds }),
+        ...(measurementsData && { measurements: measurementsData }),
+        ...(processingTimeId && { productProcessingTimeId: processingTimeId }),
+        ...(fittingOptionId && { productFittingOptionId: fittingOptionId })
+      };
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (isUploading) return; // Prevent multiple clicks during upload
+
+    // Check authentication first before any API calls
     if (!isAuthenticated) {
-      openModal("Add Item to Cart", () => {
-        // This will be called after successful login
-        addToCart({
-          productId: product.id,
-          title: product.title,
-          image: product.image,
-          basePrice,
-          customizations: selectedCustomizations,
-          customizationTotal,
-          totalPrice: singleTotal,
-          quantity,
-          consultation: consultation ?? undefined,
-          delivery: selectedDelivery,
-          measurements: measurements.hasMeasurements ? measurements : undefined,
-          specifications: product.specifications,
+        openModal("Add Item to Cart", async () => {
+          // This will be called after successful login
+          try {
+            // Double-check authentication before making API call
+            if (!authService.isAuthenticated()) {
+              throw new Error('Authentication required');
+            }
+            
+            const apiData = await prepareCartData();
+            // Call API to add to cart
+            await cartService.addToCart(apiData);
+            
+            // Also add to local cart store for UI consistency
+            addToCart({
+              productId: product.id,
+              title: product.title,
+              image: product.image,
+              basePrice,
+              customizations: Object.fromEntries(
+                Object.entries(selectedCustomizations).filter(([, option]) => option !== null)
+              ) as { [type: string]: CustomizationOption },
+              customizationTotal,
+              totalPrice: singleTotal,
+              quantity,
+              consultation: consultation ?? undefined,
+              delivery: selectedDelivery,
+              measurements: measurements.hasMeasurements ? measurements : undefined,
+              specifications: product.specifications,
+              apiData,
+            });
+            
+            toast.success(`${product.title} has been added to your cart.`);
+            clearAllSelections();
+            scrollToTop();
+          } catch (error) {
+            toast.error("Failed to add item to cart. Please try again.");
+            console.error("API add to cart error:", error);
+          }
         });
+        return;
+      }
+
+      try {
+        const apiData = await prepareCartData();
+        // Call API to add to cart
+        await cartService.addToCart(apiData);
+      
+      // Also add to local cart store for UI consistency
+      addToCart({
+        productId: product.id,
+        title: product.title,
+        image: product.image,
+        basePrice,
+        customizations: Object.fromEntries(
+          Object.entries(selectedCustomizations).filter(([, option]) => option !== null)
+        ) as { [type: string]: CustomizationOption },
+        customizationTotal,
+        totalPrice: singleTotal,
+        quantity,
+        consultation: consultation ?? undefined,
+        delivery: selectedDelivery,
+        measurements: measurements.hasMeasurements ? measurements : undefined,
+        specifications: product.specifications,
+        apiData,
+      });
+      
         toast.success(`${product.title} has been added to your cart.`);
         clearAllSelections();
         scrollToTop();
-      });
-      return;
-    }
-
-    addToCart({
-      productId: product.id,
-      title: product.title,
-      image: product.image,
-      basePrice,
-      customizations: selectedCustomizations,
-      customizationTotal,
-      totalPrice: singleTotal,
-      quantity,
-      consultation: consultation ?? undefined,
-      delivery: selectedDelivery,
-      measurements: measurements.hasMeasurements ? measurements : undefined,
-      specifications: product.specifications,
-    });
-    toast.success(`${product.title} has been added to your cart.`);
-    clearAllSelections();
-    scrollToTop();
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('upload')) {
+          toast.error("Failed to upload images. Please try again.");
+        } else {
+          toast.error("Failed to add item to cart. Please try again.");
+        }
+        console.error("Add to cart error:", error);
+      }
   };
 
   const handleWishlistToggle = () => {
@@ -156,7 +254,7 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
         <div className="flex rounded-lg border border-gray-200 overflow-hidden bg-white">
           <button
             type="button"
-            className="w-10 h-10 flex items-center justify-center text-2xl text-gray-400 hover:text-black disabled:text-gray-200 transition"
+            className="w-10 h-10 flex items-center justify-center text-2xl text-gray-400 hover:text-black disabled:text-gray-200 transition cursor-pointer"
             onClick={() => setQuantity(q => Math.max(1, q - 1))}
             disabled={quantity <= 1}
             aria-label="Decrease quantity"
@@ -168,7 +266,7 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
           </div>
           <button
             type="button"
-            className="w-10 h-10 flex items-center justify-center text-2xl text-[#C9A18A] hover:text-[#a97c5e] transition"
+            className="w-10 h-10 flex items-center justify-center text-2xl text-[#C9A18A] hover:text-[#a97c5e] transition cursor-pointer"
             onClick={() => setQuantity(q => q + 1)}
             aria-label="Increase quantity"
           >
@@ -180,16 +278,29 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
       <div className="flex items-center gap-3">
         <button
           type="button"
-          className="flex-1 flex items-center justify-center gap-2 bg-[#C9A18A] hover:bg-[#b88b6d] text-white font-semibold rounded-lg py-3 text-base transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 bg-[#C9A18A] hover:bg-[#b88b6d] text-white font-semibold rounded-lg py-3 text-base transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={handleAddToCart}
+          disabled={isUploading}
         >
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-13z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="21" r="1" fill="currentColor"/><circle cx="19" cy="21" r="1" fill="currentColor"/></svg>
-          Add to Cart - ₦{totalPrice.toLocaleString()}
+          {isUploading ? (
+            <>
+              <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Uploading...
+            </>
+          ) : (
+            <>
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-13z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="21" r="1" fill="currentColor"/><circle cx="19" cy="21" r="1" fill="currentColor"/></svg>
+              Add to Cart - ₦{totalPrice.toLocaleString()}
+            </>
+          )}
         </button>
         {isHydrated && (
           <button
             type="button"
-            className={`w-12 h-12 flex items-center justify-center border rounded-lg transition-colors ${
+            className={`w-12 h-12 flex items-center justify-center border rounded-lg transition-colors cursor-pointer ${
               isInWishlist(product.id) 
                 ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100' 
                 : 'bg-white text-black hover:bg-gray-100'
@@ -216,7 +327,7 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
         {!isHydrated && (
           <button
             type="button"
-            className="w-12 h-12 flex items-center justify-center border rounded-lg bg-white text-black hover:bg-gray-100"
+            className="w-12 h-12 flex items-center justify-center border rounded-lg bg-white text-black hover:bg-gray-100 cursor-pointer"
             aria-label="Add to Wishlist"
           >
             <svg 

@@ -24,11 +24,11 @@ const ProductDeliveryAccordion: React.FC<ProductDeliveryAccordionProps> = ({ del
   const setSelected = useDelivery(state => state.setSelected);
   const selected = useDelivery(state => state.selected);
 
-  // Initialize selected options to first option for each type
+  // Initialize selected options to "None" (first option) for each type
   useEffect(() => {
     delivery.forEach(d => {
       if (!selected[d.type] && d.options[0]) {
-        setSelected(d.type, d.options[0]);
+        setSelected(d.type, d.options[0]); // This will be "None" option
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -40,7 +40,7 @@ const ProductDeliveryAccordion: React.FC<ProductDeliveryAccordionProps> = ({ del
 
   return (
     <Accordion.Root type="single" collapsible value={openType} onValueChange={setOpenType} className="rounded-2xl border-[0.5px] border-[#98A2B3] w-full max-w-md mx-auto mt-6">
-      <div className="p-4 pb-0 text-base font-semibold">Delivery</div>
+      <div className="p-4 pb-0 text-base font-semibold">Delivery - <span>Select below </span></div>
       {delivery.map((d) => (
         <Accordion.Item value={d.type} key={d.type} className="border-b border-gray-200">
           <Accordion.Header>

@@ -80,7 +80,7 @@ export function DealsCard({
       </div>
       <div className="p-4 flex flex-col gap-2">
         <div className="font-medium text-xs md:text-base xl:text-lg">
-          <Link href={`/shop/${id}`} className="hover:underline text-inherit capitalize">
+          <Link href={`/products/${id}`} className="hover:underline text-inherit capitalize">
             {title}
           </Link>
         </div>

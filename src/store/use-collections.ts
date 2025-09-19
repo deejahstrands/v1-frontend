@@ -2,7 +2,8 @@ import { create } from "zustand";
 import { 
   Collection, 
   FeaturedCollection,
-  GetCollectionsParams 
+  GetCollectionsParams,
+  GetFeaturedCollectionParams 
 } from "@/types/collection";
 import { collectionsService } from "@/services/collections";
 
@@ -32,7 +33,7 @@ interface CollectionsState {
   // Actions
   fetchCollections: (params?: GetCollectionsParams) => Promise<void>;
   fetchActiveCollections: () => Promise<void>;
-  fetchFeaturedCollection: () => Promise<void>;
+  fetchFeaturedCollection: (params?: GetFeaturedCollectionParams) => Promise<void>;
   fetchCollectionWithProducts: (id: string) => Promise<void>;
   clearError: () => void;
   clearFeaturedError: () => void;
@@ -111,11 +112,11 @@ export const useCollections = create<CollectionsState>((set) => ({
     }
   },
 
-  fetchFeaturedCollection: async () => {
+  fetchFeaturedCollection: async (params) => {
     set({ featuredLoading: true, featuredError: null });
     
     try {
-      const response = await collectionsService.getFeaturedCollection();
+      const response = await collectionsService.getFeaturedCollection(params);
       
       set({
         featuredCollection: response.data,

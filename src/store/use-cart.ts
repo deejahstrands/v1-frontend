@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { cartService } from '@/services/cart'
+import type { CartItem as ApiCartItem } from '@/services/cart'
 
 interface CustomizationOption {
   label: string
@@ -17,8 +20,8 @@ interface MeasurementsData {
   earToEar: string;
   headCircumference: string;
   foreheadToNape: string;
-  hairlinePictures: File | null;
-  styleReference: File | null;
+  hairlinePictures: File[] | string[]; // Support both Files and URLs
+  styleReference: File[] | string[]; // Support both Files and URLs
 }
 
 interface CartItem {
@@ -34,36 +37,36 @@ interface CartItem {
   delivery?: { [type: string]: { label: string; price: number } }
   measurements?: MeasurementsData
   specifications?: { type: string; value: string }[]
+  apiData?: any // Store API-ready data for backend calls
 }
 
 export type { CartItem };
 
 interface CartState {
   items: CartItem[]
+  loading: boolean
+  error: string | null
+  totalPrice: number
   addToCart: (item: CartItem) => void
   removeFromCart: (productId: string) => void
   clearCart: () => void
   clearCartStorage: () => void
   getCartTotal: () => number
+  fetchCart: () => Promise<void>
+  updateCartItem: (itemId: string, quantity: number) => Promise<void>
+  removeCartItem: (itemId: string) => Promise<void>
+  transformApiCartItem: (apiItem: ApiCartItem) => CartItem
 }
 
 export const useCart = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
-      addToCart: (item) => set((state) => {
-        console.log('=== ADD TO CART DEBUG ===');
-        console.log('Adding item:', {
-          productId: item.productId,
-          quantity: item.quantity,
-          title: item.title
-        });
-        console.log('Current cart items:', state.items.map(i => ({
-          productId: i.productId,
-          quantity: i.quantity,
-          title: i.title
-        })));
-        
+      backendItems: [],
+      totalPrice: 0,
+      loading: false,
+      error: null,
+      addToCart: (item) => set((state) => {  
         const existingItemIndex = state.items.findIndex(
           (existingItem) => {
             const match = existingItem.productId === item.productId;
@@ -72,11 +75,7 @@ export const useCart = create<CartState>()(
           }
         );
 
-        console.log('Existing item index:', existingItemIndex);
-
         if (existingItemIndex !== -1) {
-          console.log('Found existing item, updating quantity from', state.items[existingItemIndex].quantity, 'to', item.quantity);
-          // Update existing item quantity
           const updatedItems = [...state.items];
           updatedItems[existingItemIndex] = {
             ...updatedItems[existingItemIndex],
@@ -89,13 +88,10 @@ export const useCart = create<CartState>()(
             measurements: item.measurements,
             specifications: item.specifications,
           };
-          console.log('Updated cart:', updatedItems.map(i => ({ productId: i.productId, quantity: i.quantity })));
           return { items: updatedItems };
         } else {
-          console.log('No existing item found, adding new item');
           // Add new item
           const newItems = [...state.items, item];
-          console.log('New cart:', newItems.map(i => ({ productId: i.productId, quantity: i.quantity })));
           return { items: newItems };
         }
       }),
@@ -110,6 +106,107 @@ export const useCart = create<CartState>()(
         set({ items: [] });
       },
       getCartTotal: () => get().items.reduce((sum, item) => sum + item.totalPrice * item.quantity + (item.consultation?.price || 0), 0),
+
+      // Backend API methods
+      fetchCart: async () => {
+        set({ loading: true, error: null });
+        try {
+          const response = await cartService.getCart();
+          const transformedItems = response.data.items.map(get().transformApiCartItem);
+          set({
+            items: transformedItems,
+            totalPrice: response.data.totalPrice,
+            loading: false,
+          });
+        } catch (error: any) {
+          set({
+            loading: false,
+            error: error.message || 'Failed to fetch cart',
+          });
+        }
+      },
+
+      updateCartItem: async (itemId: string, quantity: number) => {
+        try {
+          await cartService.updateCartItem(itemId, { quantity });
+          // Refresh cart after update
+          await get().fetchCart();
+        } catch (error: any) {
+          set({ error: error.message || 'Failed to update cart item' });
+        }
+      },
+
+      removeCartItem: async (itemId: string) => {
+        try {
+          await cartService.removeFromCart(itemId);
+          // Refresh cart after removal
+          await get().fetchCart();
+        } catch (error: any) {
+          set({ error: error.message || 'Failed to remove cart item' });
+        }
+      },
+
+      transformApiCartItem: (apiItem: ApiCartItem): CartItem => {
+        const product = apiItem.product || apiItem.wigUnit;
+        const basePrice = product?.basePrice || 0;
+        
+        // Calculate customization total from API customizations
+        const customizationTotal = apiItem.customizations.reduce((sum, customization) => {
+          return sum + customization.options.reduce((optionSum, option) => optionSum + option.price, 0);
+        }, 0);
+
+        // Transform customizations to local format
+        const transformedCustomizations: { [type: string]: any } = {};
+        apiItem.customizations.forEach(customization => {
+          customization.options.forEach(option => {
+            transformedCustomizations[customization.typeName] = {
+              label: option.name,
+              price: option.price,
+              itemCustomizationId: option.itemCustomizationId,
+            };
+          });
+        });
+
+        // Transform delivery options
+        const delivery: { [type: string]: { label: string; price: number } } = {};
+        if (apiItem.privateFitting) {
+          delivery['Private Fitting'] = {
+            label: apiItem.privateFitting.name,
+            price: apiItem.privateFitting.price,
+          };
+        }
+        if (apiItem.processingTime) {
+          delivery['Processing Time'] = {
+            label: apiItem.processingTime.label,
+            price: apiItem.processingTime.price,
+          };
+        }
+
+        return {
+          productId: product?.id || '',
+          title: product?.name || '',
+          image: (product as any)?.thumbnail,
+          basePrice,
+          customizations: transformedCustomizations,
+          customizationTotal,
+          totalPrice: apiItem.totalPrice,
+          quantity: apiItem.quantity,
+          delivery,
+          measurements: apiItem.measurements ? {
+            hasMeasurements: 'yes',
+            earToEar: apiItem.measurements.earToEar || '',
+            headCircumference: apiItem.measurements.headCircumference || '',
+            foreheadToNape: '',
+            hairlinePictures: apiItem.measurements.harlineImages || [], // Use actual URLs from API
+            styleReference: apiItem.measurements.wigStyleImages || [], // Use actual URLs from API
+          } : undefined,
+          specifications: [], // Would need to be derived from product data
+          apiData: {
+            cartItemId: apiItem.id,
+            ...apiItem,
+          },
+        };
+      },
     }),
     {
       name: 'cart-storage',

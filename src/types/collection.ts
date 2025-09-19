@@ -21,7 +21,19 @@ export interface CollectionProduct {
 }
 
 export interface FeaturedCollection extends Collection {
-  products: CollectionProduct[];
+  products: {
+    data: CollectionProduct[];
+    meta: {
+      page: number;
+      limit: number | null;
+      totalItems: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+      nextPage: number | null;
+      prevPage: number | null;
+    };
+  };
 }
 
 export interface CollectionResponse {
@@ -55,4 +67,16 @@ export interface GetCollectionsParams {
   status?: 'active' | 'inactive';
   featured?: boolean;
   search?: string;
+}
+
+export interface GetFeaturedCollectionParams {
+  limit?: number;
+  customization?: boolean;
+  status?: 'available' | 'sold_out';
+  featured?: boolean;
+  priceFrom?: number;
+  priceTo?: number;
+  categoryId?: string; // Comma-separated category IDs
+  sortBy?: 'name' | '-name' | 'price' | '-price';
+  page?: number;
 }

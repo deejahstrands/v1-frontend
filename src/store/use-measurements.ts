@@ -5,14 +5,16 @@ interface MeasurementsData {
   earToEar: string;
   headCircumference: string;
   foreheadToNape: string;
-  hairlinePictures: File | null;
-  styleReference: File | null;
+  hairlinePictures: File[] | string[];
+  styleReference: File[] | string[];
 }
 
 interface MeasurementsStore {
   data: MeasurementsData;
   setData: (data: Partial<MeasurementsData>) => void;
-  setField: (field: keyof MeasurementsData, value: string | File | null) => void;
+  setField: (field: keyof MeasurementsData, value: string | File[] | string[] | (File | string)[] | File | null) => void;
+  addFile: (field: 'hairlinePictures' | 'styleReference', file: File) => void;
+  removeFile: (field: 'hairlinePictures' | 'styleReference', index: number) => void;
   reset: () => void;
   isValid: () => boolean;
 }
@@ -22,8 +24,8 @@ const initialData: MeasurementsData = {
   earToEar: '',
   headCircumference: '',
   foreheadToNape: '',
-  hairlinePictures: null,
-  styleReference: null,
+  hairlinePictures: [],
+  styleReference: [],
 };
 
 export const useMeasurements = create<MeasurementsStore>((set, get) => ({
@@ -35,6 +37,20 @@ export const useMeasurements = create<MeasurementsStore>((set, get) => ({
   
   setField: (field, value) => set((state) => ({
     data: { ...state.data, [field]: value }
+  })),
+
+  addFile: (field, file) => set((state) => ({
+    data: {
+      ...state.data,
+      [field]: [...state.data[field], file]
+    }
+  })),
+
+  removeFile: (field, index) => set((state) => ({
+    data: {
+      ...state.data,
+      [field]: state.data[field].filter((_, i) => i !== index)
+    }
   })),
   
   reset: () => set({ data: initialData }),

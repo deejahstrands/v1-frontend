@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import CollectionsClient from './collections-client';
 
 export const metadata: Metadata = {
-  title: 'Collections | Featured Collections',
+  title: 'Collections | Deejah Strands',
   description: 'Explore our featured collection of premium wigs, closures, and hair extensions. Handpicked luxury hair pieces crafted for elegance and style.',
   keywords: [
     'featured hair collection',

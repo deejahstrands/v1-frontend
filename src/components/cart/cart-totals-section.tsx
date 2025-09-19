@@ -4,28 +4,21 @@ import React from 'react';
 import Link from 'next/link';
 import { ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ConsultationCard from '@/components/products/product-details/ConsultationCard';
 import { useCart } from '@/store/use-cart';
-import { useConsultation } from '@/store/use-consultation';
 
 interface CartTotalsSectionProps {
   onProceedToCheckout: () => void;
+  backendTotal?: number; // Total from backend API
 }
 
-export function CartTotalsSection({ onProceedToCheckout }: CartTotalsSectionProps) {
+export function CartTotalsSection({ onProceedToCheckout, backendTotal }: CartTotalsSectionProps) {
   const { items } = useCart();
-  const selectedConsultation = useConsultation(state => state.selectedConsultation);
-  const consultation = selectedConsultation ? {
-    type: selectedConsultation.name,
-    price: selectedConsultation.price,
-    description: selectedConsultation.description
-  } : undefined;
 
   const formatPrice = (price: number) => `₦${price.toLocaleString()}`;
 
-  const subtotal = items.reduce((sum, item) => sum + (item.totalPrice * item.quantity), 0);
-  const consultationTotal = consultation?.price || 0;
-  const total = subtotal + consultationTotal;
+  // Use backend total if available, otherwise calculate from items
+  const subtotal = backendTotal ?? items.reduce((sum, item) => sum + (item.totalPrice), 0);
+  const total = subtotal;
 
   return (
     <div className="space-y-6">
@@ -35,26 +28,9 @@ export function CartTotalsSection({ onProceedToCheckout }: CartTotalsSectionProp
 
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Shipping (3 - 5) working days</span>
-            <span className="text-gray-900 font-medium">free</span>
-          </div>
-
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Tax</span>
-            <span className="text-gray-900 font-medium">NO</span>
-          </div>
-
-          <div className="flex justify-between text-sm">
             <span className="text-gray-600">Subtotal</span>
             <span className="text-gray-900 font-medium">{formatPrice(subtotal)}</span>
           </div>
-
-          {consultationTotal > 0 && (
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Consultation</span>
-              <span className="text-gray-900 font-medium">{formatPrice(consultationTotal)}</span>
-            </div>
-          )}
 
           <div className="border-t border-gray-200 pt-3">
             <div className="flex justify-between text-lg font-semibold">
@@ -66,7 +42,7 @@ export function CartTotalsSection({ onProceedToCheckout }: CartTotalsSectionProp
         {/* Consultation Card */}
 
       </div>
-      <ConsultationCard />
+
 
       <div className="mt-6 space-y-3">
         <Button

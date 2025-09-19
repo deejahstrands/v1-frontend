@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useAuth } from "@/store/use-auth";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +20,7 @@ type LoginFormInputs = z.infer<typeof loginSchema>;
 
 const AdminLoginPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const { login, isLoading } = useAuth();
   const { rememberedCredentials, saveCredentials, clearCredentials } = useRememberCredentials();
@@ -75,7 +76,9 @@ const AdminLoginPage = () => {
         
         // Small delay to ensure store state is stable before navigation
         setTimeout(() => {
-          router.push("/admin");
+          const returnUrl = searchParams.get('returnUrl');
+          const redirectTo = returnUrl ? decodeURIComponent(returnUrl) : '/admin';
+          router.push(redirectTo);
         }, 100);
       } else {
         console.log("User is not admin, clearing auth state...");
