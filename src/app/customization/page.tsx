@@ -49,4 +49,4 @@ export default function CustomizationPage() {
       <StructuredData data={customizationServiceSchema} />
     </>
   );
-}
+} 

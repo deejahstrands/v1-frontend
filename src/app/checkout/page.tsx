@@ -101,8 +101,8 @@ export default function CheckoutPage() {
     setIsProcessing(true);
     
     try {
-      const callbackUrl = process.env.NEXT_PUBLIC_CHECKOUT_SUCCESS_URL;
-      const cancelUrl = process.env.NEXT_PUBLIC_CHECKOUT_CANCEL_URL;
+      const callbackUrl = `${process.env.NEXT_PUBLIC_CHECKOUT_SUCCESS_URL}/checkout/success`;
+      const cancelUrl = `${process.env.NEXT_PUBLIC_CHECKOUT_CANCEL_URL}/checkout/cancel`;
       
       if (!callbackUrl || !cancelUrl) {
         throw new Error('Checkout URLs not configured');

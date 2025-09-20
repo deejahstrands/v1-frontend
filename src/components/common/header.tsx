@@ -30,7 +30,7 @@ export function Header() {
   const { openModal } = useLoginModal();
   const { categories } = useCategories();
   const cartCount = useCart(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
-  const wishlistCount = useWishlist(state => state.items.length);
+  const wishlistCount = useWishlist(state => state.getWishlistCount());
 
   const handleCartClick = (e: React.MouseEvent) => {
     if (!isAuthenticated) {

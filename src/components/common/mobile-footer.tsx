@@ -13,7 +13,7 @@ interface MobileFooterProps {
 
 export function MobileFooter({ isLoggedIn = false, onSearchClick }: MobileFooterProps) {
   const cartCount = useCart(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
-  const wishlistCount = useWishlist(state => state.items.length);
+  const wishlistCount = useWishlist(state => state.getWishlistCount());
   const { openModal } = useLoginModal();
 
   const handleCartClick = (e: React.MouseEvent) => {

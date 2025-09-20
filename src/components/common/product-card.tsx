@@ -32,7 +32,7 @@ export function ProductCard({
   const { isAuthenticated } = useAuth();
   const { openModal } = useLoginModal();
   const addToCart = useCart(state => state.addToCart);
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { addToWishlist, addToWishlistApi, removeFromWishlist, removeFromWishlistApi, isInWishlist } = useWishlist();
   const { toast } = useToast();
   
   // Use first image as default, second image on hover
@@ -107,19 +107,31 @@ export function ProductCard({
     toggleWishlist();
   };
 
-  const toggleWishlist = () => {
-    if (isInWishlist(id)) {
-      removeFromWishlist(id);
-      toast.success(`${title} has been removed from your wishlist.`);
-    } else {
-      addToWishlist({
-        productId: id,
-        title: title,
-        price: price,
-        image: defaultImage,
-        category: 'Hair Products'
-      });
-      toast.success(`${title} has been added to your wishlist.`);
+  const toggleWishlist = async () => {
+    try {
+      if (isInWishlist(id)) {
+        if (isAuthenticated) {
+          await removeFromWishlistApi(id);
+        } else {
+          removeFromWishlist(id);
+        }
+        toast.success(`${title} has been removed from your wishlist.`);
+      } else {
+        if (isAuthenticated) {
+          await addToWishlistApi(id);
+        } else {
+          addToWishlist({
+            productId: id,
+            title: title,
+            price: price,
+            image: defaultImage,
+            category: 'Hair Products'
+          });
+        }
+        toast.success(`${title} has been added to your wishlist.`);
+      }
+    } catch {
+      toast.error('Failed to update wishlist');
     }
   };
 
@@ -191,7 +203,7 @@ export function ProductCard({
               type="button"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className={`col-span-3 md:col-span-2 lg:col-span-2 w-full h-10 flex items-center justify-center rounded-md md:border border-gray-200 hover:bg-gray-100 transition-colors ${isInWishlist(id) ? "text-[#4A85E4]" : "text-gray-400"}`}
+              className={`col-span-3 md:col-span-2 lg:col-span-2 cursor-pointer w-full h-10 flex items-center justify-center rounded-md md:border border-gray-200 hover:bg-gray-100 transition-colors ${isInWishlist(id) ? "text-[#4A85E4]" : "text-gray-400"}`}
             >
               <Heart fill={isInWishlist(id) ? "#4A85E4" : "none"} className="text-xs md:text-base xl:text-lg "/>
             </motion.button>
