@@ -101,11 +101,15 @@ export default function CheckoutPage() {
     setIsProcessing(true);
     
     try {
-      const callbackUrl = process.env.NEXT_PUBLIC_CHECKOUT_SUCCESS_URL || `${window.location.origin}/checkout/success`;
-      const cancelUrl = process.env.NEXT_PUBLIC_CHECKOUT_CANCEL_URL || `${window.location.origin}/checkout/cancel`;
+      const callbackUrl = process.env.NEXT_PUBLIC_CHECKOUT_SUCCESS_URL;
+      const cancelUrl = process.env.NEXT_PUBLIC_CHECKOUT_CANCEL_URL;
+      
+      if (!callbackUrl || !cancelUrl) {
+        throw new Error('Checkout URLs not configured');
+      }
       
       const checkoutData = {
-        deliveryNote: deliveryNote || undefined,
+        deliveryNote: deliveryNote || '',
         shippingAddress: formatAddress(selectedAddress),
         callbackUrl,
         cancelUrl,
