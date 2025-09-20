@@ -23,12 +23,12 @@ const CartItemCard: React.FC<CartItemCardProps> = ({ item, onRemove, onIncrease,
       </button>
       {/* Product image */}
       <div className="w-20 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-        <Image src={product.images[0]} alt={product.title} width={80} height={96} className="object-cover w-full h-full" />
+        <Image src={product.thumbnail} alt={product.name} width={80} height={96} className="object-cover w-full h-full" />
       </div>
       {/* Details */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className="font-semibold text-base md:text-lg">{product.title}</span>
+          <span className="font-semibold text-base md:text-lg">{product.name}</span>
           <button className="border border-gray-300 rounded p-1 text-gray-500 cursor-not-allowed" disabled>
             <Pencil size={16} />
           </button>

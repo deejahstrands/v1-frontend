@@ -11,9 +11,9 @@ import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/store/use-auth';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 
-export default function UserLoginPage() {
+function UserLoginForm() {
   const { toast } = useToast();
   const { login, isLoading, clearError } = useAuth();
   const router = useRouter();
@@ -138,5 +138,13 @@ export default function UserLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function UserLoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <UserLoginForm />
+    </Suspense>
   );
 } 

@@ -137,7 +137,7 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
     // Check authentication first before any API calls
     if (!isAuthenticated) {
         openModal("Add Item to Cart", async () => {
-          // This will be called after successful login
+        // This will be called after successful login
           try {
             // Double-check authentication before making API call
             if (!authService.isAuthenticated()) {
@@ -149,34 +149,34 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
             await cartService.addToCart(apiData);
             
             // Also add to local cart store for UI consistency
-            addToCart({
-              productId: product.id,
-              title: product.title,
-              image: product.image,
-              basePrice,
+        addToCart({
+          productId: product.id,
+          title: product.title,
+          image: product.image,
+          basePrice,
               customizations: Object.fromEntries(
                 Object.entries(selectedCustomizations).filter(([, option]) => option !== null)
               ) as { [type: string]: CustomizationOption },
-              customizationTotal,
-              totalPrice: singleTotal,
-              quantity,
-              consultation: consultation ?? undefined,
-              delivery: selectedDelivery,
-              measurements: measurements.hasMeasurements ? measurements : undefined,
-              specifications: product.specifications,
+          customizationTotal,
+          totalPrice: singleTotal,
+          quantity,
+          consultation: consultation ?? undefined,
+          delivery: selectedDelivery,
+          measurements: measurements.hasMeasurements ? measurements : undefined,
+          specifications: product.specifications,
               apiData,
-            });
+        });
             
-            toast.success(`${product.title} has been added to your cart.`);
-            clearAllSelections();
-            scrollToTop();
+        toast.success(`${product.title} has been added to your cart.`);
+        clearAllSelections();
+        scrollToTop();
           } catch (error) {
             toast.error("Failed to add item to cart. Please try again.");
             console.error("API add to cart error:", error);
           }
-        });
-        return;
-      }
+      });
+      return;
+    }
 
       try {
         const apiData = await prepareCartData();
@@ -184,27 +184,27 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
         await cartService.addToCart(apiData);
       
       // Also add to local cart store for UI consistency
-      addToCart({
-        productId: product.id,
-        title: product.title,
-        image: product.image,
-        basePrice,
+    addToCart({
+      productId: product.id,
+      title: product.title,
+      image: product.image,
+      basePrice,
         customizations: Object.fromEntries(
           Object.entries(selectedCustomizations).filter(([, option]) => option !== null)
         ) as { [type: string]: CustomizationOption },
-        customizationTotal,
-        totalPrice: singleTotal,
-        quantity,
-        consultation: consultation ?? undefined,
-        delivery: selectedDelivery,
-        measurements: measurements.hasMeasurements ? measurements : undefined,
-        specifications: product.specifications,
+      customizationTotal,
+      totalPrice: singleTotal,
+      quantity,
+      consultation: consultation ?? undefined,
+      delivery: selectedDelivery,
+      measurements: measurements.hasMeasurements ? measurements : undefined,
+      specifications: product.specifications,
         apiData,
-      });
+    });
       
-        toast.success(`${product.title} has been added to your cart.`);
-        clearAllSelections();
-        scrollToTop();
+    toast.success(`${product.title} has been added to your cart.`);
+    clearAllSelections();
+    scrollToTop();
       } catch (error) {
         if (error instanceof Error && error.message.includes('upload')) {
           toast.error("Failed to upload images. Please try again.");
@@ -292,8 +292,8 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
             </>
           ) : (
             <>
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-13z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="21" r="1" fill="currentColor"/><circle cx="19" cy="21" r="1" fill="currentColor"/></svg>
-              Add to Cart - ₦{totalPrice.toLocaleString()}
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-13z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="21" r="1" fill="currentColor"/><circle cx="19" cy="21" r="1" fill="currentColor"/></svg>
+          Add to Cart - ₦{totalPrice.toLocaleString()}
             </>
           )}
         </button>

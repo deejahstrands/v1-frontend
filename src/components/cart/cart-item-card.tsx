@@ -292,7 +292,7 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease, onEdit }:
                    
                     onDecrease();
                   }}
-                  className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:text-gray-300"
+                  className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 disabled:text-gray-300 cursor-pointer"
                   disabled={item.quantity <= 1}
                 >
                   –
@@ -305,7 +305,7 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease, onEdit }:
                     
                     onIncrease();
                   }}
-                  className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700"
+                  className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 cursor-pointer"
                 >
                   +
                 </button>

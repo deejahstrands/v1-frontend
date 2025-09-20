@@ -4,6 +4,7 @@ import { BannerSection } from '@/components/common/banner-section';
 import { Breadcrumb } from '@/components/common/breadcrumb';
 import { SectionContainer } from '@/components/common/section-container';
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/store/use-cart';
 import { useAuth } from '@/store/use-auth';
 import { CartItemCard } from '@/components/cart/cart-item-card';
@@ -13,6 +14,7 @@ import { CartLoadingSkeleton } from '@/components/cart/cart-loading-skeleton';
 import type { CartItem } from '@/store/use-cart';
 
 export default function CartPage() {
+  const router = useRouter();
   const {
     items,
     loading,
@@ -41,7 +43,6 @@ export default function CartPage() {
       updateCartItem(item.apiData.cartItemId, item.quantity + 1);
     } else {
       // Fallback to local cart for unauthenticated users
-      console.log('=== HANDLE INCREASE CALLED (LOCAL) ===');
       addToCart({ ...item, quantity: item.quantity + 1 });
     }
   };
@@ -60,8 +61,11 @@ export default function CartPage() {
   };
 
   const handleProceedToCheckout = () => {
-    // TODO: Implement checkout logic
-    console.log('Proceeding to checkout...');
+    if (!isAuthenticated) {
+      router.push('/auth/login?returnUrl=/checkout');
+      return;
+    }
+    router.push('/checkout');
   };
 
   return (

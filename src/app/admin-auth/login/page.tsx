@@ -9,7 +9,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { useAuth } from "@/store/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useRememberCredentials } from "@/hooks/use-remember-credentials";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -18,7 +18,7 @@ const loginSchema = z.object({
 
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
-const AdminLoginPage = () => {
+const AdminLoginForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -207,6 +207,14 @@ const AdminLoginPage = () => {
         <p>Copyright © {currentYear} Deejah Strands</p>
       </footer>
     </div>
+  );
+};
+
+const AdminLoginPage = () => {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <AdminLoginForm />
+    </Suspense>
   );
 };
 
