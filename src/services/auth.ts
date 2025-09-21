@@ -52,6 +52,18 @@ export interface VerifyEmailResponse {
   message: string;
 }
 
+export interface UpdateProfileData {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  avatar: string;
+}
+
+export interface UpdateProfileResponse {
+  message: string;
+  data: User;
+}
+
 // Cookie utility functions
 const setCookie = (name: string, value: string, days: number = 7) => {
   console.log('🍪 Setting cookie:', { name, value: value.substring(0, 20) + '...', days });
@@ -183,5 +195,11 @@ export const authService = {
       console.error('Error refreshing token:', error);
       return null;
     }
+  },
+
+  // Update user profile
+  async updateProfile(profileData: UpdateProfileData): Promise<UpdateProfileResponse> {
+    const response = await api.patch<UpdateProfileResponse>('/users/me', profileData);
+    return response.data;
   },
 }; 

@@ -73,18 +73,21 @@ export const useAddress = create<AddressState>((set, get) => ({
   updateAddress: async (addressId, data) => {
     set({ loading: true, error: null });
     try {
-      const response = await addressService.updateAddress(addressId, data);
-      const updatedAddress = response.data;
+      await addressService.updateAddress(addressId, data);
       
-      set((state) => ({
-        addresses: state.addresses.map(addr => 
-          addr.id === addressId ? updatedAddress : addr
-        ),
-        selectedAddress: state.selectedAddress?.id === addressId 
-          ? updatedAddress 
-          : state.selectedAddress,
+      // Since the API only returns a success message, refetch all addresses
+      // to get the updated data with proper structure
+      const response = await addressService.getAddresses();
+      const addresses = response.data;
+      
+      // Auto-select default address if none selected
+      const defaultAddress = addresses.find(addr => addr.default) || addresses[0] || null;
+      
+      set({
+        addresses,
+        selectedAddress: get().selectedAddress || defaultAddress,
         loading: false,
-      }));
+      });
     } catch (error) {
       set({
         loading: false,

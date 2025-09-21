@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -6,7 +7,6 @@ import Image from 'next/image';
 import { BannerSection } from '@/components/common/banner-section';
 import { Breadcrumb } from '@/components/common/breadcrumb';
 import { SectionContainer } from '@/components/common/section-container';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { AddressPreview } from '@/components/checkout/address-preview';
 import { AddressForm } from '@/components/checkout/address-form';
@@ -21,7 +21,7 @@ import type { Address } from '@/services/address';
 export default function CheckoutPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const { items, totalPrice } = useCart();
+  const { items } = useCart();
   const {  selectedAddress, fetchAddresses } = useAddress();
   const { toast } = useToast();
 
@@ -30,6 +30,7 @@ export default function CheckoutPage() {
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [deliveryNote, setDeliveryNote] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
 
   // Handle hydration
   useEffect(() => {
@@ -55,9 +56,12 @@ export default function CheckoutPage() {
   // Fetch addresses on mount
   useEffect(() => {
     if (isAuthenticated) {
-      fetchAddresses();
+      setIsLoadingAddresses(true);
+      fetchAddresses().finally(() => {
+        setIsLoadingAddresses(false);
+      });
     }
-  }, [isAuthenticated, fetchAddresses]);
+  }, [isAuthenticated]);
 
   const handleAddAddress = () => {
     setEditingAddress(null);
@@ -172,6 +176,21 @@ export default function CheckoutPage() {
                 onCancel={handleAddressFormCancel}
                 onSuccess={handleAddressFormSuccess}
               />
+            ) : isLoadingAddresses ? (
+              <div className="bg-white rounded-xl border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Shipping Address</h3>
+                <div className="space-y-4">
+                  <div className="animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+                  </div>
+                  <div className="animate-pulse">
+                    <div className="h-10 bg-gray-200 rounded w-32"></div>
+                  </div>
+                </div>
+              </div>
             ) : (
               <AddressPreview
                 onAddAddress={handleAddAddress}
@@ -180,7 +199,7 @@ export default function CheckoutPage() {
             )}
 
             {/* Delivery Note */}
-            {!showAddressForm && (
+            {!showAddressForm && !isLoadingAddresses && (
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Delivery Note (Optional)
@@ -195,7 +214,7 @@ export default function CheckoutPage() {
             )}
 
             {/* Payment Section */}
-            {!showAddressForm && (
+            {!showAddressForm && !isLoadingAddresses && (
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment</h3>
                 <div className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg">
@@ -225,37 +244,11 @@ export default function CheckoutPage() {
 
           {/* Order Summary Sidebar */}
           <div className="w-full lg:w-[400px] flex-shrink-0">
-            <OrderSummary />
-            
-            {!showAddressForm && (
-              <div className="mt-6">
-                <Button
-                  onClick={handleCheckout}
-                  disabled={!selectedAddress || isProcessing}
-                  className="w-full bg-[#C9A898] hover:bg-[#b88b6d] text-white font-semibold rounded-lg py-3 text-base transition-colors"
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    `Complete Order - ${totalPrice ? `₦${totalPrice.toLocaleString()}` : '₦0'}`
-                  )}
-                </Button>
-                
-                <p className="text-xs text-gray-500 mt-3 text-center">
-                  By continuing, you agree to our{' '}
-                  <a href="/terms" className="underline hover:text-gray-700">
-                    Terms of Service
-                  </a>{' '}
-                  and acknowledge the{' '}
-                  <a href="/privacy" className="underline hover:text-gray-700">
-                    Privacy Policy
-                  </a>
-                </p>
-              </div>
-            )}
+            <OrderSummary 
+              onCheckout={!showAddressForm ? handleCheckout : undefined}
+              isProcessing={isProcessing}
+              disabled={!selectedAddress}
+            />
           </div>
         </div>
       </SectionContainer>

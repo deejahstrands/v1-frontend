@@ -2,9 +2,16 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 import { useCart } from '@/store/use-cart';
 
-export function OrderSummary() {
+interface OrderSummaryProps {
+  onCheckout?: () => void;
+  isProcessing?: boolean;
+  disabled?: boolean;
+}
+
+export function OrderSummary({ onCheckout, isProcessing = false, disabled = false }: OrderSummaryProps) {
   const { items, totalPrice } = useCart();
   
   const formatPrice = (price: number) => `₦${price.toLocaleString()}`;
@@ -19,7 +26,7 @@ export function OrderSummary() {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 sticky top-8">
+    <div className="bg-white rounded-xl border border-gray-200 p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
       
       <div className="space-y-4 mb-6">
@@ -99,6 +106,37 @@ export function OrderSummary() {
           </div>
         </div>
       </div>
+
+      {/* Checkout Button */}
+      {onCheckout && (
+        <div className="mt-6">
+          <Button
+            onClick={onCheckout}
+            disabled={disabled || isProcessing}
+            className="w-full bg-[#C9A898] hover:bg-[#b88b6d] text-white font-semibold rounded-lg py-3 text-base transition-colors"
+          >
+            {isProcessing ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                Processing...
+              </>
+            ) : (
+              `Complete Order - ${totalPrice ? `₦${totalPrice.toLocaleString()}` : '₦0'}`
+            )}
+          </Button>
+          
+          <p className="text-xs text-gray-500 mt-3 text-center">
+            By continuing, you agree to our{' '}
+            <a href="/terms" className="underline hover:text-gray-700">
+              Terms of Service
+            </a>{' '}
+            and acknowledge the{' '}
+            <a href="/privacy" className="underline hover:text-gray-700">
+              Privacy Policy
+            </a>
+          </p>
+        </div>
+      )}
     </div>
   );
 }

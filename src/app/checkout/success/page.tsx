@@ -27,8 +27,6 @@ export default function CheckoutSuccessPage() {
           <Breadcrumb
             items={[
               { label: 'Home', href: '/' },
-              { label: 'Cart', href: '/cart' },
-              { label: 'Checkout', href: '/checkout' },
               { label: 'Success' }
             ]}
           />
@@ -63,7 +61,7 @@ export default function CheckoutSuccessPage() {
               </Button>
             </Link>
             
-            <Link href="/account/orders" className="block">
+            <Link href="/account#orders" className="block">
               <Button variant="outline" className="w-full">
                 View Orders
               </Button>

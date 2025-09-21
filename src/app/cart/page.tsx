@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 
 import { BannerSection } from '@/components/common/banner-section';
@@ -35,7 +36,7 @@ export default function CartPage() {
     if (isAuthenticated) {
       fetchCart();
     }
-  }, [isAuthenticated, fetchCart]);
+  }, [isAuthenticated]);
 
   const handleIncrease = (item: CartItem) => {
     if (isAuthenticated && item.apiData?.cartItemId) {

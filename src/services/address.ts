@@ -68,7 +68,7 @@ class AddressService {
   /**
    * Update address
    */
-  async updateAddress(addressId: string, data: Partial<AddAddressRequest>): Promise<SingleAddressResponse> {
+  async updateAddress(addressId: string, data: Partial<AddAddressRequest>): Promise<{ message: string }> {
     const response = await api.patch(`${this.baseUrl}/${addressId}`, data);
     return response.data;
   }

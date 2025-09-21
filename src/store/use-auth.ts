@@ -6,6 +6,7 @@ import {
   LoginCredentials,
   SignupCredentials,
   User,
+  UpdateProfileData,
 } from "@/services/auth";
 import { handleTokenExpiration } from "@/lib/auth-utils";
 
@@ -25,6 +26,7 @@ interface AuthState {
   resetPassword: (token: string, password: string) => Promise<void>;
   verifyEmail: (token: string) => Promise<void>;
   resendVerification: (email: string) => Promise<void>;
+  updateProfile: (profileData: UpdateProfileData) => Promise<void>;
   clearError: () => void;
   setUser: (user: User | null) => void;
   handleTokenExpiration: () => void;
@@ -150,6 +152,24 @@ export const useAuth = create<AuthState>()(
             set({
               isLoading: false,
               error: error.response?.data?.message || "Failed to verify email.",
+            });
+            throw error;
+          }
+        },
+
+        updateProfile: async (profileData: UpdateProfileData) => {
+          set({ isLoading: true, error: null });
+          try {
+            const response = await authService.updateProfile(profileData);
+            set({
+              user: response.data,
+              isLoading: false,
+              error: null,
+            });
+          } catch (error: any) {
+            set({
+              isLoading: false,
+              error: error.response?.data?.message || "Failed to update profile.",
             });
             throw error;
           }

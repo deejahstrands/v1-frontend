@@ -19,8 +19,6 @@ export default function CheckoutCancelPage() {
           <Breadcrumb
             items={[
               { label: 'Home', href: '/' },
-              { label: 'Cart', href: '/cart' },
-              { label: 'Checkout', href: '/checkout' },
               { label: 'Cancel' }
             ]}
           />
