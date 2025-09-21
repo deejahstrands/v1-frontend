@@ -17,12 +17,11 @@ export const usePriceCalculation = (productPrice: string, includeConsultation: b
   const selectedConsultation = useConsultation(state => state.selectedConsultation);
   const consultation = selectedConsultation ? {
     type: selectedConsultation.name,
-    price: selectedConsultation.price,
-    description: selectedConsultation.description
+    price: selectedConsultation.price
   } : undefined;
   
   const basePrice = Number(productPrice.replace(/[^0-9.-]+/g, ""));
-  const consultationPrice = includeConsultation ? (consultation?.price || 0) : 0;
+  const consultationPrice = includeConsultation ? Number(consultation?.price || 0) : 0;
   const totalPrice = basePrice + customizationTotal + deliveryTotal + consultationPrice;
   const hasCustomization = customizationTotal > 0;
 

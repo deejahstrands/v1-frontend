@@ -108,22 +108,25 @@ export function AddressSection() {
       </div>
 
       {/* Section Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <div className="flex items-center justify-between">
+      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center space-x-3">
             <MapPin className="text-[#C9A898]" size={24} />
-            <h1 className="text-2xl font-semibold text-gray-900">My Addresses</h1>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">My Addresses</h1>
+              <p className="text-gray-600 text-sm sm:text-base">Manage your delivery addresses</p>
+            </div>
           </div>
           <Button 
             onClick={handleAddAddress}
             disabled={loading}
-            className="bg-[#C9A898] hover:bg-[#b88b6d] disabled:opacity-50"
+            className="bg-[#C9A898] hover:bg-[#b88b6d] disabled:opacity-50 w-full sm:w-auto"
           >
             <Plus size={16} className="mr-2" />
-            Add New Address
+            <span className="hidden sm:inline">Add New Address</span>
+            <span className="sm:hidden">Add Address</span>
           </Button>
         </div>
-        <p className="text-gray-600 mt-2">Manage your delivery addresses</p>
       </div>
 
       {/* Error Display */}
@@ -139,19 +142,19 @@ export function AddressSection() {
           // Loading state - show multiple skeleton cards
           <div className="space-y-4">
             {[1, 2].map((i) => (
-              <div key={i} className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+              <div key={i} className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200">
                 <div className="animate-pulse">
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-                      <div>
+                      <div className="w-10 h-10 bg-gray-200 rounded-full flex-shrink-0"></div>
+                      <div className="min-w-0 flex-1">
                         <div className="h-4 bg-gray-200 rounded w-32 mb-2"></div>
                         <div className="h-3 bg-gray-200 rounded w-20"></div>
                       </div>
                     </div>
-                    <div className="flex space-x-2">
-                      <div className="h-8 bg-gray-200 rounded w-16"></div>
-                      <div className="h-8 bg-gray-200 rounded w-16"></div>
+                    <div className="flex space-x-2 w-full sm:w-auto">
+                      <div className="h-8 bg-gray-200 rounded flex-1 sm:flex-none sm:w-16"></div>
+                      <div className="h-8 bg-gray-200 rounded flex-1 sm:flex-none sm:w-16"></div>
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -173,77 +176,77 @@ export function AddressSection() {
             }
             
             return (
-            <div key={address.id} className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between mb-4">
+            <div key={address.id} className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200 hover:shadow-md transition-shadow">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
                 <div className="flex items-center space-x-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                     address?.default === true
                       ? 'bg-[#C9A898] text-white' 
                       : 'bg-[#C9A898] bg-opacity-50 text-gray-500'
                   }`}>
                     <MapPin size={20} />
                   </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-medium text-gray-900 text-sm sm:text-base">
                       {address?.default === true ? 'Default Address' : 'Address'}
                     </h3>
                     {address?.default === true && (
-                      <p className="text-sm text-gray-500">Default address</p>
+                      <p className="text-xs sm:text-sm text-gray-500">Default address</p>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 w-full sm:w-auto">
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => handleEditAddress(address.id)}
                     disabled={loading}
-                    className="hover:bg-gray-50"
+                    className="hover:bg-gray-50 flex-1 sm:flex-none"
                   >
                     <Edit3 size={16} className="mr-1" />
-                    Edit
+                    <span className="hidden sm:inline">Edit</span>
                   </Button>
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-1 sm:flex-none"
                     onClick={() => handleDeleteAddress(address.id)}
                     disabled={loading}
                   >
                     <Trash2 size={16} className="mr-1" />
-                    Delete
+                    <span className="hidden sm:inline">Delete</span>
                   </Button>
                 </div>
               </div>
               
-              <div className="text-gray-700 space-y-1">
+              <div className="text-gray-700 space-y-2">
                 <div className="flex items-start space-x-2">
                   <div className="w-2 h-2 bg-[#C9A898] rounded-full mt-2 flex-shrink-0"></div>
-                  <div>
-                    <p className="font-medium text-gray-900">{address.streetAddress}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-gray-900 text-sm sm:text-base break-words">{address.streetAddress}</p>
                     {address.apartment && (
-                      <p className="text-gray-600">Apt {address.apartment}</p>
+                      <p className="text-gray-600 text-sm">Apt {address.apartment}</p>
                     )}
                   </div>
                 </div>
                 
                 <div className="flex items-start space-x-2">
                   <div className="w-2 h-2 bg-gray-300 rounded-full mt-2 flex-shrink-0"></div>
-                  <div>
-                    <p className="text-gray-600">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-gray-600 text-sm sm:text-base break-words">
                       {address.city}, {address.state} {address.postalCode}
                     </p>
                     {address.province && (
-                      <p className="text-gray-600">{address.province}</p>
+                      <p className="text-gray-600 text-sm break-words">{address.province}</p>
                     )}
-                    <p className="text-gray-600">{address.country}</p>
+                    <p className="text-gray-600 text-sm sm:text-base break-words">{address.country}</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start space-x-2">
                   <div className="w-2 h-2 bg-gray-300 rounded-full mt-2 flex-shrink-0"></div>
-                  <div>
-                    <p className="text-gray-600 font-medium">{address.phoneNumber}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-gray-600 font-medium text-sm sm:text-base break-words">{address.phoneNumber}</p>
                   </div>
                 </div>
               </div>
@@ -252,14 +255,14 @@ export function AddressSection() {
           })
         ) : (
           // Show empty state if user has no addresses
-          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+          <div className="bg-white rounded-lg shadow-sm p-8 sm:p-12 text-center">
             <MapPin size={48} className="mx-auto text-gray-300 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No addresses saved</h3>
-            <p className="text-gray-500 mb-6">Add your first address to make checkout faster.</p>
+            <p className="text-gray-500 mb-6 text-sm sm:text-base px-4">Add your first address to make checkout faster.</p>
             <Button 
               onClick={handleAddAddress}
               disabled={loading}
-              className="bg-[#C9A898] hover:bg-[#b88b6d] disabled:opacity-50"
+              className="bg-[#C9A898] hover:bg-[#b88b6d] disabled:opacity-50 w-full sm:w-auto"
             >
               <Plus size={16} className="mr-2" />
               Add Address

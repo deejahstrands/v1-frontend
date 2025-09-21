@@ -80,8 +80,11 @@ const ConsultationCard: React.FC = () => {
       setSelectedConsultation({
         id: data.type.toLowerCase().replace(/\s+/g, '-'),
         name: data.type,
-        price: typeObj.price,
-        description: `Professional consultation service`
+        price: typeObj.price.toString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        deletedAt: null,
+        status: 'active'
       });
     }
   };

@@ -9,7 +9,6 @@ interface CustomizationOption {
   price?: number;
 }
 import { useProductCustomization } from '@/store/use-product-customization';
-import { useConsultation } from '@/store/use-consultation';
 import { useDelivery } from '@/store/use-delivery';
 import { useMeasurements } from '@/store/use-measurements';
 import { useCart } from '@/store/use-cart';
@@ -38,12 +37,6 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
   const [isHydrated, setIsHydrated] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const selectedCustomizations = useProductCustomization(state => state.selected);
-  const selectedConsultation = useConsultation(state => state.selectedConsultation);
-  const consultation = selectedConsultation ? {
-    type: selectedConsultation.name,
-    price: selectedConsultation.price,
-    description: selectedConsultation.description
-  } : undefined;
   const selectedDelivery = useDelivery(state => state.selected);
   const measurements = useMeasurements(state => state.data);
   const addToCart = useCart(state => state.addToCart);
@@ -160,7 +153,6 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
           customizationTotal,
           totalPrice: singleTotal,
           quantity,
-          consultation: consultation ?? undefined,
           delivery: selectedDelivery,
           measurements: measurements.hasMeasurements ? measurements : undefined,
           specifications: product.specifications,
@@ -195,7 +187,6 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
       customizationTotal,
       totalPrice: singleTotal,
       quantity,
-      consultation: consultation ?? undefined,
       delivery: selectedDelivery,
       measurements: measurements.hasMeasurements ? measurements : undefined,
       specifications: product.specifications,
