@@ -260,17 +260,43 @@ export default function ProductDetailsPage() {
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Gallery</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {product.gallery.map((image: string, index: number) => (
-                    <div key={index} className="aspect-square rounded-lg overflow-hidden">
-                      <Image
-                        src={image}
-                        alt={`${product.name} gallery ${index + 1}`}
-                        width={200}
-                        height={200}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ))}
+                  {product.gallery.map((item: any, index: number) => {
+                    const isVideo = item.type === 'video' || (typeof item === 'string' ? item.includes('.mp4') : false);
+                    const url = typeof item === 'string' ? item : item.url;
+                    
+                    return (
+                      <div key={index} className="aspect-square rounded-lg overflow-hidden bg-gray-100 relative group">
+                        {isVideo ? (
+                          <>
+                            <video
+                              src={url}
+                              controls
+                              className="w-full h-full object-cover"
+                              preload="metadata"
+                            >
+                              Your browser does not support the video tag.
+                            </video>
+                            <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
+                              Video
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <Image
+                              src={url}
+                              alt={`${product.name} gallery ${index + 1}`}
+                              width={200}
+                              height={200}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
+                              Image
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

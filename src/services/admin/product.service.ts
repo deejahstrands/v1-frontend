@@ -16,6 +16,10 @@ export interface AdminProduct {
   };
   customization: boolean;
   featured?: boolean;
+  gallery?: Array<{
+    url: string;
+    type: 'image' | 'video';
+  }>;
 }
 
 export interface CreateProductData {
@@ -27,7 +31,10 @@ export interface CreateProductData {
   totalQuantity: number;
   quantityAvailable: number;
   quantitySold: number;
-  gallery: string[];
+  gallery: Array<{
+    url: string;
+    type: 'image' | 'video';
+  }>;
   visibility: 'hidden' | 'published';
   featured: boolean;
   customizations: Array<{
@@ -60,7 +67,10 @@ export interface UpdateProductData {
   totalQuantity?: number;
   quantityAvailable?: number;
   quantitySold?: number;
-  gallery?: string[];
+  gallery?: Array<{
+    url: string;
+    type: 'image' | 'video';
+  }>;
   visibility?: 'hidden' | 'published';
   featured?: boolean;
   customizations?: Array<{

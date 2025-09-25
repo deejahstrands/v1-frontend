@@ -13,6 +13,7 @@ interface ProductStatusRowProps {
     id: string;
     name: string;
   }>;
+  collectionsLoading?: boolean;
   errors: Record<string, string>;
   onInputChange: (field: string, value: string | number | boolean | File | null) => void;
 }
@@ -20,6 +21,7 @@ interface ProductStatusRowProps {
 export const ProductStatusRow: React.FC<ProductStatusRowProps> = ({
   formData,
   collections,
+  collectionsLoading = false,
   errors,
   onInputChange
 }) => {
@@ -45,10 +47,11 @@ export const ProductStatusRow: React.FC<ProductStatusRowProps> = ({
       <div>
         <Select
           label="Collection (Optional)"
-          placeholder="Select collection"
+          placeholder={collectionsLoading ? "Loading collections..." : collections.length === 0 ? "No collections available" : "Select collection"}
           value={formData.collectionId}
           onChange={(value) => onInputChange('collectionId', value)}
           error={errors.collectionId}
+          disabled={collectionsLoading}
           options={[
             { value: '', label: 'No Collection' },
             ...collections.map(collection => ({

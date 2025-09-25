@@ -8,6 +8,7 @@ import { Button } from '@/components/common/button';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
 import { useProductManagement } from '@/hooks/admin/use-product-management';
+import { useCollectionManagement } from '@/hooks/admin/use-collection-management';
 import { useToast } from '@/hooks/use-toast';
 import { ProductBasicInfo } from '@/components/admin/products/product-basic-info';
 import { ProductStatusRow } from '@/components/admin/products/product-status-row';
@@ -30,6 +31,12 @@ export default function AdminProductsPage() {
     getProduct,
   } = useProductManagement();
 
+  const {
+    collections,
+    isLoading: collectionsLoading,
+    loadAllCollections,
+  } = useCollectionManagement();
+
   // Get mode and product ID from URL
   const mode = searchParams.get('mode') as 'add' | 'edit' | null;
   const productId = searchParams.get('id');
@@ -49,7 +56,7 @@ export default function AdminProductsPage() {
   });
 
   // Gallery state
-  const [galleryImages, setGalleryImages] = useState<Array<{ id: string; file?: File; url: string; isExisting?: boolean }>>([]);
+  const [galleryImages, setGalleryImages] = useState<Array<{ id: string; file?: File; url: string; isExisting?: boolean; type?: 'image' | 'video' }>>([]);
 
   // Product specifications state
   const [specifications, setSpecifications] = useState({
@@ -66,11 +73,12 @@ export default function AdminProductsPage() {
     '100', '150', '200', '250', '300', '350', '400', '450', '500'
   ]);
   const [colorOptions, setColorOptions] = useState([
-    'Black', 'Burgundy', 'Blonde', 'Ginger'
+    'Black', 'Burgundy', 'Blonde', 'Ginger', 'Hightlight'
   ]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const loadedProductId = useRef<string | null>(null);
 
   // Modal state for adding new values
@@ -92,6 +100,11 @@ export default function AdminProductsPage() {
   const [selectedProcessingTimes, setSelectedProcessingTimes] = useState<string[]>([]);
   const [fittingPrices, setFittingPrices] = useState<Record<string, string>>({});
   const [processingTimePrices, setProcessingTimePrices] = useState<Record<string, string>>({});
+
+  // Load all collections for dropdown
+  useEffect(() => {
+    loadAllCollections({ status: 'active' }); // Only load active collections for dropdown
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load product data for editing
   useEffect(() => {
@@ -134,10 +147,11 @@ export default function AdminProductsPage() {
 
       // Set gallery images
       if (productData.gallery && productData.gallery.length > 0) {
-        const galleryData = productData.gallery.map((url: string, index: number) => ({
+        const galleryData = productData.gallery.map((item: any, index: number) => ({
           id: `existing-${index}`,
-          url: url,
-          isExisting: true
+          url: typeof item === 'string' ? item : item.url,
+          isExisting: true,
+          type: typeof item === 'string' ? 'image' : item.type || 'image'
         }));
         setGalleryImages(galleryData);
       } else {
@@ -266,10 +280,10 @@ export default function AdminProductsPage() {
       return;
     }
 
+    setIsUploading(true);
     try {
       // Upload images to Cloudinary first
       let thumbnailUrl = '';
-      const galleryUrls: string[] = [];
 
       // Upload thumbnail if it's a File
       if (formData.thumbnail && typeof formData.thumbnail !== 'string') {
@@ -285,24 +299,42 @@ export default function AdminProductsPage() {
         thumbnailUrl = formData.thumbnail;
       }
 
-      // Upload gallery images
+      // Upload gallery files (images and videos) in parallel
       const galleryFiles = galleryImages.filter(img => img.file).map(img => img.file!);
-      for (const file of galleryFiles) {
+      const galleryData: Array<{ url: string; type: 'image' | 'video' }> = [];
+      
+      if (galleryFiles.length > 0) {
         try {
-          const galleryResult = await cloudinaryService.uploadImage(file, 'products/gallery');
-          galleryUrls.push(galleryResult.secure_url);
+          const uploadPromises = galleryFiles.map(async (file) => {
+            const imageIndex = galleryImages.findIndex(img => img.file === file);
+            const imageType = galleryImages[imageIndex]?.type || (file.type.startsWith('video/') ? 'video' : 'image');
+            
+            if (imageType === 'video') {
+              const result = await cloudinaryService.uploadVideo(file, 'products/gallery');
+              return { url: result.secure_url, type: imageType as 'video' };
+            } else {
+              const result = await cloudinaryService.uploadImage(file, 'products/gallery');
+              return { url: result.secure_url, type: imageType as 'image' };
+            }
+          });
+          
+          const uploadResults = await Promise.all(uploadPromises);
+          galleryData.push(...uploadResults);
         } catch (error) {
-          console.error('Gallery image upload failed:', error);
-          toast.error('Failed to upload gallery image');
+          console.error('Gallery file upload failed:', error);
+          toast.error('Failed to upload gallery files');
           return;
         }
       }
 
-      // Add existing gallery URLs
-      const existingGalleryUrls = galleryImages
+      // Add existing gallery data
+      const existingGalleryData = galleryImages
         .filter(img => img.isExisting && img.url)
-        .map(img => img.url);
-      galleryUrls.push(...existingGalleryUrls);
+        .map(img => ({
+          url: img.url,
+          type: img.type || 'image'
+        }));
+      galleryData.push(...existingGalleryData);
 
       // Prepare data for API
       const productData = {
@@ -310,7 +342,7 @@ export default function AdminProductsPage() {
         basePrice: parseFloat(formData.basePrice.toString()) || 0, // Convert to number
         thumbnail: thumbnailUrl,
         quantityAvailable: 0, // Default value since we removed the field
-        galleryImages: galleryUrls,
+        gallery: galleryData,
         specifications: {
           length: specifications.length,
           density: specifications.density,
@@ -357,9 +389,14 @@ export default function AdminProductsPage() {
         toast.success('Product updated successfully!');
       }
 
-      router.push('/admin/products');
+      // Use setTimeout to avoid setState during render warning
+      setTimeout(() => {
+        router.push('/admin/products');
+      }, 0);
     } catch (error) {
       console.error('Error saving product:', error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -531,19 +568,19 @@ export default function AdminProductsPage() {
               type="button"
               variant="tertiary"
               onClick={handleCancel}
-              disabled={isSaving}
+              disabled={isSaving || isUploading}
                             className="w-full sm:w-auto"
                         >
               Cancel
             </Button>
             <Button
               type="button"
-              disabled={isSaving}
+              disabled={isSaving || isUploading}
               className="!bg-black text-white w-full sm:w-auto"
               icon={<Save className="w-4 h-4" />}
               onClick={handleSubmit}
             >
-              {isSaving ? 'Saving...' : mode === 'add' ? 'Add Product' : 'Update Product'}
+              {isUploading ? 'Uploading...' : isSaving ? 'Saving...' : mode === 'add' ? 'Add Product' : 'Update Product'}
                         </Button>
                     </div>
                 </div>
@@ -574,11 +611,11 @@ export default function AdminProductsPage() {
             collectionId: formData.collectionId,
             visibility: formData.visibility,
           }}
-          collections={[
-            { id: 'collection-1', name: 'Summer Collection' },
-            { id: 'collection-2', name: 'Winter Collection' },
-            { id: 'collection-3', name: 'Spring Collection' },
-          ]}
+          collections={collections.map(collection => ({
+            id: collection.id,
+            name: collection.name
+          }))}
+          collectionsLoading={collectionsLoading}
           errors={errors}
           onInputChange={handleInputChange}
         />
@@ -635,19 +672,19 @@ export default function AdminProductsPage() {
             type="button"
             variant="tertiary"
             onClick={handleCancel}
-            disabled={isSaving}
+            disabled={isSaving || isUploading}
             className="w-full sm:w-auto order-2 sm:order-1"
           >
             Cancel
                             </Button>
                                 <Button
             type="button"
-            disabled={isSaving}
+            disabled={isSaving || isUploading}
             className="!bg-black text-white w-full sm:w-auto order-1 sm:order-2"
             icon={<Save className="w-4 h-4" />}
             onClick={handleSubmit}
           >
-            {isSaving ? 'Saving...' : mode === 'add' ? 'Add Product' : 'Update Product'}
+            {isUploading ? 'Uploading...' : isSaving ? 'Saving...' : mode === 'add' ? 'Add Product' : 'Update Product'}
                                 </Button>
                     </div>
                     </div>

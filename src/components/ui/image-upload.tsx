@@ -16,7 +16,7 @@ interface ImageUploadProps {
   existingImage?: string; // Add this prop for pre-filling existing images
 }
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
 export const ImageUpload: React.FC<ImageUploadProps> = ({
   label,
@@ -46,7 +46,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   const validateFile = (file: File): string | null => {
     // Check file size
     if (file.size > MAX_FILE_SIZE) {
-      return `File size must be less than 2MB. Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`;
+      return `File size must be less than 10MB. Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`;
     }
 
     // Check file type

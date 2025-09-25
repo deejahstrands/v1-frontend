@@ -19,6 +19,7 @@ interface ProductBasicInfoProps {
     file?: File;
     url: string;
     isExisting?: boolean;
+    type?: 'image' | 'video';
   }>;
   categories: Array<{
     id: string;
@@ -31,6 +32,7 @@ interface ProductBasicInfoProps {
     file?: File;
     url: string;
     isExisting?: boolean;
+    type?: 'image' | 'video';
   }>) => void;
 }
 

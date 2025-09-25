@@ -20,7 +20,10 @@ export interface ProductFormData {
   customization: boolean;
   featured: boolean;
   collectionId?: string;
-  galleryImages?: string[];
+  gallery?: Array<{
+    url: string;
+    type: 'image' | 'video';
+  }>;
   specifications?: {
     length: string;
     density: string;
@@ -150,7 +153,7 @@ export const useProductManagement = () => {
         totalQuantity: data.quantityAvailable,
         quantityAvailable: data.quantityAvailable,
         quantitySold: 0,
-        gallery: data.galleryImages || [],
+        gallery: data.gallery || [],
         visibility: data.visibility,
         featured: data.featured,
         customizations: data.customizationData?.options.map(opt => ({
@@ -175,9 +178,6 @@ export const useProductManagement = () => {
       };
 
       const response = await productService.createProduct(createData);
-      
-      // Reload products to show the new one
-      await loadProducts();
       
       toastRef.current.success('Product created successfully!');
       return response.data;
@@ -208,7 +208,7 @@ export const useProductManagement = () => {
         totalQuantity: data.quantityAvailable,
         quantityAvailable: data.quantityAvailable,
         quantitySold: 0,
-        gallery: data.galleryImages || undefined,
+        gallery: data.gallery,
         visibility: data.visibility,
         featured: data.featured,
         customizations: data.customizationData?.options.map(opt => ({
@@ -233,9 +233,6 @@ export const useProductManagement = () => {
       };
 
       const response = await productService.updateProduct(id, updateData);
-      
-      // Reload products to show the updated one
-      await loadProducts();
       
       toastRef.current.success('Product updated successfully!');
       return response.data;

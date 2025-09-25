@@ -49,6 +49,36 @@ export const useCollectionManagement = () => {
     }
   }, [currentPage, isLoading]);
 
+  // Load all collections (for dropdowns)
+  const loadAllCollections = useCallback(async (params?: {
+    search?: string;
+    status?: 'active' | 'inactive';
+    featured?: boolean;
+  }) => {
+    if (globalCollectionsFetching || isLoading) return;
+
+    try {
+      globalCollectionsFetching = true;
+      setIsLoading(true);
+      setError(null);
+      
+      const allCollections = await collectionService.getAllCollections({
+        search: params?.search,
+        status: params?.status,
+        featured: params?.featured,
+      });
+      
+      setCollections(allCollections);
+      // Don't set pagination info for all collections
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to load collections');
+      console.error('Error loading all collections:', err);
+    } finally {
+      setIsLoading(false);
+      globalCollectionsFetching = false;
+    }
+  }, [isLoading]);
+
   // Create collection
   const createCollection = useCallback(async (data: CreateCollectionData): Promise<boolean> => {
     setIsSaving(true);
@@ -129,6 +159,7 @@ export const useCollectionManagement = () => {
     totalPages,
     error,
     loadCollections,
+    loadAllCollections,
     createCollection,
     updateCollection,
     deleteCollection,
