@@ -67,7 +67,7 @@ export function MobileFooter() {
             className="flex flex-col items-center text-gray-600 hover:text-gray-900 relative"
           >
             <Heart className="w-6 h-6" />
-            {wishlistCount > 0 && (
+            {isAuthenticated && wishlistCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{wishlistCount}</span>
             )}
             <span className="text-xs mt-1">Wishlist</span>
@@ -78,7 +78,7 @@ export function MobileFooter() {
             className="flex flex-col items-center text-gray-600 hover:text-gray-900 relative"
           >
             <Heart className="w-6 h-6" />
-            {wishlistCount > 0 && (
+            { isAuthenticated && wishlistCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{wishlistCount}</span>
             )}
             <span className="text-xs mt-1">Wishlist</span>
@@ -90,7 +90,7 @@ export function MobileFooter() {
             className="flex flex-col items-center text-gray-600 hover:text-gray-900 relative"
           >
             <ShoppingBag className="w-6 h-6" />
-            {cartCount > 0 && (
+            {isAuthenticated && cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
             )}
             <span className="text-xs mt-1">Cart</span>
@@ -101,7 +101,7 @@ export function MobileFooter() {
             className="flex flex-col items-center text-gray-600 hover:text-gray-900 relative"
           >
             <ShoppingBag className="w-6 h-6" />
-            {cartCount > 0 && (
+            {isAuthenticated && cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
             )}
             <span className="text-xs mt-1">Cart</span>

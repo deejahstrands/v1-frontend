@@ -9,6 +9,7 @@ import clsx from "clsx";
 import type { User as UserType } from "@/services/auth";
 import { useCart } from '@/store/use-cart';
 import { useWishlist } from '@/store/use-wishlist';
+import { useAuth } from '@/store/use-auth';
 import { useLoginModal } from '@/hooks/use-login-modal';
 
 interface MobileMenuProps {
@@ -16,7 +17,6 @@ interface MobileMenuProps {
   onClose: () => void;
   mainNavItems: Array<{ label: string; href: string }>;
   categories: Array<{ label: string; href: string }>;
-  isLoggedIn?: boolean;
   user?: UserType | null;
   onLogout?: () => void;
 }
@@ -26,18 +26,18 @@ export function MobileMenu({
   onClose, 
   mainNavItems, 
   categories,
-  isLoggedIn = false,
   user,
   onLogout
 }: MobileMenuProps) {
   const pathname = usePathname();
   const [showCategories, setShowCategories] = useState(false);
+  const { isAuthenticated } = useAuth();
   const cartCount = useCart(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
   const wishlistCount = useWishlist(state => state.getWishlistCount());
   const { openModal } = useLoginModal();
 
   const handleCartClick = (e: React.MouseEvent) => {
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
       e.preventDefault();
       openModal("View Cart", () => {
         // After login, user can access cart
@@ -47,7 +47,7 @@ export function MobileMenu({
   };
 
   const handleWishlistClick = (e: React.MouseEvent) => {
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
       e.preventDefault();
       openModal("View Wishlist", () => {
         // After login, user can access wishlist
@@ -152,7 +152,7 @@ export function MobileMenu({
                               
                               {/* Cart and Wishlist Icons */}
                               <div className="flex items-center justify-center space-x-4 mt-6">
-                                {isLoggedIn ? (
+                                {isAuthenticated ? (
                                   <>
                                     <Link
                                       href="/account/wishlist"
@@ -186,7 +186,7 @@ export function MobileMenu({
                                       className="flex items-center justify-center w-12 h-12 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg relative"
                                     >
                                       <Heart className="h-6 w-6" />
-                                      {wishlistCount > 0 && (
+                                      {isAuthenticated && wishlistCount > 0 && (
                                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">
                                           {wishlistCount}
                                         </span>
@@ -197,7 +197,7 @@ export function MobileMenu({
                                       className="flex items-center justify-center w-12 h-12 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg relative"
                                     >
                                       <ShoppingBag className="h-6 w-6" />
-                                      {cartCount > 0 && (
+                                      {isAuthenticated && cartCount > 0 && (
                                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">
                                           {cartCount}
                                         </span>
@@ -208,7 +208,7 @@ export function MobileMenu({
                               </div>
 
                               {/* Login/Account Button */}
-                              {isLoggedIn ? (
+                              {isAuthenticated ? (
                                 <div className="space-y-2 mt-6">
                                   <Link
                                     href="/account"

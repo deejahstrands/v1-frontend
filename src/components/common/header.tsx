@@ -159,16 +159,16 @@ export function Header() {
                       className="p-2 text-tertiary hover:text-tertiary relative cursor-pointer"
                     >
                       <Heart className="h-5 w-5" />
-                      {wishlistCount > 0 && (
+                      {isAuthenticated && wishlistCount > 0 && (
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{wishlistCount}</span>
                       )}
-        </button>
+                    </button>
                     <button
                       onClick={handleCartClick}
                       className="p-2 text-tertiary hover:text-tertiary relative cursor-pointer"
                     >
                       <ShoppingBag className="h-5 w-5" />
-                      {cartCount > 0 && (
+                      {isAuthenticated && cartCount > 0 && (
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
                       )}
                     </button>
@@ -200,7 +200,6 @@ export function Header() {
           label: cat.name,
           href: `/shop/category/${cat.id}`
         }))}
-        isLoggedIn={isAuthenticated}
         user={user}
         onLogout={logout}
       />
