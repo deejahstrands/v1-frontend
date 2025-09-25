@@ -195,7 +195,7 @@ export default function CustomizationClient() {
                     </div>
                   </div>
                 ) : selected && selected.customizations && selected.customizations.length > 0 ? (
-                  <CustomizationAccordion />
+              <CustomizationAccordion />
                 ) : (
                   <div className="w-full max-w-md mx-auto border border-[#98A2B3] rounded-2xl p-4 text-sm text-gray-600">
                     No customization options available for the selected wig unit.

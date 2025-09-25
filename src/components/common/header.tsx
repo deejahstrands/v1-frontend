@@ -162,7 +162,7 @@ export function Header() {
                       {wishlistCount > 0 && (
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{wishlistCount}</span>
                       )}
-                    </button>
+        </button>
                     <button
                       onClick={handleCartClick}
                       className="p-2 text-tertiary hover:text-tertiary relative cursor-pointer"

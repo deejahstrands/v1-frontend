@@ -104,7 +104,7 @@ export default function Reviews({ product }: ReviewsProps) {
                 <div className="text-gray-400 text-sm text-center">No reviews yet.</div>
               ) : (
                 pagedReviews.map((review, i) => (
-                  <div key={i} className="flex gap-3 items-start mb-6">
+                    <div key={i} className="flex gap-3 items-start mb-6">
                     <Image 
                       src={review.user.avatar || "/dummy/avatar.svg"} 
                       alt={`${review.user.firstName} ${review.user.lastName}`} 
@@ -112,14 +112,14 @@ export default function Reviews({ product }: ReviewsProps) {
                       height={32} 
                       className="rounded-full object-cover w-8 h-8 sm:w-10 sm:h-10" 
                     />
-                    <div className="flex-1">
-                      <div className="flex flex-row items-center gap-2 mb-1">
+                      <div className="flex-1">
+                        <div className="flex flex-row items-center gap-2 mb-1">
                         <span className="font-semibold text-xs sm:text-sm">{review.user.firstName} {review.user.lastName}</span>
-                      </div>
-                      <StarRating rating={review.rating} size={16} />
+                        </div>
+                        <StarRating rating={review.rating} size={16} />
                       <div className="text-xs sm:text-sm mt-1 mb-2">{review.review}</div>
+                      </div>
                     </div>
-                  </div>
                 ))
               )
             )}
