@@ -3,7 +3,7 @@
 import { BannerSection } from '@/components/common/banner-section';
 import { Breadcrumb } from '@/components/common/breadcrumb';
 import { SectionContainer } from '@/components/common/section-container';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useWishlist } from '@/store/use-wishlist';
 import { useAuth } from '@/store/use-auth';
 import { ProductCard } from '@/components/common/product-card';
@@ -12,6 +12,7 @@ import { Trash2, ShoppingCart } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 
 export default function WishlistPage() {
   const { isAuthenticated } = useAuth();
@@ -25,11 +26,14 @@ export default function WishlistPage() {
     removeFromWishlistApi,
     moveToCart,
     clearWishlist,
+    clearWishlistApi,
     fetchWishlist,
     clearError
   } = useWishlist();
   const { toast } = useToast();
   const [isHydrated, setIsHydrated] = useState(false);
+  const hasFetchedRef = useRef(false);
+  const [showClearModal, setShowClearModal] = useState(false);
 
   // Handle hydration
   useEffect(() => {
@@ -38,7 +42,8 @@ export default function WishlistPage() {
 
   // Fetch wishlist data when page is accessed (only for authenticated users)
   useEffect(() => {
-    if (isHydrated && isAuthenticated) {
+    if (isHydrated && isAuthenticated && !hasFetchedRef.current) {
+      hasFetchedRef.current = true;
       fetchWishlist(1, 20); // Fetch first page with 20 items
     }
   }, [isHydrated, isAuthenticated, fetchWishlist]);
@@ -102,8 +107,25 @@ export default function WishlistPage() {
   };
 
   const handleClearWishlist = () => {
-    clearWishlist();
-    toast.success('Your wishlist has been cleared.');
+    setShowClearModal(true);
+  };
+
+  const handleConfirmClear = async () => {
+    try {
+      if (isAuthenticated) {
+        await clearWishlistApi();
+      } else {
+        clearWishlist();
+      }
+      toast.success('Your wishlist has been cleared.');
+      setShowClearModal(false);
+    } catch {
+      toast.error('Failed to clear wishlist');
+    }
+  };
+
+  const handleCancelClear = () => {
+    setShowClearModal(false);
   };
 
   const wishlistProducts = getWishlistProducts();
@@ -165,7 +187,7 @@ export default function WishlistPage() {
               </div>
               <button
                 onClick={handleClearWishlist}
-                className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2"
+                className="px-4 py-2 cursor-pointer text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
                 Clear All
@@ -227,6 +249,19 @@ export default function WishlistPage() {
           </div>
         )}
       </SectionContainer>
+
+      {/* Clear All Confirmation Modal */}
+      <ConfirmationModal
+        open={showClearModal}
+        onClose={handleCancelClear}
+        onConfirm={handleConfirmClear}
+        title="Clear All Wishlist Items"
+        message={`Are you sure you want to clear all ${wishlistProducts.length} items from your wishlist? This action cannot be undone.`}
+        type="delete"
+        confirmText="Clear All"
+        cancelText="Cancel"
+        isLoading={loading}
+      />
     </div>
   );
 } 

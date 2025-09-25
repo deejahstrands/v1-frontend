@@ -27,6 +27,7 @@ interface WishlistState {
   removeFromWishlistApi: (productId: string) => Promise<void>
   moveToCart: (productId: string) => Promise<void>
   clearWishlist: () => void
+  clearWishlistApi: () => Promise<void>
   isInWishlist: (productId: string) => boolean
   getWishlistCount: () => number
   fetchWishlist: (page?: number, limit?: number) => Promise<void>
@@ -63,6 +64,25 @@ const useWishlist = create<WishlistState>()(
         items: state.items.filter((item) => item.productId !== productId),
       })),
       clearWishlist: () => set({ items: [] }),
+      
+      clearWishlistApi: async () => {
+        set({ loading: true, error: null });
+        try {
+          await wishlistService.clearWishlist();
+          set({
+            apiItems: [],
+            totalItems: 0,
+            currentPage: 1,
+            hasNext: false,
+            hasPrev: false
+          });
+        } catch (error: any) {
+          set({ error: error.response?.data?.message || 'Failed to clear wishlist' });
+          throw error;
+        } finally {
+          set({ loading: false });
+        }
+      },
       isInWishlist: (productId) => {
         const state = get()
         return state.items.some((item) => item.productId === productId) || 

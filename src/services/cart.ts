@@ -1,7 +1,8 @@
 import api from './api';
 
 interface AddToCartRequest {
-  productId: string;
+  productId?: string; // optional now
+  wigUnitId?: string; // new for wig units
   quantity: number;
   customizations?: string[];
   measurements?: {

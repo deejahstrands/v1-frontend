@@ -4,7 +4,7 @@
 import { BannerSection } from '@/components/common/banner-section';
 import { Breadcrumb } from '@/components/common/breadcrumb';
 import { SectionContainer } from '@/components/common/section-container';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/store/use-cart';
 import { useAuth } from '@/store/use-auth';
@@ -27,13 +27,15 @@ export default function CartPage() {
     addToCart,
     removeFromCart
   } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated   } = useAuth();
   const [isHydrated, setIsHydrated] = useState(false);
+  const hasFetchedRef = useRef(false);
 
   // Handle hydration and fetch cart
   useEffect(() => {
     setIsHydrated(true);
-    if (isAuthenticated) {
+    if (isAuthenticated && !hasFetchedRef.current) {
+      hasFetchedRef.current = true;
       fetchCart();
     }
   }, [isAuthenticated]);

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { ordersService, type Order, type OrderFilters } from '@/services/orders';
+import { ordersService, type Order, type OrderFilters, type ReviewData } from '@/services/orders';
+import { toast } from 'react-toastify';
 
 export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
 
@@ -22,6 +23,7 @@ interface OrdersState {
   // Actions
   fetchOrders: (filters?: OrderFilters) => Promise<void>;
   fetchOrder: (orderId: string) => Promise<void>;
+  addReview: (itemId: string, reviewData: ReviewData) => Promise<void>;
   setFilter: (filter: string) => void;
   setPage: (page: number) => void;
   setSelectedOrder: (order: Order | null) => void;
@@ -84,6 +86,42 @@ export const useOrders = create<OrdersState>((set) => ({
         loading: false,
         error: error instanceof Error ? error.message : 'Failed to fetch order',
       });
+    }
+  },
+
+  addReview: async (itemId, reviewData) => {
+    set({ loading: true, error: null });
+    try {
+      await ordersService.addReview(itemId, reviewData);
+      
+      // Update the selected order with the new review
+      set((state) => {
+        if (!state.selectedOrder) return { loading: false };
+        
+        const updatedOrder = {
+          ...state.selectedOrder,
+          items: state.selectedOrder.items.map(item =>
+            item.id === itemId
+              ? { ...item, review: reviewData.review, rating: reviewData.rating.toString() }
+              : item
+          )
+        };
+        
+        return {
+          selectedOrder: updatedOrder,
+          loading: false,
+        };
+      });
+      
+      toast.success('Review added successfully');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to add review';
+      set({
+        loading: false,
+        error: errorMessage,
+      });
+      toast.error(errorMessage);
+      throw error; // Re-throw to let the component handle it if needed
     }
   },
 

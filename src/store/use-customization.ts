@@ -30,15 +30,8 @@ export const useCustomization = create<CustomizationState>((set, get) => ({
   selectedWigType: null,
   selectedOptions: {},
   setSelectedWigType: (wigType) => {
+    // Reset selections; default is None for every type until user chooses
     set({ selectedWigType: wigType, selectedOptions: {} });
-    // Initialize with first option for each customization type
-    const initialOptions: { [type: string]: CustomizationOption } = {};
-    wigType.customizations.forEach(custom => {
-      if (custom.options[0]) {
-        initialOptions[custom.type] = custom.options[0];
-      }
-    });
-    set({ selectedOptions: initialOptions });
   },
   setSelectedOption: (type, option) => set((state) => ({
     selectedOptions: { ...state.selectedOptions, [type]: option },

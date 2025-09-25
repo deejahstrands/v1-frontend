@@ -63,6 +63,11 @@ class WishlistService {
     const response = await api.delete(`${this.baseUrl}/${productId}`);
     return response.data;
   }
+
+  async clearWishlist(): Promise<{ message: string }> {
+    const response = await api.delete(`${this.baseUrl}`);
+    return response.data;
+  }
 }
 
 export const wishlistService = new WishlistService();

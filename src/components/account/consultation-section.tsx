@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { MessageCircle, Calendar, Clock, CheckCircle, Plus, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useConsultation } from '@/store/use-consultation';
+import { useAuth } from '@/store/use-auth';
 import { useRouter } from 'next/navigation';
 
 export function ConsultationSection() {
@@ -12,13 +12,17 @@ export function ConsultationSection() {
     consultations, 
     consultationsLoading, 
     consultationsError, 
-    fetchConsultations
-  } = useConsultation();
+    getUserConsultations
+  } = useAuth();
   const router = useRouter();
+  const hasFetchedRef = useRef(false);
 
   // Fetch consultations on mount
   useEffect(() => {
-    fetchConsultations({ status: 'active' });
+    if (!hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      getUserConsultations({ page: 1, limit: 5 });
+    }
   }, []);
 
   const handleBookConsultation = () => {
@@ -102,7 +106,7 @@ export function ConsultationSection() {
             <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load consultations</h3>
             <p className="text-gray-500 mb-6 text-sm sm:text-base px-4">{consultationsError}</p>
             <Button 
-              onClick={() => fetchConsultations({ status: 'active' })}
+              onClick={() => getUserConsultations({ page: 1, limit: 5 })}
               className="bg-[#C9A898] hover:bg-[#b88b6d] w-full sm:w-auto"
             >
               Try Again

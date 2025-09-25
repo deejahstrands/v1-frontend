@@ -86,6 +86,18 @@ export const CustomizationAccordion: React.FC<CustomizationAccordionProps> = ({ 
                   className="px-4 pb-4"
                 >
                   <div className="flex flex-col gap-2">
+                    {/* None option */}
+                    <button
+                      key={`${custom.type}-none`}
+                      type="button"
+                      className={`flex justify-between items-center border-[0.5px] border-[#98A2B3] rounded-lg px-3 py-2 text-sm sm:text-base w-full transition-colors
+                        ${!selectedOptions[custom.type] ? 'bg-secondary font-semibold' : 'hover:bg-gray-50'}`}
+                      onClick={() => handleSelect(custom.type, { label: 'None', price: 0 })}
+                    >
+                      <span>None</span>
+                      <span className="text-gray-700 font-medium">₦0</span>
+                    </button>
+
                     {custom.options.map((option) => {
                       const isSelected = selectedOptions[custom.type]?.label === option.label;
                       return (

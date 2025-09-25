@@ -32,7 +32,7 @@ export const WigTypeSelector: React.FC<WigTypeSelectorProps> = ({ wigTypes, clas
                 key={wigType.id}
                 type="button"
                 onClick={() => setSelectedWigType(wigType)}
-                className={`p-3 rounded-lg border-2 transition-all duration-200 text-center ${
+                className={`p-3 rounded-lg border-2 transition-all duration-200 text-center cursor-pointer ${
                   isSelected
                     ? 'bg-[#C9A18A] hover:bg-[#b88b6d] text-white font-semibold'
                     : 'border-[#98A2B3] hover:border-secondary/50 hover:bg-gray-50'

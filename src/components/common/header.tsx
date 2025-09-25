@@ -66,6 +66,7 @@ export function Header() {
                   width={40}
                   height={40}
                   className="h-10 w-auto"
+                  style={{ width: 'auto', height: 'auto' }}
                 />
                 <span className="ml-2 text-lg text-tertiary font-semibold font-ethereal hidden xl:inline">DEEJAH STRANDS</span>
               </Link>

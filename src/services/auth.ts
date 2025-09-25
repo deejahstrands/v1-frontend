@@ -64,6 +64,45 @@ export interface UpdateProfileResponse {
   data: User;
 }
 
+// Consultation types for user account
+export interface UserConsultationType {
+  id: string;
+  name: string;
+}
+
+export interface UserConsultation {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  consultationType: UserConsultationType;
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  date: string | null;
+  time: string | null;
+  amount: string;
+  order: any | null;
+}
+
+export interface GetUserConsultationsParams {
+  page?: number;
+  limit?: number;
+  status?: string;
+}
+
+export interface UserConsultationsResponse {
+  message: string;
+  data: UserConsultation[];
+  meta: {
+    page: number;
+    limit: number | null;
+    totalItems: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+    nextPage: number | null;
+    prevPage: number | null;
+  };
+}
+
 // Cookie utility functions
 const setCookie = (name: string, value: string, days: number = 7) => {
   console.log('🍪 Setting cookie:', { name, value: value.substring(0, 20) + '...', days });
@@ -200,6 +239,12 @@ export const authService = {
   // Update user profile
   async updateProfile(profileData: UpdateProfileData): Promise<UpdateProfileResponse> {
     const response = await api.patch<UpdateProfileResponse>('/users/me', profileData);
+    return response.data;
+  },
+
+  // Get user consultations
+  async getUserConsultations(params?: GetUserConsultationsParams): Promise<UserConsultationsResponse> {
+    const response = await api.get<UserConsultationsResponse>('/consultations/', { params });
     return response.data;
   },
 }; 

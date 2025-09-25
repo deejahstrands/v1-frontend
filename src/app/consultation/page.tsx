@@ -3,7 +3,7 @@ import ConsultationClient from './consultation-client';
 import { StructuredData, consultationServiceSchema } from '@/components/seo/structured-data';
 
 export const metadata: Metadata = {
-  title: 'Consultation | Book Wig Consultation',
+  title: 'Consultation | Deejah Strands',
   description: 'Get personalized expert advice for your perfect wig. Choose from in-studio, virtual, or home visit consultations. Includes ₦5,000 voucher toward your first purchase.',
   keywords: [
     'wig consultation',

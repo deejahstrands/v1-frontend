@@ -16,16 +16,41 @@ export interface Product {
   };
 }
 
+export interface GalleryItem {
+  url: string;
+  type: 'image' | 'video';
+}
+
 export interface DetailedProduct extends Product {
   description: string;
   totalQuantity: number;
   quantitySold: number;
-  gallery: string[];
+  gallery: GalleryItem[];
   updatedAt: string;
   privateFittings: PrivateFitting[];
   processingTimes: ProcessingTime[];
   customizations: ProductCustomization[];
   productSpecifications: ProductSpecifications;
+  reviews?: Array<{
+    user: {
+      id: string;
+      avatar: string;
+      lastName: string;
+      firstName: string;
+    };
+    rating: number;
+    review: string;
+  }>;
+  relatedProducts?: Array<{
+    id: string;
+    name: string;
+    thumbnail: string;
+    description: string;
+    status: string;
+    visibility: string;
+    basePrice: number;
+    customization: boolean;
+  }>;
 }
 
 export interface PrivateFitting {

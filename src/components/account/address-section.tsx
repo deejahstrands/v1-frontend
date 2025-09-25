@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { MapPin, Plus, Edit3, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
@@ -26,10 +26,12 @@ export function AddressSection() {
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [addressToDelete, setAddressToDelete] = useState<Address | null>(null);
+  const hasFetchedRef = useRef(false);
 
   // Fetch addresses on component mount only if not already loaded
   useEffect(() => {
-    if (addresses.length === 0 && !loading) {
+    if (!hasFetchedRef.current && addresses.length === 0 && !loading) {
+      hasFetchedRef.current = true;
       fetchAddresses();
     }
   }, []); // Empty dependency array to run only once on mount

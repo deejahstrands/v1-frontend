@@ -5,21 +5,29 @@ import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperType } from "swiper";
 import { Thumbs, Navigation } from "swiper/modules";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/navigation";
+import { createMediaItems } from "@/lib/media-utils";
 
 interface ProductImageCarouselProps {
   images: string[];
+  gallery?: Array<{ url: string; type: 'image' | 'video' }>;
+  thumbnail?: string;
 }
 
-export default function ProductImageCarousel({ images }: ProductImageCarouselProps) {
+export default function ProductImageCarousel({ images, gallery, thumbnail }: ProductImageCarouselProps) {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
 
-  if (!images || !Array.isArray(images) || images.length === 0) return null;
+  // Create media items from thumbnail and gallery, fallback to images array
+  const mediaItems = gallery && thumbnail 
+    ? createMediaItems(thumbnail, gallery)
+    : images?.map(url => ({ url, type: 'image' as const })).filter(item => item.url && item.url.trim() !== '') || [];
+  
+  if (!mediaItems || mediaItems.length === 0) return null;
 
   return (
     <div className="relative">
@@ -40,17 +48,34 @@ export default function ProductImageCarousel({ images }: ProductImageCarouselPro
         }}
         className="w-full rounded-xl overflow-hidden"
       >
-        {images.map((src, idx) => (
+        {mediaItems.map((item, idx) => (
           <SwiperSlide key={idx}>
-            <div className="relative aspect-[4/4] w-full bg-gray-100">
-              <Image
-                src={src}
-                alt={`Product image ${idx + 1}`}
-                fill
-                className="object-cover rounded-xl"
-                sizes="(min-width: 1024px) 500px, 100vw"
-                priority={idx === 0}
-              />
+            <div className="relative aspect-[4/4] w-full bg-gray-100 rounded-xl overflow-hidden">
+              {item.type === 'video' ? (
+                <div className="relative w-full h-full">
+                  <video
+                    src={item.url}
+                    className="w-full h-full object-cover"
+                    controls
+                    preload="metadata"
+                    poster={thumbnail} // Use thumbnail as poster for video
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="bg-black bg-opacity-50 rounded-full p-3">
+                      <Play className="w-8 h-8 text-white" />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Image
+                  src={item.url}
+                  alt={`Product ${item.type} ${idx + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 500px, 100vw"
+                  priority={idx === 0}
+                />
+              )}
             </div>
           </SwiperSlide>
         ))}
@@ -78,21 +103,37 @@ export default function ProductImageCarousel({ images }: ProductImageCarouselPro
         <Swiper
           onSwiper={setThumbsSwiper}
           spaceBetween={2}
-          slidesPerView={Math.min(images.length, 4)}
+          slidesPerView={Math.min(mediaItems.length, 4)}
           watchSlidesProgress
           modules={[Thumbs]}
           className="w-full"
         >
-          {images.map((src, idx) => (
+          {mediaItems.map((item, idx) => (
             <SwiperSlide key={idx}>
               <div className="relative aspect-[4/5] w-[100px] h-[100px] bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                <Image
-                  src={src}
-                  alt={`Thumbnail ${idx + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="80px"
-                />
+                {item.type === 'video' ? (
+                  <div className="relative w-full h-full">
+                    <video
+                      src={item.url}
+                      className="w-full h-full object-cover"
+                      preload="metadata"
+                      muted
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="bg-black bg-opacity-50 rounded-full p-1">
+                        <Play className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <Image
+                    src={item.url}
+                    alt={`Thumbnail ${idx + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="80px"
+                  />
+                )}
               </div>
             </SwiperSlide>
           ))}

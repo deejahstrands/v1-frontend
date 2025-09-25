@@ -78,7 +78,12 @@ export default function ProductClient() {
     name: currentProduct.name,
     price: `₦${currentProduct.basePrice.toLocaleString()}`,
     basePrice: currentProduct.basePrice,
-    images: [currentProduct.thumbnail, ...(currentProduct.gallery || [])],
+    images: [
+      currentProduct.thumbnail,
+      ...(currentProduct.gallery || []).map(item => item.url)
+    ].filter(media => media && media.trim() !== ''),
+    gallery: currentProduct.gallery,
+    thumbnail: currentProduct.thumbnail,
     description: currentProduct.description,
     customization: currentProduct.customization,
     customizations: currentProduct.customizations?.map(custom => ({
@@ -100,7 +105,6 @@ export default function ProductClient() {
     featured: currentProduct.featured,
     visibility: currentProduct.visibility,
     createdAt: currentProduct.createdAt,
-    thumbnail: currentProduct.thumbnail,
     deletedAt: currentProduct.deletedAt,
     // Transform processing times and private fittings into delivery options
     delivery: [
@@ -131,6 +135,8 @@ export default function ProductClient() {
       type: key,
       value: value || '',
     })),
+    reviews: currentProduct.reviews || [],
+    relatedProducts: currentProduct.relatedProducts || [],
   };
 
   return <ProductDetailPage product={transformedProduct} />;

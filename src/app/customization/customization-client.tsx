@@ -1,29 +1,130 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { BannerSection } from '@/components/common/banner-section';
 import { WigTypeSelector } from '@/components/customization/wig-type-selector';
 import { CustomizationAccordion } from '@/components/customization/customization-accordion';
 import { CustomizationMeasurements } from '@/components/customization/customization-measurements';
 import { SectionContainer } from '@/components/common/section-container';
-import { wigTypes } from '@/data/customization';
 import { useCustomization } from '@/store/use-customization';
+import { useCustomizationMeasurements } from '@/store/use-customization-measurements';
+import { useWigUnits } from '@/store/use-wig-units';
+import { cartService } from '@/services/cart';
+import { uploadService } from '@/services/upload';
+import { useAuth } from '@/store/use-auth';
+import { useCart } from '@/store/use-cart';
+import { useLoginModal } from '@/hooks/use-login-modal';
+import { toast } from 'react-toastify';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function CustomizationClient() {
-  const { selectedWigType, getTotalPrice } = useCustomization();
+  const { selectedWigType, setSelectedWigType, selectedOptions, reset } = useCustomization();
+  const measurements = useCustomizationMeasurements((s) => s.data);
+  const resetMeasurements = useCustomizationMeasurements((s) => s.reset);
+  const { list, selected, loading, fetchList, fetchOne } = useWigUnits();
+  const { isAuthenticated } = useAuth();
+  const { openModal } = useLoginModal();
+  const fetchCart = useCart((s) => s.fetchCart);
   const [quantity, setQuantity] = useState(1);
+  const [isAdding, setIsAdding] = useState(false);
 
-  const handleAddToCart = () => {
-    // TODO: Implement add to cart functionality
-    console.log('Adding customized wig to cart:', {
-      wigType: selectedWigType,
-      totalPrice: getTotalPrice(),
-      quantity
+  // Fetch wig units on mount (no page/limit sent)
+  useEffect(() => {
+    fetchList();
+  }, [fetchList]);
+
+  // When a wig unit detail is fetched, map it into the customization store structure
+  useEffect(() => {
+    if (!selected) return;
+    const mapped = {
+      id: selected.id,
+      name: selected.name,
+      basePrice: selected.basePrice,
+      customizations: selected.customizations.map((c) => ({
+        type: c.typeName,
+        options: c.options.map((o) => ({ label: o.name, price: o.price })),
+      })),
+    } as any;
+    setSelectedWigType(mapped);
+  }, [selected, setSelectedWigType]);
+
+  // Helper to translate selected option labels back to API IDs
+  const selectedOptionIds = useMemo(() => {
+    if (!selected) return [] as string[];
+    const ids: string[] = [];
+    selected.customizations.forEach((c) => {
+      const chosen = selectedOptions[c.typeName];
+      if (chosen?.label) {
+        const match = c.options.find((o) => o.name === chosen.label);
+        if (match) ids.push(match.itemCustomizationId);
+      }
     });
+    return ids;
+  }, [selected, selectedOptions]);
+
+  // When a wig type is chosen in the selector, fetch its detail
+  useEffect(() => {
+    if (selectedWigType?.id) {
+      fetchOne(selectedWigType.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedWigType?.id]);
+
+  const handleAddToCart = async () => {
+    if (!selected || !selectedWigType) return;
+
+    // Auth gate
+    if (!isAuthenticated) {
+      openModal('Login to continue', async () => {
+        // noop; user will retry
+      });
+      return;
+    }
+
+    try {
+      setIsAdding(true);
+      // Upload measurement images if provided
+      let harlineImages: string[] = [];
+      let wigStyleImages: string[] = [];
+      if (measurements.hasMeasurements) {
+        if (measurements.hairlinePictures && measurements.hairlinePictures instanceof File) {
+          const url = await uploadService.uploadFile(measurements.hairlinePictures);
+          harlineImages = [url];
+        }
+        if (measurements.styleReference && measurements.styleReference instanceof File) {
+          const url = await uploadService.uploadFile(measurements.styleReference);
+          wigStyleImages = [url];
+        }
+      }
+
+      await cartService.addToCart({
+        wigUnitId: selected.id,
+        quantity,
+        customizations: selectedOptionIds,
+        measurements: {
+          earToEar: measurements.earToEar || undefined,
+          headCircumference: measurements.headCircumference || undefined,
+          harlineImages: harlineImages.length ? harlineImages : undefined,
+          wigStyleImages: wigStyleImages.length ? wigStyleImages : undefined,
+        },
+      });
+      toast.success('Customized wig added to cart');
+      // Refresh cart badge
+      fetchCart();
+      // Reset selections and measurements
+      reset();
+      resetMeasurements();
+      setQuantity(1);
+    } catch (e) {
+      toast.error('Failed to add to cart');
+      console.error(e);
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   return (
@@ -73,17 +174,40 @@ export default function CustomizationClient() {
                 </p>
               </div>
 
-              {/* Wig Type Selector */}
-              <WigTypeSelector wigTypes={wigTypes} />
+              {/* Wig Type Selector (driven by wig units list) */}
+              <WigTypeSelector
+                wigTypes={list.map((w) => ({
+                  id: w.id,
+                  name: w.name,
+                  basePrice: w.basePrice,
+                  customizations: [],
+                })) as any}
+              />
 
-              {/* Customization Accordion */}
-              <CustomizationAccordion />
+              {/* Customization Section */}
+              {selectedWigType ? (
+                loading ? (
+                  <div className="w-full max-w-md mx-auto border border-[#98A2B3] rounded-2xl p-4">
+                    <div className="animate-pulse space-y-3">
+                      <div className="h-5 bg-gray-200 rounded w-2/3" />
+                      <div className="h-10 bg-gray-200 rounded" />
+                      <div className="h-10 bg-gray-200 rounded" />
+                    </div>
+                  </div>
+                ) : selected && selected.customizations && selected.customizations.length > 0 ? (
+                  <CustomizationAccordion />
+                ) : (
+                  <div className="w-full max-w-md mx-auto border border-[#98A2B3] rounded-2xl p-4 text-sm text-gray-600">
+                    No customization options available for the selected wig unit.
+                  </div>
+                )
+              ) : null}
 
               {/* Measurements & Preferences */}
               <CustomizationMeasurements />
 
               {/* Quantity & Actions */}
-              {selectedWigType && (
+              {selectedWigType && !loading && selected && selected.customizations && selected.customizations.length > 0 && (
                 <div className="w-full max-w-md mx-auto">
                   {/* Quantity Selector */}
                   <div className="mb-6 flex items-center gap-2">
@@ -94,7 +218,7 @@ export default function CustomizationClient() {
                       <button
                         type="button"
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="px-3 py-2 text-gray-600 hover:text-gray-800 focus:outline-none"
+                        className="px-3 py-2 text-gray-600 hover:text-gray-800 focus:outline-none cursor-pointer"
                       >
                         -
                       </button>
@@ -104,7 +228,7 @@ export default function CustomizationClient() {
                       <button
                         type="button"
                         onClick={() => setQuantity(quantity + 1)}
-                        className="px-3 py-2 text-gray-600 hover:text-gray-800 focus:outline-none"
+                        className="px-3 py-2 text-gray-600 hover:text-gray-800 focus:outline-none cursor-pointer"
                       >
                         +
                       </button>
@@ -115,10 +239,11 @@ export default function CustomizationClient() {
                   <div className="space-y-3">
                     <Button
                       onClick={handleAddToCart}
-                      className="w-full flex-1 flex items-center justify-center gap-2 bg-[#C9A18A] hover:bg-[#b88b6d] text-white font-semibold rounded-lg py-3 text-base transition-colors"
+                      disabled={isAdding}
+                      className="w-full flex-1 flex items-center justify-center gap-2 bg-[#C9A18A] hover:bg-[#b88b6d] disabled:opacity-70 disabled:cursor-not-allowed text-white font-semibold rounded-lg py-3 text-base transition-colors"
                     >
                       <ShoppingCart className="w-5 h-5" />
-                      Add to Cart
+                      {isAdding ? 'Adding to Cart...' : 'Add to Cart'}
                     </Button>
                   </div>
 

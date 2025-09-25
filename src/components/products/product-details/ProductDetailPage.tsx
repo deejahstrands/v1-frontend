@@ -23,6 +23,8 @@ interface ProductDetailPageProps {
     price: string;
     basePrice: number;
     images: string[];
+    gallery?: Array<{ url: string; type: 'image' | 'video' }>;
+    thumbnail?: string;
     description: string;
     customization: boolean;
     customizations?: Array<{
@@ -62,6 +64,26 @@ interface ProductDetailPageProps {
       type: string;
       value: string;
     }>;
+    reviews?: Array<{
+      user: {
+        id: string;
+        avatar: string;
+        lastName: string;
+        firstName: string;
+      };
+      rating: number;
+      review: string;
+    }>;
+    relatedProducts?: Array<{
+      id: string;
+      name: string;
+      thumbnail: string;
+      description: string;
+      status: string;
+      visibility: string;
+      basePrice: number;
+      customization: boolean;
+    }>;
     [key: string]: unknown;
   };
 }
@@ -77,7 +99,11 @@ export default function ProductDetailPage({ product }: ProductDetailPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Side: Images + Tabs (desktop) */}
           <div className="lg:col-span-7">
-            <ProductImageCarousel images={product.images} />
+            <ProductImageCarousel 
+              images={product.images} 
+              gallery={product.gallery}
+              thumbnail={product.thumbnail}
+            />
             <div className="hidden lg:block mt-8">
               {/* ProductTabs (desktop only) */}
               <ProductTabs description={<div>{product.description}</div>} product={product} />
@@ -108,7 +134,7 @@ export default function ProductDetailPage({ product }: ProductDetailPageProps) {
           </div>
         </div>
       </SectionContainer>
-      <RelatedProductsSection />
+      <RelatedProductsSection relatedProducts={product.relatedProducts} />
     </div>
   );
 } 

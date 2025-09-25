@@ -41,20 +41,44 @@ api.interceptors.response.use(
       const isLoginRequest = error.config?.url?.includes('/auth/login') || 
                             error.config?.url?.includes('/auth/register');
       
-      if (!isLoginRequest && typeof window !== "undefined") {
-        // Clear token and redirect to appropriate login
-        document.cookie =
-          "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+      // Don't redirect for public API calls that don't require authentication
+      const publicEndpoints = [
+        '/consultations/types',
+        '/collections',
+        '/products',
+        '/categories',
+        '/products/' // Product detail pages should be public
+      ];
+      
+      // Note: /consultations/ (without 'types') requires authentication and should redirect
+      const isPublicEndpoint = publicEndpoints.some(endpoint => 
+        error.config?.url?.includes(endpoint)
+      );
+      
+      // Only redirect if it's not a login request, not a public endpoint, and we're in the browser
+      if (!isLoginRequest && !isPublicEndpoint && typeof window !== "undefined") {
+        // Check if user is on a protected route that requires authentication
+        const protectedRoutes = ['/account', '/cart', '/admin'];
+        const isOnProtectedRoute = protectedRoutes.some(route => 
+          window.location.pathname.startsWith(route)
+        );
         
-        // Redirect to admin login if on admin route, otherwise user login
-        const isAdminRoute = window.location.pathname.startsWith('/admin');
-        const currentPath = window.location.pathname + window.location.search;
-        const returnUrl = encodeURIComponent(currentPath);
-        const loginUrl = isAdminRoute 
-          ? `/admin-auth/login?returnUrl=${returnUrl}` 
-          : `/auth/login?returnUrl=${returnUrl}`;
-        
-        window.location.href = loginUrl;
+        // Only redirect if on a protected route (not just because there was a token)
+        if (isOnProtectedRoute) {
+          // Clear token and redirect to appropriate login
+          document.cookie =
+            "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+          
+          // Redirect to admin login if on admin route, otherwise user login
+          const isAdminRoute = window.location.pathname.startsWith('/admin');
+          const currentPath = window.location.pathname + window.location.search;
+          const returnUrl = encodeURIComponent(currentPath);
+          const loginUrl = isAdminRoute 
+            ? `/admin-auth/login?returnUrl=${returnUrl}` 
+            : `/auth/login?returnUrl=${returnUrl}`;
+          
+          window.location.href = loginUrl;
+        }
       }
     }
     return Promise.reject(error);

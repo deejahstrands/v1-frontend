@@ -1,48 +1,35 @@
 import { useState } from "react";
 import StarRating from "./StarRating";
 import { useUser } from "@/store/use-users";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Pagination } from "@/components/ui/pagination";
 import Image from "next/image";
 import { PlusIcon } from "lucide-react";
 
 interface Review {
-  userId: string;
-  date: string;
-  text: string;
+  user: {
+    id: string;
+    avatar: string;
+    lastName: string;
+    firstName: string;
+  };
   rating: number;
-  reply?: string;
+  review: string;
 }
 
 interface Product {
   id: string;
-  reviews: Review[];
+  reviews?: Review[];
   rating?: number;
   reviewCount?: number;
 }
 
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  image: string;
-}
-
 interface ReviewsProps {
   product: Product;
-  users: User[];
 }
 
 const REVIEWS_PER_PAGE = 2;
-const SORT_OPTIONS = [
-  { label: "Most Recent", value: "recent" },
-  { label: "Highest Rated", value: "high" },
-  { label: "Lowest Rated", value: "low" },
-];
-
-export default function Reviews({ product, users }: ReviewsProps) {
+export default function Reviews({ product }: ReviewsProps) {
   const { isAuthenticated, hasPurchasedProduct } = useUser();
-  const [sort, setSort] = useState(SORT_OPTIONS[0].value);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
@@ -57,15 +44,15 @@ export default function Reviews({ product, users }: ReviewsProps) {
 
   // Sort reviews
   const reviews = [...(product.reviews || [])];
-  if (sort === "high") reviews.sort((a, b) => b.rating - a.rating);
-  if (sort === "low") reviews.sort((a, b) => a.rating - b.rating);
+  reviews.sort((a, b) => b.rating - a.rating);
   // Paginate
   const start = (page - 1) * REVIEWS_PER_PAGE;
   const end = start + REVIEWS_PER_PAGE;
   const pagedReviews = reviews.slice(start, end);
 
-  // User lookup
-  const getUser = (id: string) => users.find(u => u.id === id);
+  // Calculate average rating and review count
+  const averageRating = reviews.length > 0 ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length : 0;
+  const reviewCount = reviews.length;
 
   return (
     <div className="bg-white rounded-lg sm:p-6">
@@ -85,29 +72,12 @@ export default function Reviews({ product, users }: ReviewsProps) {
       ) : (
         <>
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-            <StarRating rating={product.rating || 0} size={20} />
-            <span className="font-normal text-base sm:text-lg">{(product.rating || 0).toFixed(1)} out of 5 ({product.reviewCount || 0} Reviews)</span>
+            <StarRating rating={averageRating} size={20} />
+            <span className="font-normal text-base sm:text-lg">{averageRating.toFixed(1)} out of 5 ({reviewCount} Reviews)</span>
           </div>
           {/* Horizontal line */}
           <hr className="my-3 sm:my-4 border-gray-200" />
-          {/* Sort Dropdown */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2 sm:gap-0">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="bg-white border border-gray-200 rounded px-3 py-1 text-sm flex items-center gap-2 min-w-[140px] w-fit">
-                  {SORT_OPTIONS.find(o => o.value === sort)?.label}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6"/></svg>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-white">
-                {SORT_OPTIONS.map(option => (
-                  <DropdownMenuItem key={option.value} onClick={() => setSort(option.value)}>
-                    {option.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+        
           {/* Horizontal line */}
           <hr className="my-3 sm:my-4 border-gray-200" />
           {/* Review List */}
@@ -133,25 +103,24 @@ export default function Reviews({ product, users }: ReviewsProps) {
               pagedReviews.length === 0 ? (
                 <div className="text-gray-400 text-sm text-center">No reviews yet.</div>
               ) : (
-                pagedReviews.map((review, i) => {
-                  const user = getUser(review.userId);
-                  return (
-                    <div key={i} className="flex gap-3 items-start mb-6">
-                      <Image src={user?.image || "/dummy/avatar.svg"} alt={user?.firstName || "User"} width={32} height={32} className="rounded-full object-cover w-8 h-8 sm:w-10 sm:h-10" />
-                      <div className="flex-1">
-                        <div className="flex flex-row items-center gap-2 mb-1">
-                          <span className="font-semibold text-xs sm:text-sm">{user?.firstName} {user?.lastName}</span>
-                          <span className="text-xs text-gray-400">{review.date}</span>
-                        </div>
-                        <StarRating rating={review.rating} size={16} />
-                        <div className="text-xs sm:text-sm mt-1 mb-2">{review.text}</div>
-                        {review.reply && (
-                          <div className="bg-[#F0F2F5] text-xs rounded px-3 py-2 text-gray-700">Deejah Strands replied: {review.reply}</div>
-                        )}
+                pagedReviews.map((review, i) => (
+                  <div key={i} className="flex gap-3 items-start mb-6">
+                    <Image 
+                      src={review.user.avatar || "/dummy/avatar.svg"} 
+                      alt={`${review.user.firstName} ${review.user.lastName}`} 
+                      width={32} 
+                      height={32} 
+                      className="rounded-full object-cover w-8 h-8 sm:w-10 sm:h-10" 
+                    />
+                    <div className="flex-1">
+                      <div className="flex flex-row items-center gap-2 mb-1">
+                        <span className="font-semibold text-xs sm:text-sm">{review.user.firstName} {review.user.lastName}</span>
                       </div>
+                      <StarRating rating={review.rating} size={16} />
+                      <div className="text-xs sm:text-sm mt-1 mb-2">{review.review}</div>
                     </div>
-                  );
-                })
+                  </div>
+                ))
               )
             )}
           </div>

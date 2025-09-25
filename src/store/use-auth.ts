@@ -7,6 +7,8 @@ import {
   SignupCredentials,
   User,
   UpdateProfileData,
+  UserConsultation,
+  GetUserConsultationsParams,
 } from "@/services/auth";
 import { handleTokenExpiration } from "@/lib/auth-utils";
 
@@ -15,6 +17,16 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+
+  // User consultations state
+  consultations: UserConsultation[];
+  consultationsLoading: boolean;
+  consultationsError: string | null;
+  consultationsPage: number;
+  consultationsTotalPages: number;
+  consultationsTotalItems: number;
+  consultationsHasNext: boolean;
+  consultationsHasPrev: boolean;
 
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -27,7 +39,9 @@ interface AuthState {
   verifyEmail: (token: string) => Promise<void>;
   resendVerification: (email: string) => Promise<void>;
   updateProfile: (profileData: UpdateProfileData) => Promise<void>;
+  getUserConsultations: (params?: GetUserConsultationsParams) => Promise<void>;
   clearError: () => void;
+  clearConsultationsError: () => void;
   setUser: (user: User | null) => void;
   handleTokenExpiration: () => void;
 }
@@ -41,6 +55,16 @@ export const useAuth = create<AuthState>()(
         isLoading: false,
         error: null,
 
+        // User consultations initial state
+        consultations: [],
+        consultationsLoading: false,
+        consultationsError: null,
+        consultationsPage: 1,
+        consultationsTotalPages: 1,
+        consultationsTotalItems: 0,
+        consultationsHasNext: false,
+        consultationsHasPrev: false,
+
         login: async (credentials: LoginCredentials) => {
           set({ isLoading: true, error: null });
           try {
@@ -52,6 +76,21 @@ export const useAuth = create<AuthState>()(
               isLoading: false,
               error: null,
             });
+
+            // Sync cart and wishlist after successful login
+            if (typeof window !== 'undefined') {
+              setTimeout(async () => {
+                try {
+                  const { useCart } = await import('@/store/use-cart');
+                  const { useWishlist } = await import('@/store/use-wishlist');
+                  
+                  useCart.getState().fetchCart();
+                  useWishlist.getState().fetchWishlist();
+                } catch (error) {
+                  console.error('Error syncing user data after login:', error);
+                }
+              }, 100);
+            }
           } catch (error: any) {
             set({
               isLoading: false,
@@ -270,8 +309,35 @@ export const useAuth = create<AuthState>()(
           }
         },
 
+        getUserConsultations: async (params) => {
+          set({ consultationsLoading: true, consultationsError: null });
+          try {
+            const response = await authService.getUserConsultations(params);
+            
+            set({
+              consultations: response.data,
+              consultationsPage: response.meta.page,
+              consultationsTotalPages: response.meta.totalPages,
+              consultationsTotalItems: response.meta.totalItems,
+              consultationsHasNext: response.meta.hasNext,
+              consultationsHasPrev: response.meta.hasPrev,
+              consultationsLoading: false,
+              consultationsError: null,
+            });
+          } catch (error: any) {
+            set({
+              consultationsLoading: false,
+              consultationsError: error.response?.data?.message || "Failed to fetch consultations",
+            });
+          }
+        },
+
         clearError: () => {
           set({ error: null });
+        },
+
+        clearConsultationsError: () => {
+          set({ consultationsError: null });
         },
 
         setUser: (user: User | null) => {

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { BannerSection } from '@/components/common/banner-section';
 import { SectionContainer } from '@/components/common/section-container';
 import { Button } from '@/components/ui/button';
@@ -28,10 +28,14 @@ export default function ConsultationClient() {
   } = useConsultation();
   const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const hasFetchedRef = useRef(false);
 
   // Fetch consultation types on mount
   useEffect(() => {
+    if (!hasFetchedRef.current) {
+      hasFetchedRef.current = true;
     fetchConsultationTypes({ status: 'active' });
+    }
   }, []);
 
   const handleBookConsultation = async () => {
