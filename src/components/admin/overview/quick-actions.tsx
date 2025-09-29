@@ -11,6 +11,8 @@ import {
   Settings,
   FileText,
   Palette,
+  Tag,
+  Percent,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -19,7 +21,7 @@ const quickActions = [
     title: "Add Product",
     description: "Create a new product",
     icon: <Plus className="h-5 w-5" />,
-    href: "/admin/products/create",
+    href: "/admin/products?mode=add", // Products page with create functionality
     color: "bg-blue-500 hover:bg-blue-600",
   },
   {
@@ -65,13 +67,26 @@ const quickActions = [
     color: "bg-amber-300 hover:bg-amber-400",
   },
   {
+    title: "Categories",
+    description: "Manage categories",
+    icon: <Tag className="h-5 w-5" />,
+    href: "/admin/categories",
+    color: "bg-teal-500 hover:bg-teal-600",
+  },
+  {
+    title: "Discounts",
+    description: "Manage discounts",
+    icon: <Percent className="h-5 w-5" />,
+    href: "/admin/discounts",
+    color: "bg-red-500 hover:bg-red-600",
+  },
+  {
     title: "Settings",
     description: "System settings",
     icon: <Settings className="h-5 w-5" />,
     href: "/admin/settings",
     color: "bg-gray-500 hover:bg-gray-600",
   },
- 
 ];
 
 export function QuickActions() {
@@ -90,7 +105,7 @@ export function QuickActions() {
         </p>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
           {quickActions.map((action) => (
             <Button
               key={action.title}

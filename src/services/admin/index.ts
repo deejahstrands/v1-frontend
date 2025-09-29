@@ -74,6 +74,12 @@ export type {
   DeleteConsultationTypeResponse
 } from './consultation-type.service';
 
+export { overviewService } from './overview.service';
+export type {
+  OverviewData,
+  OverviewResponse
+} from './overview.service';
+
 //export { userService } from './user.service';
 //export { orderService } from './order.service';
 //export { consultationService } from './consultation.service';
