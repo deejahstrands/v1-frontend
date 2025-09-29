@@ -2,15 +2,69 @@ import api from '../api';
 
 export interface AdminCustomer {
   id: string;
-  createdAt: string;
-  deletedAt: string | null;
   email: string;
   firstName: string;
   lastName: string;
+  avatar: string | null;
+  phone: string | null;
   isActive: boolean;
-  totalOrders: number;
-  lastOrderDate: string | null;
+  orders: Order[];
+  consultations: Consultation[];
+  addresses: Address[];
   totalSpend: number;
+  lastOrderDate: string | null;
+  totalOrders: number;
+}
+
+export interface Order {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  status: string;
+  totalPrice: string;
+  items: OrderItem[];
+  paymentReference: string;
+  shippingAddress: string;
+  deliveryNote: string;
+  orderId: string;
+}
+
+export interface OrderItem {
+  id: string;
+  itemName: string;
+  itemType: string;
+  totalPrice: string;
+}
+
+export interface Consultation {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  status: string;
+  date: string;
+  time: string;
+  duration: string;
+  amount: string;
+  customerNote: string;
+  paymentReference: string;
+}
+
+export interface Address {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  country: string;
+  province: string;
+  streetAddress: string;
+  state: string;
+  city: string;
+  postalCode: string;
+  phoneNumber: string;
+  apartment: string;
+  default: boolean;
 }
 
 export interface CustomerResponse {

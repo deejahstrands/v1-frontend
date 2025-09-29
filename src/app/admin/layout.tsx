@@ -16,30 +16,20 @@ export default function AdminLayout({
 }) {
   const router = useRouter();
   const { toast } = useToast();
-  const { user, isAuthenticated, isLoading, getCurrentUser } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
 
 
-  // Initialize auth on mount
+  // Initialize auth on mount - just wait for auth provider to initialize
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        // Check if we have a token
-        const token = document.cookie.split('; ').find(row => row.startsWith('accessToken='))?.split('=')[1];
+    // Give auth provider time to initialize
+    const timer = setTimeout(() => {
+      setIsInitializing(false);
+    }, 100);
 
-        if (token && !isAuthenticated) {
-          await getCurrentUser();
-        }
-      } catch (error) {
-        console.error('❌ Admin layout: Failed to initialize auth:', error);
-      } finally {
-        setIsInitializing(false);
-      }
-    };
-
-    initializeAuth();
-  }, [getCurrentUser, isAuthenticated]);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     // Don't check auth until initialization is complete

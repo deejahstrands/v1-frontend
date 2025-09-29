@@ -9,10 +9,6 @@ export function middleware(request: NextRequest) {
     const token = request.cookies.get("accessToken");
     const isAuthenticated = Boolean(token);
 
-    console.log(
-      `[Middleware] Admin check on '${pathname}'. Token found: ${!!token}. Redirecting: ${!isAuthenticated}`
-    );
-
     if (!isAuthenticated) {
       return NextResponse.redirect(new URL("/admin-auth/login", request.url));
     }

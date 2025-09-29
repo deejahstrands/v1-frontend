@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/store/use-auth';
 import { useCart } from '@/store/use-cart';
 import { useWishlist } from '@/store/use-wishlist';
@@ -10,9 +11,13 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
+  const pathname = usePathname();
   const { initializeAuth, isAuthenticated } = useAuth();
   const fetchCart = useCart((s) => s.fetchCart);
   const fetchWishlist = useWishlist((s) => s.fetchWishlist);
+
+  // Check if we're on an admin page
+  const isAdminPage = pathname?.startsWith('/admin');
 
   useEffect(() => {
     // Initialize authentication on app start
@@ -20,12 +25,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, [initializeAuth]);
 
   useEffect(() => {
-    // Only sync cart/wishlist when authenticated (token required)
-    if (isAuthenticated) {
+    // Only sync cart/wishlist when authenticated and NOT on admin pages
+    if (isAuthenticated && !isAdminPage) {
       fetchCart();
       fetchWishlist();
     }
-  }, [isAuthenticated, fetchCart, fetchWishlist]);
+  }, [isAuthenticated, isAdminPage, fetchCart, fetchWishlist]);
 
   return <>{children}</>;
 }
