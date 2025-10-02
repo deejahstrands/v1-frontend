@@ -4,7 +4,7 @@ import { DeejahStrandsCollectionSection } from "@/components/home/DeejahStrandsC
 import { CategoriesSection } from "@/components/home/CategoriesSection";
 import { ConsultationCtaSection } from "@/components/home/ConsultationCtaSection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
-import DealsSection from "@/components/home/DealsSection";
+// import DealsSection from "@/components/home/DealsSection";
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -52,7 +52,7 @@ export default function HomePage() {
       <DeejahStrandsCollectionSection />
       <CategoriesSection />
       <TestimonialsSection />
-      <DealsSection />
+      {/* <DealsSection /> */}
       <ConsultationCtaSection />
     </>
   );

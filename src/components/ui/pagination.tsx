@@ -55,7 +55,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       <button
         onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`w-9 h-9 flex items-center justify-center rounded-md border border-gray-200 bg-white text-gray-400 transition disabled:opacity-60 disabled:cursor-not-allowed mr-1`}
+        className={`w-9 h-9 flex items-center justify-center rounded-md border border-gray-200 bg-white text-gray-400 transition disabled:opacity-60 disabled:cursor-not-allowed mr-1 cursor-pointer`}
         aria-label="Previous page"
       >
         <ChevronLeft className="w-4 h-4" />
@@ -66,7 +66,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             {typeof page === "number" ? (
               <button
                 onClick={() => onPageChange(page)}
-                className={`w-9 h-9 flex items-center justify-center rounded-md border transition font-medium
+                className={`w-9 h-9 flex items-center justify-center rounded-md border transition font-medium cursor-pointer
                   ${currentPage === page
                     ? "bg-black text-white border-black shadow"
                     : "bg-white text-black border-gray-200 hover:bg-gray-50"}
@@ -84,7 +84,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       <button
         onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className={`w-9 h-9 flex items-center justify-center rounded-md border border-gray-200 bg-white text-gray-400 transition disabled:opacity-60 disabled:cursor-not-allowed ml-1`}
+        className={`w-9 h-9 flex items-center justify-center rounded-md border border-gray-200 bg-white text-gray-400 transition disabled:opacity-60 disabled:cursor-not-allowed ml-1 cursor-pointer`}
         aria-label="Next page"
       >
         <ChevronRight className="w-4 h-4" />
