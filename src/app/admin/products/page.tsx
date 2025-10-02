@@ -147,12 +147,24 @@ export default function AdminProductsPage() {
 
       // Set gallery images
       if (productData.gallery && productData.gallery.length > 0) {
-        const galleryData = productData.gallery.map((item: any, index: number) => ({
-          id: `existing-${index}`,
-          url: typeof item === 'string' ? item : item.url,
-          isExisting: true,
-          type: typeof item === 'string' ? 'image' : item.type || 'image'
-        }));
+        const galleryData = productData.gallery.map((item: any, index: number) => {
+          const url = typeof item === 'string' ? item : item.url;
+          let type = 'image'; // Default to image
+          
+          if (typeof item === 'object' && item.type) {
+            type = item.type;
+          } else if (typeof item === 'string' || !item.type) {
+            // Try to detect type from URL if not provided
+            type = url.includes('.mp4') || url.includes('.mov') || url.includes('.avi') || url.includes('video') ? 'video' : 'image';
+          }
+          
+          return {
+            id: `existing-${index}`,
+            url,
+            isExisting: true,
+            type
+          };
+        });
         setGalleryImages(galleryData);
       } else {
         setGalleryImages([]);
@@ -330,10 +342,19 @@ export default function AdminProductsPage() {
       // Add existing gallery data
       const existingGalleryData = galleryImages
         .filter(img => img.isExisting && img.url)
-        .map(img => ({
-          url: img.url,
-          type: img.type || 'image'
-        }));
+        .map(img => {
+          let type = img.type || 'image';
+          
+          // If type is still not set, try to detect from URL
+          if (!img.type) {
+            type = img.url.includes('.mp4') || img.url.includes('.mov') || img.url.includes('.avi') || img.url.includes('video') ? 'video' : 'image';
+          }
+          
+          return {
+            url: img.url,
+            type
+          };
+        });
       galleryData.push(...existingGalleryData);
 
       // Prepare data for API

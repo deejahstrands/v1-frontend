@@ -55,7 +55,11 @@ export interface CategoryOption {
   name: string;
 }
 
-export const useProductManagement = () => {
+export const useProductManagement = (options?: {
+  loadOnMount?: boolean; // shorthand for both products and categories
+  loadProductsOnMount?: boolean;
+  loadCategoriesOnMount?: boolean;
+}) => {
   const { toast } = useToast();
   const toastRef = useRef(toast);
 
@@ -298,11 +302,20 @@ export const useProductManagement = () => {
   // Clear error
   const clearError = () => setError(null);
 
-  // Load data on mount
+  // Resolve mount loading options (default true for backward compatibility)
+  const shouldLoadProductsOnMount = options?.loadProductsOnMount ?? options?.loadOnMount ?? true;
+  const shouldLoadCategoriesOnMount = options?.loadCategoriesOnMount ?? options?.loadOnMount ?? true;
+
+  // Load data on mount (configurable)
   useEffect(() => {
-    loadProducts();
-    loadCategories();
-  }, [loadProducts, loadCategories]);
+    if (shouldLoadProductsOnMount) {
+      loadProducts();
+    }
+    if (shouldLoadCategoriesOnMount) {
+      loadCategories();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shouldLoadProductsOnMount, shouldLoadCategoriesOnMount]);
 
   return {
     // Data

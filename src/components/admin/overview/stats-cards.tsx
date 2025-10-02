@@ -53,7 +53,16 @@ export function StatsCards({ selectedPeriod }: StatsCardsProps) {
     if (selectedPeriod === 'all') {
       loadOverview(); // No since parameter = get all data
     } else {
-      loadOverview({ since: selectedPeriod as 'last_seven_days' | 'last_thirty_days' | 'last_three_months' | 'last_year' });
+      loadOverview({
+        since: selectedPeriod as
+          | 'this_week'
+          | 'this_month'
+          | 'last_seven_days'
+          | 'last_thirty_days'
+          | 'last_three_months'
+          | 'last_six_months'
+          | 'last_year',
+      });
     }
   }, [selectedPeriod, loadOverview, setCurrentPeriod, setFiltering]);
 
@@ -91,7 +100,16 @@ export function StatsCards({ selectedPeriod }: StatsCardsProps) {
               if (selectedPeriod === 'all') {
                 loadOverview();
               } else {
-                loadOverview({ since: selectedPeriod as 'last_seven_days' | 'last_thirty_days' | 'last_three_months' | 'last_year' });
+                loadOverview({
+                  since: selectedPeriod as
+                    | 'this_week'
+                    | 'this_month'
+                    | 'last_seven_days'
+                    | 'last_thirty_days'
+                    | 'last_three_months'
+                    | 'last_six_months'
+                    | 'last_year',
+                });
               }
             }}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"

@@ -14,7 +14,14 @@ interface OverviewState {
   setCurrentPeriod: (period: string) => void;
   setFiltering: (isFiltering: boolean) => void;
   loadOverview: (params?: {
-    since?: 'last_seven_days' | 'last_thirty_days' | 'last_three_months' | 'last_year';
+    since?:
+      | 'this_week'
+      | 'this_month'
+      | 'last_seven_days'
+      | 'last_thirty_days'
+      | 'last_three_months'
+      | 'last_six_months'
+      | 'last_year';
   }) => Promise<OverviewData | null>;
   clearError: () => void;
   reset: () => void;

@@ -51,9 +51,8 @@ export default function OrderDetailPage() {
     try {
       const success = await updateOrderStatus(currentOrder.id, { status: newStatus as any });
       if (success) {
+        // The hook already reloads the order and shows a toast
         setIsStatusModalOpen(false);
-        // Reload the order to get updated data
-        loadOrder(orderId);
       }
     } catch (error) {
       console.error('Error updating order status:', error);

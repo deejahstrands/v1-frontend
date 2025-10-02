@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Table, TableColumn } from '@/components/ui/table';
 import { SearchInput } from '@/components/ui/search-input';
 import { Select } from '@/components/ui/select';
-import { Plus, Edit, Trash2, Eye, Grid3X3, List, Filter, Settings, FolderPlus } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, Grid3X3, List, Filter, Settings, FolderPlus, RefreshCw } from "lucide-react";
 import { Pagination } from '@/components/ui/pagination';
 import { Button } from '@/components/common/button';
 import { useProductManagement } from '@/hooks/admin/use-product-management';
@@ -69,9 +69,13 @@ export default function ProductsListPage() {
   const [productToAddToCollection, setProductToAddToCollection] = useState<AdminProduct | null>(null);
   const [isAddingToCollection, setIsAddingToCollection] = useState(false);
 
-  // Initial load
+  // Initial load with delay to ensure page is ready
   React.useEffect(() => {
-    loadProducts();
+    const timer = setTimeout(() => {
+      loadProducts();
+    }, 100); // Small delay to ensure page is fully rendered
+    
+    return () => clearTimeout(timer);
   }, []); // Empty dependency array - only run once on mount
 
   // Handle search and filters with debouncing
@@ -104,6 +108,16 @@ export default function ProductsListPage() {
 
   const handleAddProduct = () => {
     router.push('/admin/products?mode=add');
+  };
+
+  const handleRefresh = () => {
+    loadProducts({
+      page: currentPage,
+      search: searchTerm || undefined,
+      categoryId: selectedCategory || undefined,
+      customization: selectedCustomization === 'customization' ? true : selectedCustomization === 'no-customization' ? false : undefined,
+      visibility: selectedVisibility as 'hidden' | 'published' | undefined,
+    });
   };
 
   const handleEdit = (product: AdminProduct) => {
@@ -381,6 +395,17 @@ export default function ProductsListPage() {
               </button>
             </div>
             
+            {/* Refresh Button */}
+            <Button
+              icon={<RefreshCw className="w-4 h-4" />}
+              variant="tertiary"
+              onClick={handleRefresh}
+              disabled={isLoadingProducts}
+              className="w-full sm:w-auto cursor-pointer"
+            >
+              {isLoadingProducts ? 'Refreshing...' : 'Refresh'}
+            </Button>
+
             {/* Filter Button */}
             <Button
               icon={<Filter className="w-4 h-4" />}

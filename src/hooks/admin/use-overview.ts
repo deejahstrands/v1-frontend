@@ -12,7 +12,14 @@ export const useOverview = () => {
 
   // Load overview data
   const loadOverview = useCallback(async (params?: {
-    since?: 'last_seven_days' | 'last_thirty_days' | 'last_three_months' | 'last_year';
+    since?:
+      | 'this_week'
+      | 'this_month'
+      | 'last_seven_days'
+      | 'last_thirty_days'
+      | 'last_three_months'
+      | 'last_six_months'
+      | 'last_year';
   }): Promise<OverviewData | null> => {
     // Clear current data to show loading state
     setOverviewData(null);
@@ -42,7 +49,15 @@ export const useOverview = () => {
   }, []);
 
   // Refresh overview data
-  const refreshOverview = useCallback(async (since?: 'last_seven_days' | 'last_thirty_days' | 'last_three_months' | 'last_year') => {
+  const refreshOverview = useCallback(async (since?:
+    | 'this_week'
+    | 'this_month'
+    | 'last_seven_days'
+    | 'last_thirty_days'
+    | 'last_three_months'
+    | 'last_six_months'
+    | 'last_year'
+  ) => {
     return loadOverview({ since });
   }, [loadOverview]);
 

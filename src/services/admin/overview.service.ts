@@ -38,7 +38,14 @@ class OverviewService {
    * Get admin overview data
    */
   async getOverview(params?: {
-    since?: 'last_seven_days' | 'last_thirty_days' | 'last_three_months' | 'last_year';
+    since?:
+      | 'this_week'
+      | 'this_month'
+      | 'last_seven_days'
+      | 'last_thirty_days'
+      | 'last_three_months'
+      | 'last_six_months'
+      | 'last_year';
   }): Promise<OverviewResponse> {
     const queryParams = new URLSearchParams();
     

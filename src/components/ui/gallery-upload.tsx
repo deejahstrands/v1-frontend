@@ -19,7 +19,12 @@ interface GalleryUploadProps {
     maxDimensions?: string;
     maxImages?: number;
     onImagesChange?: (images: GalleryImage[]) => void;
-    existingImages?: string[];
+    existingImages?: Array<{
+        id: string;
+        url: string;
+        isExisting?: boolean;
+        type?: 'image' | 'video';
+    }>;
     className?: string;
     error?: string;
 }
@@ -38,11 +43,12 @@ export const GalleryUpload: React.FC<GalleryUploadProps> = ({
     error
 }) => {
     const [images, setImages] = useState<GalleryImage[]>(() => {
-        // Initialize with existing images
-        return existingImages.map((url, index) => ({
-            id: `existing-${index}`,
-            url,
-            isExisting: true
+        // Initialize with existing images, preserving their type information
+        return existingImages.map((img, index) => ({
+            id: img.id || `existing-${index}`,
+            url: img.url,
+            isExisting: true,
+            type: img.type || (img.url.includes('.mp4') || img.url.includes('.mov') || img.url.includes('.avi') || img.url.includes('video') ? 'video' : 'image')
         }));
     });
 

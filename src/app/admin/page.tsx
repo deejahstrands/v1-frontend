@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { StatsCards } from "@/components/admin/overview/stats-cards";
@@ -10,12 +11,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, RefreshCw } from "lucide-react";
 import { useOverviewStore } from "@/store/admin/use-overview";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function AdminDashboardPage() {
   const { loadOverview, isLoading } = useOverviewStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
+  const hasLoadedRef = useRef(false);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -45,6 +47,14 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Load overview data on initial mount
+  useEffect(() => {
+    if (hasLoadedRef.current) return;
+    hasLoadedRef.current = true;
+    // Reuse refresh handler to keep state behavior consistent
+    void handleRefresh();
+  }, []);
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
@@ -68,15 +78,18 @@ export default function AdminDashboardPage() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm">
-                <span>{selectedPeriod === 'all' ? 'All Time' : selectedPeriod.replace('last_', '').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                <span>{selectedPeriod === 'all' ? 'All Time' : selectedPeriod.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
                 <ChevronDown className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-white">
               <DropdownMenuItem onClick={() => handlePeriodChange('all')}>All Time</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handlePeriodChange('this_week')}>This Week</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handlePeriodChange('this_month')}>This Month</DropdownMenuItem>
               <DropdownMenuItem onClick={() => handlePeriodChange('last_seven_days')}>Last 7 Days</DropdownMenuItem>
               <DropdownMenuItem onClick={() => handlePeriodChange('last_thirty_days')}>Last 30 Days</DropdownMenuItem>
               <DropdownMenuItem onClick={() => handlePeriodChange('last_three_months')}>Last 3 Months</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handlePeriodChange('last_six_months')}>Last 6 Months</DropdownMenuItem>
               <DropdownMenuItem onClick={() => handlePeriodChange('last_year')}>Last Year</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

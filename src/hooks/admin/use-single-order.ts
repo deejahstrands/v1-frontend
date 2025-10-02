@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useCallback, useRef, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 import {
   orderService,
   Order,
@@ -15,24 +16,14 @@ export const useSingleOrder = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const currentOrderRef = useRef<Order | null>(null);
-  const loadOrderRef = useRef<((id: string) => Promise<Order | null>) | null>(
-    null
-  );
-  const isInitialized = useRef(false);
+  const { toast } = useToast();
 
   // Load single order
   const loadOrder = useCallback(async (id: string): Promise<Order | null> => {
-    if (globalOrderFetching) {
-      return null;
-    }
-
-    if (isInitialized.current) {
-      return null;
-    }
+    if (globalOrderFetching) return null;
 
     try {
       globalOrderFetching = true;
-      isInitialized.current = true;
       setIsLoading(true);
       setError(null);
 
@@ -49,9 +40,6 @@ export const useSingleOrder = () => {
     }
   }, []);
 
-  // Store the loadOrder function in ref for stable reference
-  loadOrderRef.current = loadOrder;
-
   // Update order status
   const updateOrderStatus = useCallback(
     async (id: string, data: UpdateOrderStatusData): Promise<boolean> => {
@@ -60,10 +48,9 @@ export const useSingleOrder = () => {
 
       try {
         await orderService.updateOrderStatus(id, data);
-        // Reload the current order to get updated data
-        if (currentOrderRef.current && loadOrderRef.current) {
-          await loadOrderRef.current(currentOrderRef.current.id);
-        }
+        // Reload the order to get updated data
+        await loadOrder(id);
+        toast.success("Order updated successfully");
         return true;
       } catch (err: any) {
         setError(
@@ -75,7 +62,7 @@ export const useSingleOrder = () => {
         setIsUpdating(false);
       }
     },
-    []
+    [loadOrder, toast]
   );
 
   // Clear error

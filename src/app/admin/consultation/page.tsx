@@ -1,121 +1,158 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Table, TableColumn } from '@/components/ui/table';
 import { Button } from '@/components/common/button';
 import { SearchInput } from '@/components/ui/search-input';
 import { Select } from '@/components/ui/select';
-import { MessageSquare, Settings, Eye, Trash2 } from 'lucide-react';
+import { MessageSquare, Settings, Eye, Trash2, RefreshCw } from 'lucide-react';
 import { Pagination } from '@/components/ui/pagination';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
-
-// Mock data for consultation bookings - replace with actual API data
-const mockConsultations = [
-  {
-    id: '1',
-    customerName: 'Tony Reiley',
-    consultationType: 'Virtual',
-    date: '2025-05-01T09:00:00Z',
-    orderId: '#23456',
-    status: 'pending',
-  },
-  {
-    id: '2',
-    customerName: 'Dee Jah',
-    consultationType: 'In-Studio',
-    date: '2025-05-01T09:00:00Z',
-    orderId: '#23456',
-    status: 'scheduled',
-  },
-  {
-    id: '3',
-    customerName: 'Aramide Mojisola',
-    consultationType: 'Home Visit',
-    date: '2025-05-01T09:00:00Z',
-    orderId: '#23456',
-    status: 'canceled',
-  },
-];
+import { useConsultationManagement } from '@/hooks/admin/use-consultation-management';
+import { useDebounce } from '@/hooks/use-debounce';
+import { ConsultationListItem } from '@/services/admin/consultation.service';
+import { consultationTypeService, ConsultationType } from '@/services/admin/consultation-type.service';
 
 export default function ConsultationPage() {
   const router = useRouter();
   
+  const {
+    consultations,
+    isLoadingConsultations,
+    isDeleting,
+    currentPage,
+    totalPages,
+    error,
+    clearError,
+    loadConsultations,
+    deleteConsultation,
+    setCurrentPage,
+  } = useConsultationManagement();
+
   // State for filters and search
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading] = useState(false);
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [statusFilter, setStatusFilter] = useState<'pending' | 'confirmed' | 'completed' | 'cancelled' | ''>('');
+  const [typeFilter, setTypeFilter] = useState('');
+  
+  // Consultation types state
+  const [consultationTypes, setConsultationTypes] = useState<ConsultationType[]>([]);
+  const [isLoadingTypes, setIsLoadingTypes] = useState(false);
   
   // Modal states
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [consultationToDelete, setConsultationToDelete] = useState<any>(null);
+  const [consultationToDelete, setConsultationToDelete] = useState<ConsultationListItem | null>(null);
 
-  // Filter consultations based on search and filters
-  const filteredConsultations = mockConsultations.filter(consultation => {
-    const matchesSearch = !searchTerm || 
-      consultation.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      consultation.orderId.toLowerCase().includes(searchTerm.toLowerCase());
+  // Load consultation types
+  const loadConsultationTypes = async () => {
+    try {
+      setIsLoadingTypes(true);
+      const response = await consultationTypeService.getConsultationTypes({
+        status: 'active', // Only get active types
+        limit: 100 // Get all active types
+      });
+      setConsultationTypes(response.data);
+    } catch (error) {
+      console.error('Error loading consultation types:', error);
+    } finally {
+      setIsLoadingTypes(false);
+    }
+  };
+
+  // Load consultations on mount
+  useEffect(() => {
+    loadConsultations();
+    loadConsultationTypes();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Load consultations with filters
+  useEffect(() => {
+    const params = {
+      search: debouncedSearchTerm || undefined,
+      status: statusFilter || undefined,
+      type: typeFilter || undefined,
+      page: 1,
+    };
     
-    const matchesStatus = statusFilter === 'all' || consultation.status === statusFilter;
-    const matchesType = typeFilter === 'all' || consultation.consultationType.toLowerCase() === typeFilter.toLowerCase();
-    
-    return matchesSearch && matchesStatus && matchesType;
-  });
+    loadConsultations(params);
+    setCurrentPage(1);
+  }, [debouncedSearchTerm, statusFilter, typeFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle search
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    setCurrentPage(1);
   };
 
   // Handle status filter
   const handleStatusFilter = (status: string) => {
-    setStatusFilter(status);
-    setCurrentPage(1);
+    setStatusFilter(status as 'pending' | 'confirmed' | 'completed' | 'cancelled' | '');
   };
 
   // Handle type filter
   const handleTypeFilter = (type: string) => {
     setTypeFilter(type);
-    setCurrentPage(1);
+  };
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    loadConsultations({
+      search: searchTerm || undefined,
+      status: statusFilter || undefined,
+      type: typeFilter || undefined,
+      page,
+    });
+  };
+
+  // Handle refresh
+  const handleRefresh = () => {
+    loadConsultations({
+      search: searchTerm || undefined,
+      status: statusFilter || undefined,
+      type: typeFilter || undefined,
+      page: currentPage,
+    });
   };
 
   // Handle delete
-  const handleDelete = (consultation: any) => {
+  const handleDelete = (consultation: ConsultationListItem) => {
     setConsultationToDelete(consultation);
     setIsDeleteModalOpen(true);
   };
 
   // Handle confirm delete
-  const handleConfirmDelete = () => {
-    // TODO: Implement delete logic
-    console.log('Delete consultation:', consultationToDelete);
-    setIsDeleteModalOpen(false);
-    setConsultationToDelete(null);
+  const handleConfirmDelete = async () => {
+    if (!consultationToDelete) return;
+    
+    const success = await deleteConsultation(consultationToDelete.id);
+    if (success) {
+      setIsDeleteModalOpen(false);
+      setConsultationToDelete(null);
+    }
   };
 
   // Handle view
-  const handleView = (consultation: any) => {
+  const handleView = (consultation: ConsultationListItem) => {
     router.push(`/admin/consultation/${consultation.id}`);
   };
 
   // Table columns
-  const columns: TableColumn<any>[] = [
+  const columns: TableColumn<ConsultationListItem>[] = [
     {
-      accessor: 'customerName',
+      accessor: 'user',
       label: 'Customer Name',
       render: (row) => (
-        <div className="font-medium text-gray-900">{row.customerName}</div>
+        <div className="font-medium text-gray-900">
+          {row.user.firstName} {row.user.lastName}
+        </div>
       ),
     },
     {
       accessor: 'consultationType',
       label: 'Consultation Type',
       render: (row) => (
-        <div className="text-gray-900">{row.consultationType}</div>
+        <div className="text-gray-900">{row.consultationType.name}</div>
       ),
     },
     {
@@ -123,24 +160,24 @@ export default function ConsultationPage() {
       label: 'Date',
       render: (row) => (
         <div className="text-gray-900">
-          {new Date(row.date).toLocaleDateString('en-US', {
+          {row.date ? new Date(row.date).toLocaleDateString('en-US', {
             day: '2-digit',
             month: 'short',
             year: '2-digit',
             hour: '2-digit',
             minute: '2-digit',
             hour12: true,
-          })}
+          }) : 'Not scheduled'}
         </div>
       ),
     },
     {
-      accessor: 'orderId',
-      label: 'Order ID',
+      accessor: 'amount',
+      label: 'Amount',
       render: (row) => (
-        <button className="text-blue-600 hover:text-blue-800 font-medium">
-          {row.orderId}
-        </button>
+        <div className="text-gray-900 font-medium">
+          ₦{parseInt(row.amount).toLocaleString()}
+        </div>
       ),
     },
     {
@@ -149,8 +186,8 @@ export default function ConsultationPage() {
       render: (row) => {
         const statusColors = {
           pending: 'bg-yellow-100 text-yellow-800',
-          scheduled: 'bg-green-100 text-green-800',
-          canceled: 'bg-red-100 text-red-800',
+          confirmed: 'bg-green-100 text-green-800',
+          cancelled: 'bg-red-100 text-red-800',
           completed: 'bg-blue-100 text-blue-800',
         };
         
@@ -168,7 +205,7 @@ export default function ConsultationPage() {
   ];
 
   // Actions for each row
-  const actions = (row: any) => (
+  const actions = (row: ConsultationListItem) => (
     <div className="flex items-center gap-2">
       <button
         onClick={() => handleView(row)}
@@ -203,13 +240,23 @@ export default function ConsultationPage() {
               </p>
             </div>
           </div>
-          <Button
-            onClick={() => router.push('/admin/consultation/types')}
-            className="flex items-center gap-2"
-          >
-            <Settings className="w-4 h-4" />
-            Consultation Settings
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              icon={<RefreshCw className="w-4 h-4" />}
+              variant="tertiary"
+              onClick={handleRefresh}
+              disabled={isLoadingConsultations}
+            >
+              {isLoadingConsultations ? 'Refreshing...' : 'Refresh'}
+            </Button>
+            <Button
+              onClick={() => router.push('/admin/consultation/types')}
+              className="flex items-center gap-2"
+            >
+              <Settings className="w-4 h-4" />
+              Consultation Settings
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -218,29 +265,33 @@ export default function ConsultationPage() {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Filter & Search</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <SearchInput
-            placeholder="Search customer name or order ID"
+            placeholder="Search customer name"
             value={searchTerm}
             onChange={handleSearch}
           />
           <Select
             value={statusFilter}
             onChange={handleStatusFilter}
+            placeholder="All Status"
             options={[
-              { label: 'All Status', value: 'all' },
+              { label: 'All Status', value: '' },
               { label: 'Pending', value: 'pending' },
-              { label: 'Scheduled', value: 'scheduled' },
-              { label: 'Canceled', value: 'canceled' },
+              { label: 'Confirmed', value: 'confirmed' },
+              { label: 'Cancelled', value: 'cancelled' },
               { label: 'Completed', value: 'completed' },
             ]}
           />
           <Select
             value={typeFilter}
             onChange={handleTypeFilter}
+            placeholder={isLoadingTypes ? "Loading types..." : "All Types"}
+            disabled={isLoadingTypes}
             options={[
-              { label: 'All Types', value: 'all' },
-              { label: 'Virtual', value: 'virtual' },
-              { label: 'In-Studio', value: 'in-studio' },
-              { label: 'Home Visit', value: 'home visit' },
+              { label: 'All Types', value: '' },
+              ...consultationTypes.map(type => ({
+                label: type.name,
+                value: type.name
+              }))
             ]}
           />
         </div>
@@ -249,24 +300,37 @@ export default function ConsultationPage() {
       {/* Table */}
       <div className="bg-white rounded-lg border border-gray-200">
         <Table
-          data={filteredConsultations}
+          data={consultations}
           columns={columns}
           actions={actions}
-          isLoading={isLoading}
+          isLoading={isLoadingConsultations}
           emptyMessage="No consultation bookings found"
           footerContent={
-            filteredConsultations.length > 0 && (
+            totalPages > 1 && (
               <div className="flex justify-center py-4">
                 <Pagination
                   currentPage={currentPage}
-                  totalPages={1}
-                  onPageChange={setCurrentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
                 />
               </div>
             )
           }
         />
       </div>
+
+      {/* Error handling */}
+      {error && (
+        <div className="fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50">
+          <span className="block sm:inline">{error}</span>
+          <button
+            onClick={clearError}
+            className="ml-2 text-red-500 hover:text-red-700"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       <ConfirmationModal
@@ -277,9 +341,11 @@ export default function ConsultationPage() {
         }}
         onConfirm={handleConfirmDelete}
         title="Delete Consultation Booking"
-        message={`Are you sure you want to delete the consultation booking for "${consultationToDelete?.customerName}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete the consultation booking for "${consultationToDelete?.user.firstName} ${consultationToDelete?.user.lastName}"? This action cannot be undone.`}
+        type="delete"
         confirmText="Delete"
-        isLoading={false}
+        cancelText="Cancel"
+        isLoading={isDeleting}
       />
     </div>
   );

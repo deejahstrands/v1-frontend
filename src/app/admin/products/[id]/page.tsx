@@ -3,19 +3,22 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, Edit, Settings } from "lucide-react";
+import { ArrowLeft, Edit, Settings, MessageSquare } from "lucide-react";
 import { Button } from '@/components/common/button';
 import { useProductManagement } from '@/hooks/admin/use-product-management';
 import { useToast } from '@/hooks/use-toast';
 import { Modal } from '@/components/ui/modal';
 import { Select } from '@/components/ui/select';
+import { ProductReviews } from '@/components/admin/products/product-reviews';
 import Image from 'next/image';
 
 export default function ProductDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const { toast } = useToast();
-  const { getProduct, updateProduct, isSaving } = useProductManagement();
+  const { getProduct, updateProduct, isSaving } = useProductManagement({
+    loadOnMount: false,
+  });
   
   const [product, setProduct] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,6 +31,9 @@ export default function ProductDetailsPage() {
     visibility: 'published' as 'published' | 'hidden',
     featured: false,
   });
+
+  // Reviews state
+  const [showReviews, setShowReviews] = useState(false);
 
   const productId = params.id as string;
 
@@ -67,6 +73,14 @@ export default function ProductDetailsPage() {
 
   const handleOpenStatusModal = () => {
     setIsStatusModalOpen(true);
+  };
+
+  const handleShowReviews = () => {
+    setShowReviews(true);
+  };
+
+  const handleCloseReviews = () => {
+    setShowReviews(false);
   };
 
   const handleStatusFormChange = (field: string, value: string | boolean) => {
@@ -122,6 +136,18 @@ export default function ProductDetailsPage() {
             Back to Products
           </Button>
         </div>
+      </div>
+    );
+  }
+
+  // Show reviews section if reviews are being viewed
+  if (showReviews) {
+    return (
+      <div className="w-full mx-auto max-w-4xl pb-10">
+        <ProductReviews 
+          productId={productId} 
+          onClose={handleCloseReviews} 
+        />
       </div>
     );
   }
@@ -218,6 +244,14 @@ export default function ProductDetailsPage() {
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3">Actions</h3>
                 <div className="space-y-2">
+                  <Button
+                    icon={<MessageSquare className="w-4 h-4" />}
+                    onClick={handleShowReviews}
+                    variant="tertiary"
+                    className="w-full justify-start"
+                  >
+                    View Reviews
+                  </Button>
                   <Button
                     icon={<Edit className="w-4 h-4" />}
                     onClick={handleEdit}

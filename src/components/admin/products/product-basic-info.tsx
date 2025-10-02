@@ -130,7 +130,7 @@ export const ProductBasicInfo: React.FC<ProductBasicInfoProps> = ({
           label="Product Gallery"
           helperText="Share a few snippets of this product"
           onImagesChange={onGalleryChange}
-          existingImages={galleryImages.filter(img => img.isExisting).map(img => img.url)}
+          existingImages={galleryImages.filter(img => img.isExisting)}
           error={errors.gallery}
         />
       </div>
