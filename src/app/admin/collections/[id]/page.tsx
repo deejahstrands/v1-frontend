@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
  
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use as usePromise } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/common/button';
 import { ArrowLeft, Edit, Trash2, Package, Calendar, Tag } from 'lucide-react';
+import { Pagination } from '@/components/ui/pagination';
 import { CollectionWithProducts } from '@/services/admin/collection.service';
 import { collectionService } from '@/services/admin/collection.service';
 import { ProductCard } from '@/components/admin/products/product-card';
@@ -12,19 +14,21 @@ import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import Image from 'next/image';
 
 export default function CollectionDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = usePromise(params);
   const router = useRouter();
   const [collection, setCollection] = useState<CollectionWithProducts | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(12);
 
   // Load collection data
   useEffect(() => {
     const loadCollection = async () => {
       setIsLoading(true);
       try {
-        const resolvedParams = await params;
-        const response = await collectionService.getCollectionWithProducts(resolvedParams.id);
+        const response = await collectionService.getCollectionWithProducts(id, { page, limit });
         setCollection(response.data);
       } catch (error) {
         console.error('Error loading collection:', error);
@@ -34,7 +38,7 @@ export default function CollectionDetailsPage({ params }: { params: Promise<{ id
     };
 
     loadCollection();
-  }, [params]);
+  }, [id, page, limit]);
 
   // Handle delete
   const handleDelete = () => {
@@ -59,7 +63,7 @@ export default function CollectionDetailsPage({ params }: { params: Promise<{ id
 
   // Handle edit
   const handleEdit = () => {
-    router.push(`/admin/collections?mode=edit&id=${collection?.id}`);
+    router.push(`/admin/collections/create?mode=edit&id=${collection?.id}`);
   };
 
   if (isLoading) {
@@ -169,6 +173,17 @@ export default function CollectionDetailsPage({ params }: { params: Promise<{ id
               />
             </div>
 
+            {/* Collection Video (if available) */}
+            {collection.video && (
+              <div className="mb-6">
+                <video
+                  src={collection.video as unknown as string}
+                  className="w-full h-48 rounded-lg object-cover"
+                  controls
+                />
+              </div>
+            )}
+
             {/* Collection Details */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -221,13 +236,13 @@ export default function CollectionDetailsPage({ params }: { params: Promise<{ id
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-gray-900">
-                Products in Collection ({collection.products.length})
+                Products in Collection ({collection.products.meta?.totalItems ?? collection.noOfProducts ?? 0})
               </h2>
             </div>
 
-            {collection.products.length > 0 ? (
+            {collection.products.data.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {collection.products.map((product) => (
+                {collection.products.data.map((product) => (
                   <ProductCard
                     key={product.id}
                     product={{
@@ -235,14 +250,14 @@ export default function CollectionDetailsPage({ params }: { params: Promise<{ id
                       name: product.name,
                       thumbnail: product.thumbnail,
                       basePrice: product.basePrice,
-                      category: { id: '1', name: 'Collection Product' },
-                      status: 'available' as const,
+                      category: product.category ?? { id: '1', name: 'Collection Product' },
+                      status: product.status as any,
                       visibility: product.visibility,
-                      customization: false,
-                      featured: false,
-                      createdAt: collection.createdAt,
-                      deletedAt: null,
-                      quantityAvailable: 0,
+                      customization: product.customization,
+                      featured: product.featured,
+                      createdAt: product.createdAt ?? collection.createdAt,
+                      deletedAt: product.deletedAt,
+                      quantityAvailable: product.quantityAvailable,
                     }}
                     onView={() => router.push(`/admin/products/${product.id}`)}
                     onEdit={() => router.push(`/admin/products?mode=edit&id=${product.id}`)}
@@ -265,6 +280,16 @@ export default function CollectionDetailsPage({ params }: { params: Promise<{ id
                 >
                   Add Products
                 </Button>
+              </div>
+            )}
+
+            {collection.products.meta.totalPages > 1 && (
+              <div className="mt-6">
+                <Pagination
+                  totalPages={collection.products.meta.totalPages}
+                  currentPage={collection.products.meta.page ?? page}
+                  onPageChange={(p) => setPage(p)}
+                />
               </div>
             )}
           </div>

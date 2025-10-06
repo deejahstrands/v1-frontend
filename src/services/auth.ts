@@ -31,8 +31,8 @@ export interface User {
 
 export interface AuthResponse {
   message: string;
-  accessToken: string;
-  user: User;
+  accessToken?: string; // optional for flows that don't auto-login (e.g., register)
+  user?: User;          // optional for the same reason
 }
 
 export interface ResendVerificationResponse {
@@ -144,8 +144,10 @@ export const authService = {
     const { accessToken } = response.data;
     
     
-    // Store token in cookie
-    setCookie('accessToken', accessToken, 7); // 7 days
+    // Store token in cookie when present
+    if (accessToken) {
+      setCookie('accessToken', accessToken, 7); // 7 days
+    }
     
     return response.data;
   },
@@ -153,10 +155,11 @@ export const authService = {
   // Signup user
   async signup(credentials: SignupCredentials): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>('/auth/register', credentials);
-    const { accessToken } = response.data;
-    
-    // Store token in cookie
-    setCookie('accessToken', accessToken, 7); // 7 days
+    const { accessToken } = response.data as AuthResponse;
+    // Store token in cookie only if provided (some backends only return a message)
+    if (accessToken) {
+      setCookie('accessToken', accessToken, 7); // 7 days
+    }
     
     return response.data;
   },

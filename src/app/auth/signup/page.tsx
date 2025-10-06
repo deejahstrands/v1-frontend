@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import Image from 'next/image';
@@ -24,12 +25,16 @@ export default function UserSignupPage() {
 
   const handleSubmit = async (values: SignupFormData, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
     try {
-      await signup({
+      const res = await signup({
         firstName: values.firstName,
         lastName: values.lastName,
         email: values.email,
         password: values.password,
       });
+      // Show success toast if backend confirms success
+      if (res?.message) {
+        toast.success(res.message);
+      }
       
       // Store email in localStorage for resend functionality
       if (typeof window !== 'undefined') {
@@ -38,8 +43,9 @@ export default function UserSignupPage() {
       
       // Redirect to success page with email as query param
       router.push(`/auth/success/account-created?email=${encodeURIComponent(values.email)}`);
-    } catch {
-      toast.error("There was an error creating your account. Please try again.");
+    } catch (err) {
+      const apiMsg = (err as any)?.response?.data?.message || (err as Error)?.message || 'Signup failed.';
+      toast.error(apiMsg);
     } finally {
       setSubmitting(false);
     }

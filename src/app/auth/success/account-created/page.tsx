@@ -22,6 +22,7 @@ function AccountCreatedSuccessForm() {
   const { toast } = useToast();
   const { resendVerification } = useAuth();
   const [isResending, setIsResending] = useState(false);
+  const [cooldown, setCooldown] = useState<number>(10); // initial cooldown on page load
   const [userEmail, setUserEmail] = useState<string>('');
 
   useEffect(() => {
@@ -35,6 +36,13 @@ function AccountCreatedSuccessForm() {
       setUserEmail(emailFromStorage);
     }
   }, [searchParams]);
+
+  // Countdown timer for cooldown state
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = setInterval(() => setCooldown((s) => (s > 0 ? s - 1 : 0)), 1000);
+    return () => clearInterval(id);
+  }, [cooldown]);
 
   const handleContinue = () => {
     router.push('/');
@@ -51,6 +59,8 @@ function AccountCreatedSuccessForm() {
       await resendVerification(userEmail);
       
       toast.success("Verification email has been resent to your inbox.");
+      // Start a longer cooldown after a resend to prevent spamming
+      setCooldown(30);
     } catch (error: unknown) {
       const apiError = error as ApiError;
       const errorMessage = apiError?.response?.data?.message || "There was an error sending the email. Please try again.";
@@ -100,11 +110,15 @@ function AccountCreatedSuccessForm() {
             </p>
             <Button
               onClick={handleResendEmail}
-              disabled={isResending}
+              disabled={isResending || cooldown > 0}
               variant="outline"
               className="w-full border-blue-300 text-blue-700 hover:bg-blue-100"
             >
-              {isResending ? 'Sending...' : 'Resend Verification Email'}
+              {isResending
+                ? 'Sending...'
+                : cooldown > 0
+                  ? `Resend in ${cooldown}s`
+                  : 'Resend Verification Email'}
             </Button>
           </div>
           
@@ -134,7 +148,7 @@ function AccountCreatedSuccessForm() {
         {/* Main image card flush right */}
         <div className="relative z-10 w-full h-full flex items-center justify-end">
           <div className="relative w-full h-full overflow-hidden flex items-end">
-            <Image src="https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945539/16_nbayoa.jpg" alt="Success Visual" fill className="object-cover w-full h-full" />
+            <Image src="https://res.cloudinary.com/dhnanmyf3/image/upload/v1753709757/16_gappbe.jpg" alt="Success Visual" fill className="object-cover w-full h-full" />
             {/* Dark overlay for better pattern visibility */}
             <div className="absolute inset-0 bg-black/30 z-10"></div>
             {/* Content overlays on image card */}

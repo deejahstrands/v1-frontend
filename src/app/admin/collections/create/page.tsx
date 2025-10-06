@@ -109,7 +109,7 @@ export default function CreateCollectionPage() {
             if (mode === 'edit' && collectionId) {
                 setIsLoadingCollection(true);
                 try {
-                    const response = await collectionService.getCollectionWithProducts(collectionId);
+                    const response = await collectionService.getCollectionWithProducts(collectionId, { page: 1, limit: 1000 });
                     const collection = response.data;
 
                     setCurrentCollection(collection);
@@ -122,10 +122,31 @@ export default function CreateCollectionPage() {
                         video: (collection as any).video || '',
                     });
 
-                    // Set selected products from the collection
-                    if (collection.products && collection.products.length > 0) {
-                        setSelectedProducts(collection.products.map(p => p.id));
+                    // Set selected products from the collection (new API shape)
+                    const selectedFromCollection = (collection as any).products?.data?.map((p: any) => p.id) ?? [];
+                    if (selectedFromCollection.length > 0) {
+                        setSelectedProducts(selectedFromCollection);
                     }
+
+                    // Ensure selected products are visible in the available list
+                    // by merging them into availableProducts if missing
+                    const selectedProductObjects = (collection as any).products?.data ?? [];
+                    setAvailableProducts(prev => {
+                        const existingIds = new Set(prev.map(p => p.id));
+                        const merged = [...prev];
+                        for (const p of selectedProductObjects) {
+                            if (!existingIds.has(p.id)) {
+                                merged.push({
+                                    id: p.id,
+                                    name: p.name,
+                                    thumbnail: p.thumbnail,
+                                    basePrice: p.basePrice,
+                                    visibility: p.visibility,
+                                } as AdminProduct);
+                            }
+                        }
+                        return merged;
+                    });
                 } catch (error) {
                     console.error('Error loading collection for edit:', error);
                     alert('Failed to load collection data. Please try again.');

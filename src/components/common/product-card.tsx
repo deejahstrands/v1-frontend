@@ -8,10 +8,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/store/use-auth";
 import { useLoginModal } from "@/hooks/use-login-modal";
-import { useCart } from "@/store/use-cart";
+// import { useCart } from "@/store/use-cart";
 import { useWishlist } from "@/store/use-wishlist";
 import { useToast } from "@/hooks/use-toast";
-import { cartService } from "@/services/cart";
+// import { cartService } from "@/services/cart"; // no longer used here; handled on detail page
+import { useRouter } from "next/navigation";
 
 export function ProductCard({
   images,
@@ -19,21 +20,23 @@ export function ProductCard({
   price,
   customization,
   id,
-  specifications,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  specifications: _unusedSpecifications,
 }: {
   images: string[];
   title: string;
   price: string;
   customization: boolean;
   id: string;
-  specifications?: { type: string; value: string }[];
+  specifications?: { type: string; value: string }[]; // kept for type compatibility
 }) {
   const [isHovered, setIsHovered] = useState(false);
   const { isAuthenticated } = useAuth();
   const { openModal } = useLoginModal();
-  const addToCart = useCart(state => state.addToCart);
+  // const addToCart = useCart(state => state.addToCart); // adding to cart happens on detail page now
   const { addToWishlist, addToWishlistApi, removeFromWishlist, removeFromWishlistApi, isInWishlist } = useWishlist();
   const { toast } = useToast();
+  const router = useRouter();
   
   // Use first image as default, second image on hover
   const defaultImage = images[0];
@@ -43,52 +46,8 @@ export function ProductCard({
     e.preventDefault();
     e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation();
-    
-    if (!isAuthenticated) {
-      openModal("Add Item to Cart", () => {
-        // This will be called after successful login
-        addProductToCart();
-      });
-      return;
-    }
-    
-    addProductToCart();
-  };
-
-  const addProductToCart = async () => {
-    const basePrice = Number(price.replace(/[^0-9.-]+/g, ""));
-    
-    try {
-      // Call API for authenticated users
-      if (isAuthenticated) {
-        await cartService.addToCart({
-          productId: id,
-          quantity: 1
-        });
-      }
-      
-      // Always add to local cart store for UI consistency
-      addToCart({
-        productId: id,
-        title: title,
-        image: defaultImage,
-        basePrice: basePrice,
-        customizations: {},
-        customizationTotal: 0,
-        totalPrice: basePrice,
-        quantity: 1,
-        delivery: {
-          "Private Fitting": { label: "None", price: 0 },
-          "Processing Time": { label: "Default", price: 0 }
-        },
-        specifications: specifications
-      });
-      
-      toast.success(`${title} has been added to your cart.`);
-    } catch (error) {
-      console.error("Failed to add to cart:", error);
-      toast.error("Failed to add item to cart. Please try again.");
-    }
+    // Redirect to product detail so user selects Processing Time or Private Fitting
+    router.push(`/products/${id}`);
   };
 
   const handleWishlist = (e: React.MouseEvent) => {

@@ -66,6 +66,11 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
   const { basePrice, customizationTotal, totalPrice: singleTotal } = useCartPrice(product.price);
   const totalPrice = singleTotal * quantity;
 
+  // Require both delivery selections before adding to cart
+  const processingTimeId = selectedDelivery['Processing Time']?.productProcessingTimeId;
+  const fittingOptionId = selectedDelivery['Private Fitting']?.productFittingOptionId;
+  const isDeliveryComplete = Boolean(processingTimeId && fittingOptionId);
+
   const clearAllSelections = () => {
     resetCustomization();
     resetDelivery();
@@ -80,6 +85,10 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
   const prepareCartData = async () => {
     setIsUploading(true);
     try {
+      // Validate required delivery selections
+      if (!isDeliveryComplete) {
+        throw new Error('delivery_incomplete');
+      }
       // Upload images if measurements exist
       let measurementsData = undefined;
       if (measurements.hasMeasurements) {
@@ -108,9 +117,6 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
         .filter(id => id !== undefined);
 
       // Get delivery IDs
-      const processingTimeId = selectedDelivery['Processing Time']?.productProcessingTimeId;
-      const fittingOptionId = selectedDelivery['Private Fitting']?.productFittingOptionId;
-
       return {
         productId: product.id,
         quantity,
@@ -126,6 +132,12 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
 
   const handleAddToCart = async () => {
     if (isUploading) return; // Prevent multiple clicks during upload
+
+    // Enforce delivery requirements
+    if (!isDeliveryComplete) {
+      toast.info('Please select both Processing Time and Private Fitting to continue.');
+      return;
+    }
 
     // Check authentication first before any API calls
     if (!isAuthenticated) {
@@ -197,7 +209,9 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
     clearAllSelections();
     scrollToTop();
       } catch (error) {
-        if (error instanceof Error && error.message.includes('upload')) {
+        if (error instanceof Error && error.message === 'delivery_incomplete') {
+          toast.info('Please select both Processing Time and Private Fitting to continue.');
+        } else if (error instanceof Error && error.message.includes('upload')) {
           toast.error("Failed to upload images. Please try again.");
         } else {
           toast.error("Failed to add item to cart. Please try again.");
@@ -271,7 +285,7 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
           type="button"
           className="flex-1 flex items-center justify-center gap-2 bg-[#C9A18A] hover:bg-[#b88b6d] text-white font-semibold rounded-lg py-3 text-base transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={handleAddToCart}
-          disabled={isUploading}
+          disabled={isUploading || !isDeliveryComplete}
         >
           {isUploading ? (
             <>
@@ -284,7 +298,7 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
           ) : (
             <>
           <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-13z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="21" r="1" fill="currentColor"/><circle cx="19" cy="21" r="1" fill="currentColor"/></svg>
-          Add to Cart - ₦{totalPrice.toLocaleString()}
+          {isDeliveryComplete ? `Add to Cart - ₦${totalPrice.toLocaleString()}` : 'Select delivery options to continue'}
             </>
           )}
         </button>
@@ -338,11 +352,14 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
           </button>
         )}
       </div>
-      {/* Info */}
+      {/* Info / Helper */}
       <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#98A2B3" strokeWidth="2"/><path d="M12 8v4m0 4h.01" stroke="#98A2B3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
         Taxes included. <span className="underline ml-1 cursor-pointer">Shipping</span> calculated at checkout.
       </div>
+      {!isDeliveryComplete && (
+        <div className="text-xs text-red-600 mt-1">Please select both Processing Time and Private Fitting above to enable Add to Cart.</div>
+      )}
     </div>
   );
 };

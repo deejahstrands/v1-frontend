@@ -7,6 +7,7 @@ export interface Collection {
   updatedAt: string;
   deletedAt: string | null;
   thumbnail: string;
+  video?: string | null;
   name: string;
   status: 'active' | 'inactive';
   description: string;
@@ -16,12 +17,34 @@ export interface Collection {
 
 export interface CollectionWithProducts extends Collection {
   products: {
-    id: string;
-    thumbnail: string;
-    name: string;
-    basePrice: number;
-    visibility: 'published' | 'hidden';
-  }[];
+    data: {
+      id: string;
+      createdAt: string;
+      deletedAt: string | null;
+      thumbnail: string;
+      name: string;
+      basePrice: number;
+      featured: boolean;
+      status: 'available' | 'unavailable' | 'archived';
+      quantityAvailable: number;
+      visibility: 'published' | 'hidden';
+      customization: boolean;
+      category: {
+        id: string;
+        name: string;
+      };
+    }[];
+    meta: {
+      page: number;
+      limit: number | null;
+      totalItems: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+      nextPage: number | null;
+      prevPage: number | null;
+    };
+  };
 }
 
 export interface CreateCollectionData {
@@ -131,8 +154,12 @@ class CollectionService {
   /**
    * Get collection with products by ID
    */
-  async getCollectionWithProducts(id: string): Promise<CollectionWithProductsResponse> {
-    const response = await api.get(`${this.baseUrl}/${id}`);
+  async getCollectionWithProducts(id: string, params?: { page?: number; limit?: number; }): Promise<CollectionWithProductsResponse> {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    const url = `${this.baseUrl}/${id}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const response = await api.get(url);
     return response.data;
   }
 

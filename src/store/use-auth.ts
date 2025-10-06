@@ -30,7 +30,9 @@ interface AuthState {
 
   // Actions
   login: (credentials: LoginCredentials) => Promise<void>;
-  signup: (credentials: SignupCredentials) => Promise<void>;
+  signup: (
+    credentials: SignupCredentials
+  ) => Promise<import("@/services/auth").AuthResponse>;
   logout: () => void;
   getCurrentUser: () => Promise<void>;
   initializeAuth: () => Promise<void>;
@@ -78,16 +80,16 @@ export const useAuth = create<AuthState>()(
             });
 
             // Sync cart and wishlist after successful login
-            if (typeof window !== 'undefined') {
+            if (typeof window !== "undefined") {
               setTimeout(async () => {
                 try {
-                  const { useCart } = await import('@/store/use-cart');
-                  const { useWishlist } = await import('@/store/use-wishlist');
-                  
+                  const { useCart } = await import("@/store/use-cart");
+                  const { useWishlist } = await import("@/store/use-wishlist");
+
                   useCart.getState().fetchCart();
                   useWishlist.getState().fetchWishlist();
                 } catch (error) {
-                  console.error('Error syncing user data after login:', error);
+                  console.error("Error syncing user data after login:", error);
                 }
               }, 100);
             }
@@ -106,12 +108,15 @@ export const useAuth = create<AuthState>()(
           set({ isLoading: true, error: null });
           try {
             const response = await authService.signup(credentials);
+            // Only mark authenticated if backend returned a user or token
+            const hasAuth = !!response.user || !!authService.getToken();
             set({
-              user: response.user,
-              isAuthenticated: true,
+              user: response.user ?? null,
+              isAuthenticated: hasAuth,
               isLoading: false,
               error: null,
             });
+            return response;
           } catch (error: any) {
             set({
               isLoading: false,
@@ -208,7 +213,8 @@ export const useAuth = create<AuthState>()(
           } catch (error: any) {
             set({
               isLoading: false,
-              error: error.response?.data?.message || "Failed to update profile.",
+              error:
+                error.response?.data?.message || "Failed to update profile.",
             });
             throw error;
           }
@@ -276,7 +282,7 @@ export const useAuth = create<AuthState>()(
         initializeAuth: async () => {
           // Check if we have a token
           const hasToken = authService.isAuthenticated();
-          
+
           if (hasToken) {
             // Silently fetch user profile without loading state
             try {
@@ -313,7 +319,7 @@ export const useAuth = create<AuthState>()(
           set({ consultationsLoading: true, consultationsError: null });
           try {
             const response = await authService.getUserConsultations(params);
-            
+
             set({
               consultations: response.data,
               consultationsPage: response.meta.page,
@@ -327,7 +333,9 @@ export const useAuth = create<AuthState>()(
           } catch (error: any) {
             set({
               consultationsLoading: false,
-              consultationsError: error.response?.data?.message || "Failed to fetch consultations",
+              consultationsError:
+                error.response?.data?.message ||
+                "Failed to fetch consultations",
             });
           }
         },
