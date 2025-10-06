@@ -7,7 +7,7 @@ export interface OverviewData {
     pendingConsultations: number;
     completedConsultations: number;
     canceledConsultations: number;
-    scheduledConsultations: number;
+    confirmedConsultations: number;
   };
   orders: {
     totalOrders: number;
