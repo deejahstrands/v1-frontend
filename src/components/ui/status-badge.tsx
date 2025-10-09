@@ -1,13 +1,13 @@
 import { cn } from '@/lib/utils';
 
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'completed';
 
 interface StatusBadgeProps {
-  status: OrderStatus;
+  status: OrderStatus | string;
   className?: string;
 }
 
-const statusConfig = {
+const statusConfig: Record<string, { label: string; className: string }> = {
   pending: {
     label: 'Pending',
     className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
@@ -24,6 +24,10 @@ const statusConfig = {
     label: 'Delivered',
     className: 'bg-green-100 text-green-800 border-green-200',
   },
+  completed: {
+    label: 'Completed',
+    className: 'bg-green-100 text-green-800 border-green-200',
+  },
   cancelled: {
     label: 'Cancelled',
     className: 'bg-red-100 text-red-800 border-red-200',
@@ -31,7 +35,7 @@ const statusConfig = {
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const config = statusConfig[status];
+  const config = statusConfig[status] ?? { label: String(status ?? 'Unknown'), className: 'bg-gray-100 text-gray-800 border-gray-200' };
   
   return (
     <span

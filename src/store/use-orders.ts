@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { ordersService, type Order, type OrderFilters, type ReviewData } from '@/services/orders';
 import { toast } from 'react-toastify';
 
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'completed';
 
 interface OrdersState {
   orders: Order[];

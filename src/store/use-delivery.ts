@@ -5,6 +5,7 @@ interface DeliveryOption {
   price: number;
   productProcessingTimeId?: string;
   productFittingOptionId?: string;
+  timeRange?: string;
 }
 
 interface DeliveryState {

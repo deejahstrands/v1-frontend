@@ -53,6 +53,7 @@ interface ProductDetailPageProps {
       processingTimeId: string;
       label: string;
       price: number;
+      timeRange?: string;
     }>;
     productSpecifications?: Record<string, string>;
     category?: string;
@@ -122,7 +123,7 @@ export default function ProductDetailPage({ product }: ProductDetailPageProps) {
                     <MeasurementsAndPreferences />
                   </div>
                 )}
-                <ProductDeliveryAccordion delivery={(product.delivery as Array<{ type: string; options: Array<{ label: string; price: number; }> }>) || []} />
+                <ProductDeliveryAccordion delivery={(product.delivery as Array<{ type: string; options: Array<{ label: string; price: number; timeRange?: string; }> }>) || []} />
                 <AddToCartSection product={product} />
                 {/* ProductTabs (mobile only) */}
                 <div className="block lg:hidden">

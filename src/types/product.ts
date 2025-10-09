@@ -65,6 +65,7 @@ export interface ProcessingTime {
   processingTimeId: string;
   label: string;
   price: number;
+  timeRange?: string;
 }
 
 export interface ProductCustomization {

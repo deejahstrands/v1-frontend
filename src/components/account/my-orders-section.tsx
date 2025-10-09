@@ -9,13 +9,13 @@ import { Pagination } from '@/components/ui/pagination';
 import { OrderDetails } from '@/components/orders/order-details';
 import { useOrders } from '@/store/use-orders';
 
-type OrderFilter = 'all' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+type OrderFilter = 'all' | 'processing' | 'shipped' | 'completed' | 'cancelled';
 
 const filterTabs = [
   { id: 'all' as OrderFilter, label: 'All Orders' },
   { id: 'processing' as OrderFilter, label: 'Processing' },
   { id: 'shipped' as OrderFilter, label: 'Shipped' },
-  { id: 'delivered' as OrderFilter, label: 'Delivered' },
+  { id: 'completed' as OrderFilter, label: 'Completed' },
 ];
 
 export function MyOrdersSection() {

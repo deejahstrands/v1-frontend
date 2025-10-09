@@ -60,7 +60,7 @@ export interface Order {
   updatedAt: string;
   deletedAt: string | null;
   user: OrderUser;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'completed';
   totalPrice: string;
   items: OrderItem[];
   paymentReference: string;

@@ -115,7 +115,8 @@ export default function ProductClient() {
           ...currentProduct.processingTimes.map(pt => ({
             label: pt.label,
             price: pt.price,
-            productProcessingTimeId: pt.productProcessingTimeId
+            productProcessingTimeId: pt.productProcessingTimeId,
+            timeRange: pt.timeRange,
           }))
         ]
       }] : []),

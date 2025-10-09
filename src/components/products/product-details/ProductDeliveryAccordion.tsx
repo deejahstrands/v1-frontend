@@ -7,6 +7,7 @@ import { Info } from 'lucide-react';
 interface DeliveryOption {
   label: string;
   price: number;
+  timeRange?: string;
 }
 
 interface DeliveryType {
@@ -74,6 +75,7 @@ const ProductDeliveryAccordion: React.FC<ProductDeliveryAccordionProps> = ({ del
                   <span className="ml-2 text-xs sm:text-sm text-gray-500 font-normal">
                     (
                     {selected[d.type]?.label}
+                    {selected[d.type]?.timeRange ? `  ${selected[d.type]?.timeRange}` : ''}
                     {selected[d.type]?.price ? ` - ₦${selected[d.type]?.price.toLocaleString()}` : ''}
                     )
                   </span>
@@ -106,7 +108,10 @@ const ProductDeliveryAccordion: React.FC<ProductDeliveryAccordionProps> = ({ del
                           ${isSelected ? 'bg-secondary font-semibold' : ''}`}
                         onClick={() => handleSelect(d.type, option)}
                       >
-                        <span>{option.label}</span>
+                        <span>
+                          {option.label}
+                          {option.timeRange ? <span className="ml-2 text-xs text-gray-600">({option.timeRange})</span> : null}
+                        </span>
                         {option.price ? <span className="text-gray-700 font-medium">₦{option.price.toLocaleString()}</span> : null}
                       </button>
                     );
