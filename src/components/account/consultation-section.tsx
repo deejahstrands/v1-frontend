@@ -1,25 +1,42 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { MessageCircle, Calendar, Clock, CheckCircle, Plus, Loader2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { MessageCircle, Calendar, Clock, CheckCircle, Plus, Loader2, ArrowLeft, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/store/use-auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export function ConsultationSection() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const { 
     consultations, 
     consultationsLoading, 
     consultationsError, 
     getUserConsultations
   } = useAuth();
-  const router = useRouter();
+  
+  const [selectedConsultationId, setSelectedConsultationId] = useState<string | null>(null);
+  const [isLoadingConsultationDetails, setIsLoadingConsultationDetails] = useState(false);
   const hasFetchedRef = useRef(false);
 
-  // Fetch consultations on mount
+  // Check for consultationId in URL on component mount
   useEffect(() => {
-    if (!hasFetchedRef.current) {
+    const consultationIdFromUrl = searchParams.get('consultationId');
+    if (consultationIdFromUrl) {
+      setSelectedConsultationId(consultationIdFromUrl);
+      handleViewDetails(consultationIdFromUrl);
+    } else if (!hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      getUserConsultations({ page: 1, limit: 5 });
+    }
+  }, [searchParams]);
+
+  // Fetch consultations on component mount if no consultationId in URL
+  useEffect(() => {
+    if (!hasFetchedRef.current && !searchParams.get('consultationId')) {
       hasFetchedRef.current = true;
       getUserConsultations({ page: 1, limit: 5 });
     }
@@ -27,6 +44,34 @@ export function ConsultationSection() {
 
   const handleBookConsultation = () => {
     router.push('/consultation');
+  };
+
+  const handleViewDetails = async (consultationId: string) => {
+    setIsLoadingConsultationDetails(true);
+    setSelectedConsultationId(consultationId);
+    
+    // Update URL with query parameter
+    router.push(`/account#consultation?consultationId=${consultationId}`);
+    
+    // Scroll to top when navigating to consultation details
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    try {
+      // For now, we'll simulate loading since we don't have a specific consultation fetch method
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    } catch (error) {
+      console.error('Error fetching consultation details:', error);
+    } finally {
+      setIsLoadingConsultationDetails(false);
+    }
+  };
+
+  const handleBackToList = () => {
+    setSelectedConsultationId(null);
+    setIsLoadingConsultationDetails(false);
+    
+    // Clear query parameter from URL
+    router.push('/account#consultation');
   };
 
 
@@ -59,6 +104,178 @@ export function ConsultationSection() {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // If a consultation is selected, show consultation details or loading
+  if (selectedConsultationId) {
+    if (isLoadingConsultationDetails || consultationsLoading) {
+      return (
+        <div className="max-w-4xl mx-auto">
+          {/* Breadcrumb */}
+          <div className="mb-6">
+            <nav className="flex items-center space-x-2 text-sm text-gray-500">
+              <span>Home</span>
+              <span>/</span>
+              <span className="text-[#C9A898] font-medium">Consultation</span>
+            </nav>
+          </div>
+
+          {/* Back Button */}
+          <div className="mb-6">
+            <Button
+              onClick={handleBackToList}
+              variant="outline"
+              size="sm"
+              className="flex items-center space-x-2"
+            >
+              <ArrowLeft size={16} />
+              <span>Back to Consultations</span>
+            </Button>
+          </div>
+
+          {/* Consultation Details Skeleton Loader */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="animate-pulse">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                  <div>
+                    <div className="h-6 bg-gray-200 rounded w-48 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-32"></div>
+                  </div>
+                  <div className="h-6 bg-gray-200 rounded w-20"></div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center space-x-3">
+                      <div className="w-5 h-5 bg-gray-200 rounded"></div>
+                      <div>
+                        <div className="h-3 bg-gray-200 rounded w-12 mb-1"></div>
+                        <div className="h-4 bg-gray-200 rounded w-16"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    // Find the selected consultation
+    const selectedConsultation = consultations.find(c => c.id === selectedConsultationId);
+    
+    if (!selectedConsultation) {
+      return (
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6">
+            <Button
+              onClick={handleBackToList}
+              variant="outline"
+              size="sm"
+              className="flex items-center space-x-2"
+            >
+              <ArrowLeft size={16} />
+              <span>Back to Consultations</span>
+            </Button>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+            <MessageCircle size={48} className="mx-auto text-gray-300 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Consultation not found</h3>
+            <p className="text-gray-500">The consultation you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+          </div>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="max-w-4xl mx-auto">
+        {/* Breadcrumb */}
+        <div className="mb-6">
+          <nav className="flex items-center space-x-2 text-sm text-gray-500">
+            <span>Home</span>
+            <span>/</span>
+            <span className="text-[#C9A898] font-medium">Consultation</span>
+          </nav>
+        </div>
+
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button
+            onClick={handleBackToList}
+            variant="outline"
+            size="sm"
+            className="flex items-center space-x-2"
+          >
+            <ArrowLeft size={16} />
+            <span>Back to Consultations</span>
+          </Button>
+        </div>
+
+        {/* Consultation Details */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div className="flex items-center space-x-3">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                selectedConsultation.status === 'completed' 
+                  ? 'bg-[#C9A898] bg-opacity-10' 
+                  : 'bg-blue-100'
+              }`}>
+                <MessageCircle 
+                  size={24} 
+                  className={selectedConsultation.status === 'completed' ? 'text-[#C9A898]' : 'text-blue-600'} 
+                />
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold text-gray-900">{selectedConsultation.consultationType.name}</h1>
+                <p className="text-gray-500">Consultation Details</p>
+              </div>
+            </div>
+            <span className={`px-3 py-1 text-sm rounded-full flex items-center w-fit ${getStatusColor(selectedConsultation.status)}`}>
+              {selectedConsultation.status === 'completed' && <CheckCircle size={16} className="mr-1" />}
+              {selectedConsultation.status.charAt(0).toUpperCase() + selectedConsultation.status.slice(1)}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6 bg-gray-50 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <Calendar size={20} className="text-gray-400" />
+              <div>
+                <p className="text-sm text-gray-500">Date</p>
+                <p className="font-medium">{formatDate(selectedConsultation.date)}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Clock size={20} className="text-gray-400" />
+              <div>
+                <p className="text-sm text-gray-500">Time</p>
+                <p className="font-medium">{selectedConsultation.time || 'TBD'}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="text-gray-400 text-xl">₦</span>
+              <div>
+                <p className="text-sm text-gray-500">Amount</p>
+                <p className="font-medium">{formatPrice(selectedConsultation.amount)}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Details */}
+          <div className="mt-6 space-y-4">
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Consultation Type</h3>
+              <p className="text-gray-600">{selectedConsultation.consultationType.name}</p>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Status</h3>
+              <p className="text-gray-600 capitalize">{selectedConsultation.status}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -156,8 +373,12 @@ export function ConsultationSection() {
               
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <div className="flex items-center justify-between">
-                  <button className="text-[#C9A898] hover:text-[#b88b6d] text-sm font-medium">
-                    View Details
+                  <button 
+                    onClick={() => handleViewDetails(consultation.id)}
+                    className="text-[#C9A898] hover:text-[#b88b6d] text-sm font-medium flex items-center space-x-1"
+                  >
+                    <Eye size={14} />
+                    <span>View Details</span>
                   </button>
                 </div>
               </div>

@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Package, ShoppingBag, Eye, MapPin, CreditCard, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -19,6 +20,9 @@ const filterTabs = [
 ];
 
 export function MyOrdersSection() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const { 
     orders, 
     loading, 
@@ -38,9 +42,21 @@ export function MyOrdersSection() {
   const [isLoadingOrderDetails, setIsLoadingOrderDetails] = useState(false);
   const hasFetchedRef = useRef(false);
 
-  // Fetch orders on component mount
+  // Check for orderId in URL on component mount
   useEffect(() => {
-    if (!hasFetchedRef.current) {
+    const orderIdFromUrl = searchParams.get('orderId');
+    if (orderIdFromUrl) {
+      setSelectedOrderId(orderIdFromUrl);
+      handleViewDetails(orderIdFromUrl);
+    } else if (!hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      fetchOrders();
+    }
+  }, [searchParams]);
+
+  // Fetch orders on component mount if no orderId in URL
+  useEffect(() => {
+    if (!hasFetchedRef.current && !searchParams.get('orderId')) {
       hasFetchedRef.current = true;
       fetchOrders();
     }
@@ -101,6 +117,9 @@ export function MyOrdersSection() {
     setIsLoadingOrderDetails(true);
     setSelectedOrderId(orderId);
     
+    // Update URL with query parameter
+    router.push(`/account#orders?orderId=${orderId}`);
+    
     // Scroll to top when navigating to order details
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
@@ -118,6 +137,9 @@ export function MyOrdersSection() {
     setIsLoadingOrderDetails(false);
     // Clear any selected order from the store to prevent stale data
     setSelectedOrder(null);
+    
+    // Clear query parameter from URL
+    router.push('/account#orders');
   };
 
   // If an order is selected, show order details or loading
