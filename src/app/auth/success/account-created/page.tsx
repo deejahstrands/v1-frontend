@@ -45,7 +45,7 @@ function AccountCreatedSuccessForm() {
   }, [cooldown]);
 
   const handleContinue = () => {
-    router.push('/');
+    router.push('/auth/login');
   };
 
   const handleResendEmail = async () => {
@@ -127,7 +127,7 @@ function AccountCreatedSuccessForm() {
               onClick={handleContinue}
               className="w-full bg-[#C9A898] hover:bg-[#b88b6d] text-white"
             >
-              Continue to Home
+              Continue to Login
             </Button>
             
             <p className="text-sm text-gray-500">

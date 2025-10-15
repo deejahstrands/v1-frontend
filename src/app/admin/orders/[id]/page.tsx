@@ -270,14 +270,37 @@ export default function OrderDetailPage() {
                               <h5 className="text-xs font-medium text-gray-600 mb-1">Hairline Images:</h5>
                               <div className="flex flex-wrap gap-2">
                                 {item.measurements.harlineImages.map((image, idx) => (
-                                  <Image
-                                    key={idx}
-                                    src={image}
-                                    alt={`Hairline ${idx + 1}`}
-                                    width={60}
-                                    height={60}
-                                    className="w-15 h-15 rounded object-cover"
-                                  />
+                                  <div key={idx} className="flex flex-col items-center">
+                                    <Image
+                                      src={image}
+                                      alt={`Hairline ${idx + 1}`}
+                                      width={60}
+                                      height={60}
+                                      className="w-15 h-15 rounded object-cover"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={async () => {
+                                        try {
+                                          const res = await fetch(image);
+                                          const blob = await res.blob();
+                                          const url = URL.createObjectURL(blob);
+                                          const a = document.createElement('a');
+                                          a.href = url;
+                                          a.download = (image.split('/').pop() || 'hairline.jpg').split('?')[0];
+                                          document.body.appendChild(a);
+                                          a.click();
+                                          a.remove();
+                                          URL.revokeObjectURL(url);
+                                        } catch (e) {
+                                          console.error('Download failed', e);
+                                        }
+                                      }}
+                                      className="mt-1 text-[10px] px-2 py-1 border rounded text-gray-600 hover:bg-gray-50 cursor-pointer"
+                                    >
+                                      Download
+                                    </button>
+                                  </div>
                                 ))}
                               </div>
                             </div>
@@ -287,14 +310,37 @@ export default function OrderDetailPage() {
                               <h5 className="text-xs font-medium text-gray-600 mb-1">Wig Style Images:</h5>
                               <div className="flex flex-wrap gap-2">
                                 {item.measurements.wigStyleImages.map((image, idx) => (
-                                  <Image
-                                    key={idx}
-                                    src={image}
-                                    alt={`Wig Style ${idx + 1}`}
-                                    width={60}
-                                    height={60}
-                                    className="w-15 h-15 rounded object-cover"
-                                  />
+                                  <div key={idx} className="flex flex-col items-center">
+                                    <Image
+                                      src={image}
+                                      alt={`Wig Style ${idx + 1}`}
+                                      width={60}
+                                      height={60}
+                                      className="w-15 h-15 rounded object-cover"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={async () => {
+                                        try {
+                                          const res = await fetch(image);
+                                          const blob = await res.blob();
+                                          const url = URL.createObjectURL(blob);
+                                          const a = document.createElement('a');
+                                          a.href = url;
+                                          a.download = (image.split('/').pop() || 'style.jpg').split('?')[0];
+                                          document.body.appendChild(a);
+                                          a.click();
+                                          a.remove();
+                                          URL.revokeObjectURL(url);
+                                        } catch (e) {
+                                          console.error('Download failed', e);
+                                        }
+                                      }}
+                                      className="mt-1 text-[10px] px-2 py-1 border rounded text-gray-600 hover:bg-gray-50 cursor-pointer"
+                                    >
+                                      Download
+                                    </button>
+                                  </div>
                                 ))}
                               </div>
                             </div>
@@ -391,11 +437,11 @@ export default function OrderDetailPage() {
                 <div className="min-w-0">
                   <p className="text-sm font-medium">Processing</p>
                   <p className="text-xs text-gray-500">
-                    {currentOrder.status === 'processing' ||
-                      currentOrder.status === 'shipped' ||
-                      currentOrder.status === 'completed'
+                    {currentOrder.status === 'processing'
                       ? 'In Progress'
-                      : 'Pending'}
+                      : (currentOrder.status === 'shipped' || currentOrder.status === 'completed')
+                        ? 'Completed'
+                        : 'Pending'}
                   </p>
                 </div>
               </div>
@@ -421,7 +467,7 @@ export default function OrderDetailPage() {
                     : 'bg-gray-300'
                   }`}></div>
                 <div className="min-w-0">
-                  <p className="text-sm font-medium">Delivered</p>
+                  <p className="text-sm font-medium">Completed</p>
                   <p className="text-xs text-gray-500">
                     {currentOrder.status === 'completed'
                       ? 'Completed'

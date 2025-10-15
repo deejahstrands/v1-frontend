@@ -14,7 +14,7 @@ export default function ConsultationSuccessPage() {
       <BannerSection
         title="CONSULTATION BOOKED"
         description="Your consultation has been successfully booked"
-        bgImage="/images/banner.svg"
+        bgImage="/images/banner.jpg"
         breadcrumb={
           <Breadcrumb
             items={[

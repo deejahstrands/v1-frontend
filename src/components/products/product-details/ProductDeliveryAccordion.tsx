@@ -45,7 +45,7 @@ const ProductDeliveryAccordion: React.FC<ProductDeliveryAccordionProps> = ({ del
       {delivery.map((d) => (
         <Accordion.Item value={d.type} key={d.type} className="border-b border-gray-200">
           <Accordion.Header>
-            <Accordion.Trigger className="flex w-full justify-between items-center px-4 py-3 text-left font-medium text-sm sm:text-base focus:outline-none">
+            <Accordion.Trigger className="flex w-full justify-between items-center px-4 py-3 text-left font-medium text-sm sm:text-base focus:outline-none cursor-pointer">
               <span className="flex items-center gap-2">
                 {d.type}
                 {d.type === 'Processing Time' && (
@@ -104,7 +104,7 @@ const ProductDeliveryAccordion: React.FC<ProductDeliveryAccordionProps> = ({ del
                       <button
                         key={option.label}
                         type="button"
-                        className={`flex justify-between items-center border-[0.5px] border-[#98A2B3] rounded-lg px-3 py-2 text-sm sm:text-base w-full transition-colors
+                        className={`flex justify-between items-center border-[0.5px] border-[#98A2B3] rounded-lg px-3 py-2 text-sm sm:text-base w-full transition-colors cursor-pointer
                           ${isSelected ? 'bg-secondary font-semibold' : ''}`}
                         onClick={() => handleSelect(d.type, option)}
                       >

@@ -35,7 +35,7 @@ export default function ProductTabs({ description, product }: ProductTabsProps) 
           <button
             key={tab.key}
             onClick={() => setActive(tab.key)}
-            className={`flex-1 px-4 py-2 text-base rounded-lg transition font-medium
+            className={`flex-1 px-4 py-2 text-base rounded-lg transition font-medium cursor-pointer
               ${active === tab.key ? "bg-secondary text-black font-semibold" : "bg-transparent text-black"}
             `}
           >

@@ -21,7 +21,7 @@ export default function DealsClient() {
             <span className="text-white">Deals</span>
           </>
         }
-        bgImage="/images/banner.svg"
+        bgImage="/images/banner.jpg"
       />
       <SectionContainer className="my-8 pb-8">
         <h1 className="text-2xl sm:text-3xl font-bold mb-4 font-ethereal">Deals</h1>

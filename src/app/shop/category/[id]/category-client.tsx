@@ -67,7 +67,7 @@ export default function CategoryClient({ params }: CategoryClientProps) {
               <span className="text-white">Loading...</span>
             </>
           }
-          bgImage="/images/banner.svg"
+          bgImage="/images/banner.jpg"
         />
         <SectionContainer className="my-8 pb-8 lg:pb-24">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-12 lg:mt-20">
@@ -95,7 +95,7 @@ export default function CategoryClient({ params }: CategoryClientProps) {
               <span className="text-white">Error</span>
             </>
           }
-          bgImage="/images/banner.svg"
+          bgImage="/images/banner.jpg"
         />
         <SectionContainer className="my-8 pb-8 lg:pb-24">
           <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -125,7 +125,7 @@ export default function CategoryClient({ params }: CategoryClientProps) {
             <span className="text-white">{displayName}</span>
           </>
         }
-        bgImage="/images/banner.svg"
+        bgImage="/images/banner.jpg"
       />
       <SectionContainer className="my-8 pb-8 lg:pb-24">
         {products.length === 0 ? (

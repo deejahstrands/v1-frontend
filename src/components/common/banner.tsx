@@ -7,7 +7,7 @@ export function Banner({
   title,
   description,
   breadcrumb,
-  bgImage = "/images/banner.svg",
+  bgImage = "/images/banner.jpg",
 }: {
   title: string;
   description: string;
@@ -22,7 +22,7 @@ export function Banner({
           style={{
             backgroundImage: `url('${bgImage}')`,
             backgroundSize: "cover",
-            backgroundPosition: "center",
+            backgroundPosition: "center 25%",
           }}
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}

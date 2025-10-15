@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { PriceSummary } from '@/components/customization/price-summary';
 
 export default function CustomizationClient() {
   const { selectedWigType, setSelectedWigType, selectedOptions, reset } = useCustomization();
@@ -140,7 +141,6 @@ export default function CustomizationClient() {
             <span className="text-white">Customization</span>
           </div>
         }
-        bgImage="/images/banner.svg"
       />
 
       {/* Main Content */}
@@ -168,10 +168,15 @@ export default function CustomizationClient() {
               {/* Product Description */}
               <div className="w-full max-w-md mx-auto">
                 <p className="text-gray-700 leading-relaxed text-sm">
-                  At Deejah Strands, we offer the ultimate in luxury and customization. From hair type to cut and color, 
-                  you have complete control to create a bespoke unit that is uniquely yours. Stand out with a personalized 
+                  At Deejah Strands, we offer the ultimate in luxury and customization. From hair type to cut and color,
+                  you have complete control to create a bespoke unit that is uniquely yours. Stand out with a personalized
                   wig that perfectly reflects your style and individuality.
                 </p>
+              </div>
+
+              {/* Processing Time Notice */}
+              <div className="w-full max-w-md mx-auto bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl p-4 text-xs md:text-sm">
+                Processing time for customized wigs is 10–14 working days.
               </div>
 
               {/* Wig Type Selector (driven by wig units list) */}
@@ -195,7 +200,7 @@ export default function CustomizationClient() {
                     </div>
                   </div>
                 ) : selected && selected.customizations && selected.customizations.length > 0 ? (
-              <CustomizationAccordion />
+                  <CustomizationAccordion />
                 ) : (
                   <div className="w-full max-w-md mx-auto border border-[#98A2B3] rounded-2xl p-4 text-sm text-gray-600">
                     No customization options available for the selected wig unit.
@@ -206,14 +211,17 @@ export default function CustomizationClient() {
               {/* Measurements & Preferences */}
               <CustomizationMeasurements />
 
+              {/* Live Price Summary */}
+              <PriceSummary />
+
               {/* Quantity & Actions */}
               {selectedWigType && !loading && selected && selected.customizations && selected.customizations.length > 0 && (
                 <div className="w-full max-w-md mx-auto">
                   {/* Quantity Selector */}
                   <div className="mb-6 flex items-center gap-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Quantity:
-                      </label>
+                      Quantity:
+                    </label>
                     <div className="flex items-center border border-gray-300 rounded-lg w-32">
                       <button
                         type="button"

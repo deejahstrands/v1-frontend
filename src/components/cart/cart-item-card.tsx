@@ -94,7 +94,7 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease, onEdit }:
         <div className="space-y-1 text-sm text-gray-600">
           <div>HEAD MEASUREMENT - EAR TO EAR: {item.measurements.earToEar}&rdquo;</div>
           <div>HEAD MEASUREMENT - HEAD CIRCUMFERENCE: {item.measurements.headCircumference}&quot;</div>
-          <div>HEAD MEASUREMENT - FOREHEAD TO NAPE: {item.measurements.foreheadToNape || 'N/A'}&quot;</div>
+          {/* Removed FOREHEAD TO NAPE as it's not captured */}
           <div className="space-y-2">
             <div>
               <span className="block text-sm font-medium mb-2">FRONT AND SIDE PICTURES OF YOUR HAIR LINE:</span>
@@ -273,8 +273,8 @@ export function CartItemCard({ item, onRemove, onIncrease, onDecrease, onEdit }:
 
             {/* Additional Info - Only show if no delivery options selected */}
             {(!item.delivery || Object.keys(item.delivery).length === 0) && (
-              <div className="space-y-1 text-sm text-gray-600">
-                <div>PRIVATE FITTING: DEEJAH STRAND STUDIO, LAGOS</div>
+              <div className="space-y-1 text-sm text-gray-600 mt-2">
+                <div>PRIVATE FITTING: Will be communicated to you</div>
                 <div>PROCESSING TIME: 10 - 14 WORKING DAYS</div>
               </div>
             )}

@@ -14,7 +14,7 @@ export default function ConsultationFailedPage() {
       <BannerSection
         title="BOOKING FAILED"
         description="Your consultation booking could not be completed"
-        bgImage="/images/banner.svg"
+        bgImage="/images/banner.jpg"
         breadcrumb={
           <Breadcrumb
             items={[

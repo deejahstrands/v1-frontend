@@ -78,7 +78,6 @@ export default function ConsultationClient() {
             <span className="text-white">Consultation</span>
           </div>
         }
-        bgImage="/images/banner.svg"
       />
 
       {/* Main Content */}
@@ -144,7 +143,7 @@ export default function ConsultationClient() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-secondary mt-1">•</span>
-                    <span>An exclusive ₦5,000 voucher toward your first wig purchase</span>
+                    <span>An exclusive ₦10,000 voucher toward your first wig purchase</span>
                   </li>
                 </ul>
               </div>

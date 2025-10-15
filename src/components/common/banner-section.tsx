@@ -16,7 +16,7 @@ export function BannerSection({
   title,
   description,
   breadcrumb,
-  bgImage = "/images/banner.svg",
+  bgImage = "/images/banner.jpg",
   className = "",
   disableAnimation = false,
 }: BannerSectionProps) {
@@ -28,7 +28,7 @@ export function BannerSection({
           style={{
             backgroundImage: `url('${bgImage}')`,
             backgroundSize: "cover",
-            backgroundPosition: "center",
+            backgroundPosition: "center 10%",
           }}
         >
           <div className="relative z-10 w-full p-8 md:p-16 flex flex-col items-center justify-end text-center bg-black/40">
@@ -59,7 +59,7 @@ export function BannerSection({
           style={{
             backgroundImage: `url('${bgImage}')`,
             backgroundSize: "cover",
-            backgroundPosition: "center",
+            backgroundPosition: "center 25%",
           }}
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
