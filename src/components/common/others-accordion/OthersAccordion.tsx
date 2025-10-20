@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CapSizeGuideContent from './CapSizeGuideContent';
 import DisclaimersContent from './DisclaimersContent';
-import FAQContent from './FAQContent';
 import ShippingInfoContent from './ShippingInfoContent';
 
 const sections = [
@@ -16,11 +15,6 @@ const sections = [
     value: 'disclaimers',
     label: 'Disclaimers (PLEASE READ)',
     Content: DisclaimersContent,
-  },
-  {
-    value: 'faq',
-    label: 'FAQ',
-    Content: FAQContent,
   },
   {
     value: 'shipping-info',
@@ -46,7 +40,7 @@ const OthersAccordion: React.FC = () => {
           <Accordion.Header>
             <Accordion.Trigger className="flex w-full justify-between items-center px-4 py-3 text-left font-medium text-sm sm:text-base focus:outline-none">
               <span>{label}</span>
-              <svg className="ml-2 h-4 w-4 transition-transform data-[state=open]:rotate-180" viewBox="0 0 20 20" fill="none"><path d="M6 8l4 4 4-4" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <svg className="ml-2 h-4 w-4 transition-transform data-[state=open]:rotate-180" viewBox="0 0 20 20" fill="none"><path d="M6 8l4 4 4-4" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Content className="overflow-hidden">

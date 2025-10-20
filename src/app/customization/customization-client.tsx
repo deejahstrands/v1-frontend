@@ -175,8 +175,15 @@ export default function CustomizationClient() {
               </div>
 
               {/* Processing Time Notice */}
-              <div className="w-full max-w-md mx-auto bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl p-4 text-xs md:text-sm">
-                Processing time for customized wigs is 10–14 working days.
+              <div className="w-full max-w-md mx-auto bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl p-4 text-xs md:text-sm space-y-2">
+                <p>
+                  All customized orders placed on the website are subject to a 25–30 business day
+                  processing window prior to shipment (processing time = time used to make your unit).
+                  Once shipped, the approximate delivery times are based on your location.
+                </p>
+                <p className="text-amber-900/80">
+                  Please note: The timescale provided is an estimate and may be extended in the event of unforeseen delays.
+                </p>
               </div>
 
               {/* Wig Type Selector (driven by wig units list) */}

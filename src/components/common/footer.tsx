@@ -25,12 +25,7 @@ export function Footer() {
     <footer className="w-full bg-[#161616] pt-10 pb-20 lg:pb-0">
       {/* Quick Info Cards */}
       <SectionContainer>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-10">
-          <Link href="/faq" className="group rounded-2xl border border-[#FCFCFC]/15 bg-white/5 hover:bg-white/10 transition-colors p-5 flex flex-col gap-2">
-            <div className="text-[#FCFCFC] font-semibold text-base">FAQ</div>
-            <p className="text-[#FCFCFC]/80 text-xs">Answers to common questions about our wigs and services.</p>
-            <span className="text-[#FCFCFC] text-xs mt-2 group-hover:underline">Read more →</span>
-          </Link>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-10">
           <Link href="/disclaimers" className="group rounded-2xl border border-[#FCFCFC]/15 bg-white/5 hover:bg-white/10 transition-colors p-5 flex flex-col gap-2">
             <div className="text-[#FCFCFC] font-semibold text-base">Disclaimers</div>
             <p className="text-[#FCFCFC]/80 text-xs">Important info on color, texture, length and readiness.</p>

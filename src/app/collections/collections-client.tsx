@@ -89,7 +89,7 @@ export default function CollectionsClient() {
               <span className="text-white">Collections</span>
             </>
           }
-          bgImage="/images/banner.jpg"
+     
         />
         <SectionContainer className="my-8 pb-8 lg:pb-24">
           <div className="flex flex-col items-center justify-center py-16 text-center">
