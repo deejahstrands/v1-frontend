@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { LayoutWrapper } from "@/components/common/layout-wrapper";
-import { Toaster } from "@/components/ui/toaster";
+import { LoginModalProvider } from "@/components/auth/login-modal-provider";
+import { AuthProvider } from "@/components/providers/auth-provider";
+import { LoadingScreen } from "@/components/common/loading-screen";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { StructuredData, organizationSchema, websiteSchema } from '@/components/seo/structured-data';
 
 const satoshi = localFont({
   src: [
@@ -34,16 +39,158 @@ const ethereal = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Deejah Strands",
-  description: "Luxury in hairs",
+  title: {
+    template: '%s | Deejah Strands',
+    default: 'Deejah Strands - Luxury Hair & Wigs | Premium Raw & Virgin Hair'
+  },
+  description: "Experience the finest raw and virgin hair — flawlessly customized for your look, lifestyle, and legacy. Shop premium wigs, closures, frontals, and bundles at Deejah Strands.",
+  keywords: [
+    'luxury hair',
+    'virgin hair',
+    'raw hair',
+    'wigs',
+    'lace wigs',
+    'closures',
+    'frontals',
+    'hair bundles',
+    'custom wigs',
+    'Nigerian hair brand',
+    'premium hair extensions',
+    'HD lace wigs',
+    'body wave',
+    'straight hair',
+    'curly hair',
+    'hair customization'
+  ],
+  authors: [{ name: 'Deejah Strands' }],
+  creator: 'Deejah Strands',
+  publisher: 'Deejah Strands',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://deejahstrands.co'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Deejah Strands - Luxury Hair & Wigs | Premium Raw & Virgin Hair',
+    description: 'Experience the finest raw and virgin hair — flawlessly customized for your look, lifestyle, and legacy. Shop premium wigs, closures, frontals, and bundles.',
+    url: 'https://deejahstrands.co',
+    siteName: 'Deejah Strands',
+    images: [
+      {
+        url: '/logo/logo-white.svg',
+        width: 1200,
+        height: 630,
+        alt: 'Deejah Strands - Luxury Hair & Wigs',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Deejah Strands - Luxury Hair & Wigs | Premium Raw & Virgin Hair',
+    description: 'Experience the finest raw and virgin hair — flawlessly customized for your look, lifestyle, and legacy.',
+    images: ['/logo/logo-white.svg'],
+    creator: '@deejahstrands',
+    site: '@deejahstrands',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" data-theme="light">
+      <head>
+        {/* CSS moved to globals.css to fix hydration issues */}
+      </head>
       <body className={`${satoshi.variable} ${ethereal.variable} antialiased min-h-screen flex flex-col`}>
-        <LayoutWrapper>{children}</LayoutWrapper>
-        <Toaster />
+        <div id="initial-loading">
+          <div className="initial-loading-content">
+            <div style={{ position: 'relative' }}>
+              <svg width="140" height="140" viewBox="0 0 72 73" fill="none" xmlns="http://www.w3.org/2000/svg" className="initial-loading-logo">
+                <rect width="71.9999" height="73" rx="36" fill="#EBE4DE"/>
+                <path fillRule="evenodd" clipRule="evenodd" d="M22.6031 46.7135C23.1388 47.0708 33.7606 46.9452 35.5746 46.8591C37.1416 46.7848 38.0929 46.447 39.4513 46.2117C40.2653 47.2907 41.048 50.8752 46.5757 51.2279C54.9601 51.763 59.6006 43.3023 52.5515 36.4843C52.2695 36.2117 51.1306 35.289 50.8558 35.1362C50.0639 34.6959 46.1236 34.9563 44.8986 34.9266C44.5679 37.1338 44.4834 38.7259 43.5484 40.5097C42.8318 41.8773 41.3515 43.7579 40.0346 44.2664C40.0331 42.3899 40.2571 41.0346 41.1664 39.484C42.1111 37.8735 41.9666 38.4855 41.5734 38.264C41.2612 38.2113 40.0674 40.0637 39.7835 40.7967C39.2165 42.2602 39.1355 43.2008 39.1822 44.922C37.0729 45.5469 36.4527 45.8088 33.8779 45.8088C31.9281 45.8088 29.626 45.92 27.7197 45.7811L27.6598 34.9348L25.37 34.9533C25.204 37.1717 25.3429 39.91 25.3434 42.1546C25.3439 43.2161 25.5412 44.6365 25.0041 45.45C24.2003 46.6674 23.3669 46.1435 22.6016 46.7135H22.6031ZM40.458 45.8693C41.7123 50.44 49.3837 51.5405 52.3669 47.2968C56.6619 41.1873 47.9864 35.8662 47.4717 35.7816C47.2272 38.4347 46.4881 40.2339 45.2292 42.0223C43.5033 44.4751 41.9112 44.7718 40.458 45.8693Z" fill="#070D17"/>
+                <path fillRule="evenodd" clipRule="evenodd" d="M16.3184 27.1394C17.0412 26.8565 16.8059 26.4049 17.7598 25.3602C19.5672 23.3806 22.613 22.9454 25.3379 22.9526L25.3445 31.2606L27.6655 31.3595L27.6712 22.9634C30.6185 22.7353 36.3923 22.6917 38.7938 23.7312C43.608 25.8149 41.7053 27.064 41.8862 29.119C41.9575 29.9304 42.1881 30.7593 42.6607 31.3103L47.2238 31.3472C46.8388 29.016 45.6163 27.0835 44.3651 25.8267C44.6906 24.2822 46.8409 23.1797 48.9917 23.5164C52.2681 24.0295 51.9954 26.309 52.4547 27.1071C52.77 26.7662 52.5029 27.2932 52.6352 26.7514C52.6833 26.5545 52.6818 26.5007 52.691 26.2957L52.6208 22.7409C50.7586 22.6932 48.8881 22.217 47.0864 22.4323C44.9207 22.6912 44.2185 23.5626 43.2384 24.5939C41.2419 23.7112 40.8303 22.6794 36.9182 22.0592C34.487 21.6737 30.8707 21.7572 28.3088 21.7526C24.1569 21.7444 19.0044 21.6604 16.7982 25.5801C16.6941 25.7652 16.4604 26.1824 16.384 26.3664C16.3651 26.412 16.2938 26.5545 16.2713 26.7124C16.2005 27.2076 16.199 26.8688 16.3205 27.1394H16.3184Z" fill="#070D17"/>
+                <path d="M16.688 33.658H16V31.9026H16.6642C17.179 31.9026 17.5372 32.2631 17.5372 32.785C17.5372 33.2974 17.1885 33.658 16.688 33.658ZM16.6263 32.2584H16.3843V33.3022H16.65C16.9536 33.3022 17.1316 33.11 17.1316 32.785C17.1316 32.4529 16.9442 32.2584 16.6263 32.2584Z" fill="#070D17"/>
+                <path d="M20.1769 33.658H19.062V31.9026H20.1769V32.2584H19.4463V32.6024H20.0939V32.9392H19.4463V33.3022H20.1769V33.658Z" fill="#070D17"/>
+                <path d="M22.8636 33.658H21.7486V31.9026H22.8636V32.2584H22.1329V32.6024H22.7806V32.9392H22.1329V33.3022H22.8636V33.658Z" fill="#070D17"/>
+                <path d="M24.3001 33.1551V33.0318H24.6701V33.1551C24.6701 33.2476 24.7223 33.333 24.8694 33.333C25.0117 33.333 25.0663 33.2595 25.0663 33.1409V31.9026H25.4506V33.1646C25.4506 33.4659 25.2276 33.6889 24.8742 33.6889C24.4875 33.6889 24.3001 33.4588 24.3001 33.1551Z" fill="#070D17"/>
+                <path d="M27.255 33.658H26.8541L27.4804 31.9026H27.8552L28.4791 33.658H28.071L27.9477 33.288H27.3807L27.255 33.658ZM27.6179 32.5905L27.4922 32.9653H27.8386L27.7128 32.5905C27.6939 32.5312 27.6725 32.4624 27.6654 32.4197C27.6583 32.46 27.6393 32.5265 27.6179 32.5905Z" fill="#070D17"/>
+                <path d="M30.325 33.658H29.9407V31.9026H30.325V32.5953H31.0034V31.9026H31.3877V33.658H31.0034V32.9511H30.325V33.658Z" fill="#070D17"/>
+                <path d="M32.9693 33.9546V33.696H34.0154V33.9546H32.9693Z" fill="#070D17"/>
+                <path d="M35.4994 32.4126C35.4994 32.0947 35.7674 31.8694 36.1446 31.8694C36.5218 31.8694 36.759 32.0781 36.759 32.4102H36.3771C36.3771 32.2869 36.2846 32.211 36.1399 32.211C35.9833 32.211 35.8837 32.2821 35.8837 32.3984C35.8837 32.5051 35.9382 32.5573 36.0616 32.5834L36.3249 32.638C36.6381 32.702 36.7875 32.8515 36.7875 33.129C36.7875 33.4683 36.5218 33.6889 36.1185 33.6889C35.7271 33.6889 35.4733 33.4777 35.4733 33.148H35.8552C35.8552 33.2761 35.9501 33.3473 36.1209 33.3473C36.2941 33.3473 36.4032 33.2785 36.4032 33.167C36.4032 33.0697 36.3581 33.0199 36.2419 32.9962L35.9738 32.9416C35.6607 32.8776 35.4994 32.6996 35.4994 32.4126Z" fill="#070D17"/>
+                <path d="M38.1411 32.2584V31.9026H39.5218V32.2584H39.0236V33.658H38.6393V32.2584H38.1411Z" fill="#070D17"/>
+                <path d="M41.3937 33.658H41.0093V31.9026H41.6878C42.1148 31.9026 42.3568 32.109 42.3568 32.4719C42.3568 32.6996 42.2595 32.861 42.065 32.9606L42.3734 33.658H41.9535L41.6902 33.0436H41.3937V33.658ZM41.3937 32.2442V32.7068H41.6854C41.8539 32.7068 41.9511 32.6214 41.9511 32.4719C41.9511 32.3248 41.8586 32.2442 41.6878 32.2442H41.3937Z" fill="#070D17"/>
+                <path d="M44.1395 33.658H43.7386L44.3648 31.9026H44.7397L45.3636 33.658H44.9555L44.8322 33.288H44.2652L44.1395 33.658ZM44.5024 32.5905L44.3767 32.9653H44.723L44.5973 32.5905C44.5783 32.5312 44.557 32.4624 44.5499 32.4197C44.5428 32.46 44.5238 32.5265 44.5024 32.5905Z" fill="#070D17"/>
+                <path d="M47.2047 33.658H46.8252V31.9026H47.2047L47.9449 33.0199V31.9026H48.3244V33.658H47.9449L47.2047 32.5431V33.658Z" fill="#070D17"/>
+                <path d="M50.6353 33.658H49.9473V31.9026H50.6116C51.1264 31.9026 51.4846 32.2631 51.4846 32.785C51.4846 33.2974 51.1358 33.658 50.6353 33.658ZM50.5736 32.2584H50.3316V33.3022H50.5973C50.901 33.3022 51.0789 33.11 51.0789 32.785C51.0789 32.4529 50.8915 32.2584 50.5736 32.2584Z" fill="#070D17"/>
+                <path d="M52.9121 32.4126C52.9121 32.0947 53.1801 31.8694 53.5573 31.8694C53.9345 31.8694 54.1717 32.0781 54.1717 32.4102H53.7898C53.7898 32.2869 53.6973 32.211 53.5526 32.211C53.396 32.211 53.2964 32.2821 53.2964 32.3984C53.2964 32.5051 53.3509 32.5573 53.4743 32.5834L53.7376 32.638C54.0507 32.702 54.2002 32.8515 54.2002 33.129C54.2002 33.4683 53.9345 33.6889 53.5312 33.6889C53.1398 33.6889 52.886 33.4777 52.886 33.148H53.2679C53.2679 33.2761 53.3628 33.3473 53.5336 33.3473C53.7067 33.3473 53.8159 33.2785 53.8159 33.167C53.8159 33.0697 53.7708 33.0199 53.6546 32.9962L53.3865 32.9416C53.0734 32.8776 52.9121 32.6996 52.9121 32.4126Z" fill="#070D17"/>
+              </svg>
+              <div className="initial-loading-spinner"></div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <h2 className="initial-loading-title">Deejah Strands</h2>
+              <div className="initial-loading-dots">
+                <div className="initial-loading-dot"></div>
+                <div className="initial-loading-dot"></div>
+                <div className="initial-loading-dot"></div>
+              </div>
+              <p className="initial-loading-text">Loading your experience...</p>
+            </div>
+          </div>
+        </div>
+        <LoadingScreen />
+        <AuthProvider>
+          <LayoutWrapper>{children}</LayoutWrapper>
+          <LoginModalProvider />
+        </AuthProvider>
+        <StructuredData data={organizationSchema} />
+        <StructuredData data={websiteSchema} />
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            // Hide initial loading screen after React mounts
+            window.addEventListener('load', function() {
+              setTimeout(function() {
+                const initialLoading = document.getElementById('initial-loading');
+                if (initialLoading) {
+                  initialLoading.classList.add('fade-out');
+                  setTimeout(function() {
+                    initialLoading.style.display = 'none';
+                  }, 500);
+                }
+              }, 1000);
+            });
+          `
+        }} />
       </body>
     </html>
   );

@@ -1,38 +1,43 @@
-import { SectionContainer } from "@/components/common/section-container";
-import { Banner } from "@/components/common/banner";
-import Link from "next/link";
-import { products } from "@/data/products";
-import { DealsCard } from "@/components/common/deals-card";
+import { Metadata } from 'next';
+import DealsClient from './deals-client';
+
+export const metadata: Metadata = {
+  title: 'Deals & Discounts - Limited Time Offers',
+  description: 'Discover the best deals on luxury wigs, bundles, and more. Enjoy exclusive discounts for a limited time only! Save on premium hair pieces.',
+  keywords: [
+    'hair deals',
+    'wig discounts',
+    'hair sale',
+    'discounted wigs',
+    'hair bundles sale',
+    'limited time offers',
+    'premium hair deals',
+    'luxury wig sale',
+    'hair extensions discount',
+    'best hair deals Nigeria'
+  ],
+  openGraph: {
+    title: 'Deals & Discounts - Deejah Strands Limited Offers',
+    description: 'Discover the best deals on luxury wigs, bundles, and more. Exclusive discounts for a limited time only!',
+    url: 'https://deejahstrands.co/deals',
+    images: [
+      {
+        url: '/logo/logo-white.svg',
+        width: 1200,
+        height: 630,
+        alt: 'Deejah Strands Deals & Discounts',
+      },
+    ],
+  },
+  twitter: {
+    title: 'Deals & Discounts - Deejah Strands',
+    description: 'Discover the best deals on luxury wigs and hair extensions. Limited time offers!',
+  },
+  alternates: {
+    canonical: 'https://deejahstrands.co/deals',
+  },
+};
 
 export default function DealsPage() {
-  const deals = products.filter((p) => p.dealPrice);
-  return (
-    <>
-      <Banner
-        title="Deals & Discounts"
-        description="Discover the best deals on luxury wigs, bundles, and more. Enjoy exclusive discounts for a limited time only!"
-        breadcrumb={
-          <>
-            <Link href="/" className="hover:underline">Home</Link>
-            <span className="mx-2">/</span>
-            <span className="text-white">Deals</span>
-          </>
-        }
-        bgImage="/images/banner.svg"
-      />
-      <SectionContainer className="my-8 pb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-4 font-ethereal">Deals</h1>
-        <p className="text-gray-600 text-base mb-6">Browse all products currently on deal. Amazing discounts await!</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {deals.length === 0 ? (
-            <div className="col-span-full text-center text-gray-400 py-12">No deals available at the moment.</div>
-          ) : (
-            deals.map((product) => (
-              <DealsCard key={product.id} {...product} />
-            ))
-          )}
-        </div>
-      </SectionContainer>
-    </>
-  );
+  return <DealsClient />;
 } 

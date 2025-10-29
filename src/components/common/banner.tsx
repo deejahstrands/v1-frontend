@@ -7,7 +7,7 @@ export function Banner({
   title,
   description,
   breadcrumb,
-  bgImage = "/images/banner.svg",
+  bgImage = "/images/banner.jpg",
 }: {
   title: string;
   description: string;
@@ -22,7 +22,7 @@ export function Banner({
           style={{
             backgroundImage: `url('${bgImage}')`,
             backgroundSize: "cover",
-            backgroundPosition: "center",
+            backgroundPosition: "center 25%",
           }}
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -34,7 +34,7 @@ export function Banner({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
-            <h1 className="text-xl md:text-5xl font-ethereal font-semibold text-white mb-2 md:mb-4 drop-shadow-lg">
+            <h1 className="text-xl md:text-5xl font-ethereal font-semibold text-white mb-2 md:mb-4 drop-shadow-lg capitalize">
               {title}
             </h1>
             <p className="text-xs md:text-lg text-white mb-4 max-w-2xl drop-shadow">

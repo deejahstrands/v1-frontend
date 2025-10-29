@@ -1,44 +1,42 @@
-import { SectionContainer } from "@/components/common/section-container";
-import { Banner } from "@/components/common/banner";
-import Link from "next/link";
-import { products } from "@/data/products";
-import { collections } from "@/data/collections";
-import { DealsCard } from "@/components/common/deals-card";
-import { ProductCard } from "@/components/common/product-card";
+import { Metadata } from 'next';
+import CollectionsClient from './collections-client';
+
+export const metadata: Metadata = {
+  title: 'Collections | Deejah Strands',
+  description: 'Explore our featured collection of premium wigs, closures, and hair extensions. Handpicked luxury hair pieces crafted for elegance and style.',
+  keywords: [
+    'featured hair collection',
+    'premium wig collection',
+    'luxury hair bundles',
+    'curated hair pieces',
+    'best selling wigs',
+    'top rated hair extensions',
+    'featured closures',
+    'premium frontals',
+    'collection hair Nigeria'
+  ],
+  openGraph: {
+    title: 'Featured Collections - Deejah Strands Premium Hair',
+    description: 'Explore our featured collection of premium wigs, closures, and hair extensions. Handpicked luxury hair pieces crafted for elegance and style.',
+    url: 'https://deejahstrands.co/collections',
+    images: [
+      {
+        url: '/logo/logo-white.svg',
+        width: 1200,
+        height: 630,
+        alt: 'Deejah Strands Featured Collections',
+      },
+    ],
+  },
+  twitter: {
+    title: 'Featured Collections - Deejah Strands Premium Hair',
+    description: 'Explore our featured collection of premium wigs, closures, and hair extensions.',
+  },
+  alternates: {
+    canonical: 'https://deejahstrands.co/collections',
+  },
+};
 
 export default function CollectionsPage() {
-  const collection = collections[0];
-  const collectionProducts = products.filter(p => collection.productIds.includes(p.id));
-  return (
-    <>
-      <Banner
-        title={collection.title}
-        description={collection.description}
-        breadcrumb={
-          <>
-            <Link href="/" className="hover:underline">Home</Link>
-            <span className="mx-2">/</span>
-            <span className="text-white">Collections</span>
-          </>
-        }
-        bgImage="/images/banner.svg"
-      />
-      <SectionContainer className="my-8 pb-8 lg:pb-24">
-    
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-12 lg:mt-20">
-          {collectionProducts.length === 0 ? (
-            <div className="col-span-full text-center text-gray-400 py-12">No products in this collection.</div>
-          ) : (
-            collectionProducts.map((product) =>
-              product.dealPrice ? (
-                <DealsCard key={product.id} {...product} />
-              ) : (
-                <ProductCard key={product.id} {...product} />
-              )
-            )
-          )}
-        </div>
-      </SectionContainer>
-    </>
-  );
+  return <CollectionsClient />;
 } 

@@ -29,7 +29,7 @@ export function FeaturesSection() {
               className="w-full h-full"
             >
               <Image
-                src="https://res.cloudinary.com/dwpetnbf1/image/upload/v1750945478/20_vykyai.png"
+                src="/images/cos.jpg"
                 alt="Customize your own unit"
                 width={800}
                 height={660}

@@ -10,9 +10,9 @@ export function BannerSection() {
       <motion.div
         className="relative rounded-2xl overflow-hidden shadow-lg min-h-[200px] md:min-h-[320px] flex items-end justify-center bg-black/70"
         style={{
-          backgroundImage: "url('/images/banner.svg')",
+          backgroundImage: "url('/images/banner.jpg')",
           backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundPosition: "center 25%",
         }}
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}

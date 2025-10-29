@@ -1,18 +1,22 @@
 import Image from "next/image";
 import { motion, useSpring } from "framer-motion";
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 export function CategoryCard({
   image,
   name,
+  categoryId,
   onClick,
 }: {
   image: string;
   name: string;
+  categoryId?: string;
   onClick?: () => void;
 }) {
   const [isHovered, setIsHovered] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Motion values for tilt
   const rotateX = useSpring(0, { stiffness: 200, damping: 20 });
@@ -41,6 +45,18 @@ export function CategoryCard({
     setIsHovered(false);
   }
 
+  function handleCategoryClick() {
+    if (onClick) {
+      onClick();
+    } else if (categoryId) {
+      // Navigate to category page with ID
+      router.push(`/shop/category/${categoryId}`);
+    } else {
+      // Fallback to name-only navigation (existing behavior for backward compatibility)
+      router.push(`/shop/category/${encodeURIComponent(name)}`);
+    }
+  }
+
   return (
     <div className="aspect-[3/4] h-64 md:h-80 w-full">
       <motion.div
@@ -66,7 +82,7 @@ export function CategoryCard({
         />
         {/* Default button, hidden on hover */}
         <button
-          onClick={onClick}
+          onClick={handleCategoryClick}
           className={`absolute left-1/2 -translate-x-1/2 w-[80%] bottom-4 px-6 py-3 rounded-md bg-secondary text-black font-medium text-base shadow-md transition-opacity duration-200 ${isHovered ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
           type="button"
         >
@@ -81,8 +97,8 @@ export function CategoryCard({
           style={{ pointerEvents: isHovered ? 'auto' : 'none' }}
         >
           <button
-            onClick={onClick}
-            className="px-8 py-2 rounded-full bg-primary text-white font-semibold text-lg shadow-lg"
+            onClick={handleCategoryClick}
+            className="px-8 py-2 rounded-full bg-primary text-white font-semibold text-lg shadow-lg cursor-pointer"
             type="button"
           >
             View more

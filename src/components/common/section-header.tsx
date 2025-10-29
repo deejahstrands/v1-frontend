@@ -19,7 +19,7 @@ export function SectionHeader({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6 lg:mb-10 items-center">
       <div className="lg:col-span-3">
-        <h2 className="text-2xl md:text-4xl font-ethereal font-medium text-[#1A1A1A] mb-6 lg:mb-6">{title}</h2>
+        <h2 className="text-2xl md:text-4xl font-ethereal font-medium text-[#1A1A1A] mb-6 lg:mb-6 capitalize">{title}</h2>
         {description && (
           <p className="text-sm md:text-base lg:text-lg text-gray-500">{description}</p>
         )}

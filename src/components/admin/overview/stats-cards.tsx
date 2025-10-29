@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import {
   ArrowUpRight,
   ArrowDownRight,
@@ -7,47 +8,198 @@ import {
   CreditCard,
   Package,
   Briefcase,
+  Clock,
+  CheckCircle,
+  Settings,
+  Calendar,
+  Users,
+  AlertCircle,
 } from "lucide-react";
 import {
   Card,
   CardContent,
   CardHeader,
 } from "@/components/ui/card";
+import { useOverviewStore } from "@/store/admin/use-overview";
 
-const statsData = [
-  {
-    title: "Total Orders",
-    value: "123",
-    change: "+5%",
-    changeType: "increase",
-    icon: <ShoppingCart className="h-6 w-6 text-gray-500" />,
-  },
-  {
-    title: "Total Revenue",
-    value: "₦46,009,284",
-    change: "+16%",
-    changeType: "increase",
-    icon: <CreditCard className="h-6 w-6 text-gray-500" />,
-  },
-  {
-    title: "Product in Store",
-    value: "543",
-    change: "-9%",
-    changeType: "decrease",
-    icon: <Package className="h-6 w-6 text-gray-500" />,
-  },
-  {
-    title: "Active Consultation",
-    value: "12",
-    change: "+12%",
-    changeType: "increase",
-    icon: <Briefcase className="h-6 w-6 text-gray-500" />,
-  },
-];
+interface StatsCardsProps {
+  selectedPeriod: string;
+}
 
-export function StatsCards() {
+export function StatsCards({ selectedPeriod }: StatsCardsProps) {
+  const { 
+    overviewData, 
+    isLoading, 
+    error, 
+    loadOverview, 
+    setCurrentPeriod,
+    setFiltering,
+    clearError 
+  } = useOverviewStore();
+
+  // Load overview data on mount and when selectedPeriod changes
+  useEffect(() => {
+    const currentState = useOverviewStore.getState();
+    
+    // Only proceed if period is actually changing
+    if (selectedPeriod === currentState.currentPeriod) {
+      return;
+    }
+    
+    // If period is changing, set filtering state
+    setFiltering(true);
+    setCurrentPeriod(selectedPeriod);
+    
+    if (selectedPeriod === 'all') {
+      loadOverview(); // No since parameter = get all data
+    } else {
+      loadOverview({
+        since: selectedPeriod as
+          | 'this_week'
+          | 'this_month'
+          | 'last_seven_days'
+          | 'last_thirty_days'
+          | 'last_three_months'
+          | 'last_six_months'
+          | 'last_year',
+      });
+    }
+  }, [selectedPeriod, loadOverview, setCurrentPeriod, setFiltering]);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4">
+        {Array.from({ length: 10 }).map((_, index) => (
+          <Card key={index}>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
+                <div className="h-6 w-6 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="h-8 bg-gray-200 rounded animate-pulse mb-2"></div>
+              <div className="h-6 bg-gray-200 rounded animate-pulse w-16"></div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Failed to load overview data</p>
+          <button
+            onClick={() => {
+              clearError();
+              if (selectedPeriod === 'all') {
+                loadOverview();
+              } else {
+                loadOverview({
+                  since: selectedPeriod as
+                    | 'this_week'
+                    | 'this_month'
+                    | 'last_seven_days'
+                    | 'last_thirty_days'
+                    | 'last_three_months'
+                    | 'last_six_months'
+                    | 'last_year',
+                });
+              }
+            }}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!overviewData) {
+    return null;
+  }
+
+  const statsData = [
+    {
+      title: "Total Orders",
+      value: String(overviewData.orders?.totalOrders ?? 0),
+      change: "+0%", // You can calculate this based on previous period
+      changeType: "increase" as const,
+      icon: <ShoppingCart className="h-6 w-6 text-gray-500" />,
+    },
+    {
+      title: "Pending Orders",
+      value: String(overviewData.orders?.pendingOrders ?? 0),
+      change: "+0%",
+      changeType: "increase" as const,
+      icon: <Clock className="h-6 w-6 text-orange-500" />,
+    },
+    {
+      title: "Completed Orders",
+      value: String(overviewData.orders?.completedOrders ?? 0),
+      change: "+0%",
+      changeType: "increase" as const,
+      icon: <CheckCircle className="h-6 w-6 text-green-500" />,
+    },
+    {
+      title: "Processing Orders",
+      value: String(overviewData.orders?.processingOrders ?? 0),
+      change: "+0%",
+      changeType: "increase" as const,
+      icon: <Settings className="h-6 w-6 text-blue-500" />,
+    },
+    {
+      title: "Total Consultations",
+      value: String(overviewData.consultation?.totalConsultations ?? 0),
+      change: "+0%",
+      changeType: "increase" as const,
+      icon: <Briefcase className="h-6 w-6 text-gray-500" />,
+    },
+    {
+      title: "Confirmed Consultations",
+      value: String(overviewData.consultation?.confirmedConsultations ?? 0),
+      change: "+0%",
+      changeType: "increase" as const,
+      icon: <Calendar className="h-6 w-6 text-purple-500" />,
+    },
+    {
+      title: "Pending Consultations",
+      value: String(overviewData.consultation?.pendingConsultations ?? 0),
+      change: "+0%",
+      changeType: "increase" as const,
+      icon: <AlertCircle className="h-6 w-6 text-red-500" />,
+    },
+    {
+      title: "Total Revenue",
+      value: `₦${(overviewData.revenue ?? 0).toLocaleString()}`,
+      change: "+0%",
+      changeType: "increase" as const,
+      icon: <CreditCard className="h-6 w-6 text-gray-500" />,
+    },
+    {
+      title: "Products in Store",
+      value: String(overviewData.products?.totalProducts ?? 0),
+      change: "+0%",
+      changeType: "increase" as const,
+      icon: <Package className="h-6 w-6 text-gray-500" />,
+    },
+    {
+      title: "Total Users",
+      value: String(overviewData.users?.totalUsers ?? 0),
+      change: "+0%",
+      changeType: "increase" as const,
+      icon: <Users className="h-6 w-6 text-cyan-500" />,
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4">
       {statsData.map((stat) => (
         <Card key={stat.title}>
           <CardHeader>

@@ -1,47 +1,53 @@
 "use client";
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Table, TableColumn } from '@/components/ui/table';
 import { SearchInput } from '@/components/ui/search-input';
-import { Filter } from '@/components/ui/filter';
-import { FilterDropdown } from '@/components/ui/filter-dropdown';
-import { SubDropdown } from '@/components/ui/sub-dropdown';
-import { useUsers, type UserFilterKey } from '@/store/admin/use-users';
-import { Eye, MessageSquare } from "lucide-react";
+import { Select } from '@/components/ui/select';
+import { useCustomerManagement } from '@/hooks/admin/use-customer-management';
+import { Eye } from "lucide-react";
 import { Pagination } from '@/components/ui/pagination';
 import Link from 'next/link';
-import { useFilter, type FilterConfig } from "@/hooks/use-filter";
+import { useDebounce } from '@/hooks/use-debounce';
+import { AdminCustomer } from '@/services/admin/customer.service';
 
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  totalOrders: number;
-  totalSpend: string;
-  lastOrder: string;
-  consultation: 'Yes' | 'No';
-};
-
-const filterConfigs: FilterConfig[] = [
-  {
-    key: "consultation" as UserFilterKey,
-    label: "Consultation",
-    icon: <MessageSquare className="w-5 h-5" />,
-    options: [
-      { label: "Yes", value: "Yes" },
-      { label: "No", value: "No" },
-    ],
+const columns: TableColumn<AdminCustomer>[] = [
+  { 
+    label: 'NAME', 
+    accessor: 'firstName',
+    render: (row) => `${row.firstName} ${row.lastName}`
   },
-];
-
-const columns: TableColumn<User>[] = [
-  { label: 'NAME', accessor: 'name' },
   { label: 'EMAIL', accessor: 'email' },
   { label: 'TOTAL ORDERS', accessor: 'totalOrders' },
-  { label: 'TOTAL SPEND', accessor: 'totalSpend' },
-  { label: 'LAST ORDER', accessor: 'lastOrder' },
-  { label: 'CONSULTATION', accessor: 'consultation' },
+  { 
+    label: 'TOTAL SPEND', 
+    accessor: 'totalSpend',
+    render: (row) => `₦${row.totalSpend.toLocaleString()}`
+  },
+  { 
+    label: 'LAST ORDER', 
+    accessor: 'lastOrderDate',
+    render: (row) => row.lastOrderDate 
+      ? new Date(row.lastOrderDate).toLocaleDateString('en-US', {
+          day: '2-digit',
+          month: 'short',
+          year: '2-digit',
+        })
+      : 'No orders'
+  },
+  {
+    label: 'STATUS',
+    accessor: 'isActive',
+    render: (row) => (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        row.isActive
+          ? 'bg-green-100 text-green-800'
+          : 'bg-gray-100 text-gray-800'
+      }`}>
+        {row.isActive ? 'Active' : 'Inactive'}
+      </span>
+    ),
+  },
   {
     label: 'ACTION',
     accessor: 'action',
@@ -59,166 +65,143 @@ const columns: TableColumn<User>[] = [
 
 export default function AdminCustomersPage() {
   const {
-    filteredUsers,
-    search,
-    setSearch,
-    filters,
-    setFilter,
-    removeFilter,
-    isLoading: isUsersLoading,
-  } = useUsers();
+    customers,
+    isLoading,
+    error,
+    currentPage,
+    totalPages,
+    loadCustomers,
+    handlePageChange,
+    clearError,
+  } = useCustomerManagement();
 
-  // Add logging for filtered results
+  // Local state for search and filters
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [statusFilter, setStatusFilter] = useState('');
+
+  // Load customers on mount
   useEffect(() => {
-    console.log('Table data status:', {
-      filteredUsers: filteredUsers.map(u => u.name),
-      searchTerm: search,
-      filters,
-      totalResults: filteredUsers.length
-    });
-  }, [filteredUsers, search, filters]);
-
-  const {
-    subDropdown,
-    isFilterOpen,
-    setIsFilterOpen,
-    setSubDropdown,
-    availableFilters,
-    getSubOptions,
-  } = useFilter<UserFilterKey>(filterConfigs);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isPageLoading, setIsPageLoading] = useState(true);
-  const [isPaginationLoading, setIsPaginationLoading] = useState(false);
-
-  // Pagination configuration
-  const itemsPerPage = 8;
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-
-  // Get paginated data
-  const paginatedUsers = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const slicedData = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
-    console.log('CustomersPage - Paginated data:', {
-      totalFiltered: filteredUsers.length,
-      currentPage,
-      itemsPerPage,
-      slicedDataCount: slicedData.length,
-      slicedData: slicedData.map(u => u.name)
-    });
-    return slicedData;
-  }, [filteredUsers, currentPage, itemsPerPage]);
-
-  // Handle page change
-  const handlePageChange = async (page: number) => {
-    setIsPaginationLoading(true);
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setIsPaginationLoading(false);
-  };
-
-  // Initial page load simulation
-  useEffect(() => {
-    const loadInitialData = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setIsPageLoading(false);
-    };
-    loadInitialData();
+    loadCustomers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Reset to first page when filters or search changes
+  // Handle search and filters with debouncing
   useEffect(() => {
-    setCurrentPage(1);
-  }, [search, filters]);
+    const searchParams = {
+      search: debouncedSearchTerm || undefined,
+      page: 1,
+      isActive: statusFilter === 'active' ? true : statusFilter === 'inactive' ? false : undefined,
+    };
+    
+    loadCustomers(searchParams);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearchTerm, statusFilter]);
 
-  const isLoading = isPageLoading || isPaginationLoading || isUsersLoading;
+  // Handle search
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+  };
 
-  // Add logging for filtered results
-  useEffect(() => {
-    console.log('Table data status:', {
-      filteredUsers: filteredUsers.map(u => u.name),
-      paginatedUsers: paginatedUsers.map(u => u.name),
-      searchTerm: search,
-      isLoading
+  // Handle status filter
+  const handleStatusFilter = (status: string) => {
+    setStatusFilter(status);
+  };
+
+  // Clear filters
+  const clearFilters = () => {
+    setStatusFilter('');
+    setSearchTerm('');
+    
+    loadCustomers({
+      page: 1,
+      search: undefined,
+      isActive: undefined,
     });
-  }, [filteredUsers, paginatedUsers, search, isLoading]);
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = statusFilter || searchTerm;
 
   return (
-    <div className="w-full mx-auto" >
-      <h1 className="text-2xl font-semibold mb-1">Customer</h1>
-      <p className="text-gray-500 mb-6">View all registered customers</p>
-      <Table 
-        columns={columns} 
-        data={paginatedUsers}
+    <div className="w-full mx-auto">
+      {/* Header Section */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold mb-1">Customers</h1>
+        <p className="text-gray-500">View all registered customers</p>
+      </div>
+
+      {/* Search Section */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        <h3 className="font-medium mb-3">Filter & Search</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Search
+            </label>
+            <SearchInput
+              value={searchTerm}
+              onChange={handleSearch}
+              placeholder="Search customers"
+            />
+          </div>
+          <Select
+            label="Status"
+            placeholder="All Status"
+            value={statusFilter}
+            onChange={handleStatusFilter}
+            options={[
+              { label: 'All Status', value: '' },
+              { label: 'Active', value: 'active' },
+              { label: 'Inactive', value: 'inactive' },
+            ]}
+          />
+        </div>
+        {hasActiveFilters && (
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={clearFilters}
+              className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
+            >
+              Clear all filters
+            </button>
+          </div>
+        )}
+        {isLoading && (
+          <div className="mt-2 text-sm text-gray-500">
+            Loading...
+          </div>
+        )}
+      </div>
+
+      {/* Table with pagination in footer */}
+      <Table
+        columns={columns}
+        data={customers}
         isLoading={isLoading}
         footerContent={
-          <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
-          />
+          totalPages > 1 && (
+            <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+            />
+          )
         }
-      >
-        <div className="flex flex-col md:flex-row md:items-center gap-3 p-4 pb-2">
-          <SearchInput
-            value={search}
-            onChange={setSearch}
-            placeholder="Search Customer Name/Email"
-            className="md:w-72"
-          />
-          <div className="flex flex-wrap items-center gap-2 ml-auto">
-            {/* Active filters as pills */}
-            {Object.entries(filters).map(([key, value]) => (
-              <span key={key} className="flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs border border-gray-200">
-                {key.charAt(0).toUpperCase() + key.slice(1)}: {value}
-                <button
-                  className="ml-1 text-gray-400 hover:text-gray-700"
-                  onClick={() => removeFilter(key as UserFilterKey)}
-                  aria-label="Remove filter"
-                >
-                  &times;
-                </button>
-              </span>
-            ))}
-            {/* Filter button and dropdown */}
-            <Filter 
-              buttonLabel="Filter" 
-              hasSubDropdownOpen={!!subDropdown}
-              onOpenChange={setIsFilterOpen}
-            >
-              {subDropdown !== 'consultation' ? (
-                <FilterDropdown
-                  options={availableFilters}
-                  selected={subDropdown || undefined}
-                  onSelect={(val) => {
-                    setSubDropdown(val as UserFilterKey);
-                    if (val === 'consultation') {
-                      setIsFilterOpen(true);
-                    }
-                  }}
-                />
-              ) : (
-                <SubDropdown
-                  options={getSubOptions('consultation')}
-                  selected={filters['consultation']}
-                  onSelect={(val) => {
-                    setFilter('consultation', val);
-                    setSubDropdown(null);
-                    setIsFilterOpen(false);
-                  }}
-                  onClose={() => {
-                    setSubDropdown(null);
-                    setIsFilterOpen(true);
-                  }}
-                  title="Consultation"
-                />
-              )}
-            </Filter>
-          </div>
+      />
+
+      {/* Error handling */}
+      {error && (
+        <div className="fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50">
+          <span className="block sm:inline">{error}</span>
+          <button
+            onClick={clearError}
+            className="ml-2 text-red-500 hover:text-red-700"
+          >
+            ×
+          </button>
         </div>
-      </Table>
+      )}
     </div>
   );
 } 

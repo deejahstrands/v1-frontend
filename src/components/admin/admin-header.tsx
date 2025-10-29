@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Bell, ChevronDown, Menu, LogOut, CalendarIcon } from "lucide-react";
+import { Bell, ChevronDown, Menu, LogOut, CalendarIcon, Home } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
@@ -18,13 +18,18 @@ import {
 } from "@/components/ui/tooltip";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { Modal } from "@/components/ui/modal";
+import { useAuth } from "@/store/use-auth";
+import { User } from "@/services/auth";
 
 export function AdminHeader({
   setIsSidebarOpen,
+  currentUser,
 }: {
   setIsSidebarOpen: (isOpen: boolean) => void;
+  currentUser: User;
 }) {
   const router = useRouter();
+  const { logout } = useAuth();
   const [currentDate, setCurrentDate] = useState("");
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -43,7 +48,7 @@ export function AdminHeader({
   const handleLogout = async () => {
     setLoading(true);
     try {
-      await fetch("/api/admin/logout", { method: "POST" });
+      logout(); // This will clear remembered credentials
       router.push("/admin-auth/login");
       router.refresh();
     } catch (error) {
@@ -60,6 +65,23 @@ export function AdminHeader({
           <div className="flex-1"></div>
 
           <div className="flex items-center gap-4">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => router.push('/')}
+                    className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-none cursor-pointer"
+                  >
+                    <Home className="h-4 w-4" />
+                    <span className="text-sm font-medium hidden xl:inline">Go Home</span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Go to main website</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
             <div className="hidden lg:flex items-center gap-2 border border-gray-300 rounded-lg px-3 py-2">
               <CalendarIcon className="h-5 w-5 text-gray-600" />
               <span className="text-sm font-medium">{currentDate}</span>
@@ -93,8 +115,8 @@ export function AdminHeader({
                     className="rounded-full"
                   />
                   <div className="hidden md:block">
-                    <p className="text-sm font-medium">Deejah Strands</p>
-                    <p className="text-xs text-gray-500">deejah@gmail.com</p>
+                    <p className="text-sm font-medium">{currentUser.firstName} {currentUser.lastName}</p>
+                    <p className="text-xs text-gray-500">{currentUser.email}</p>
                   </div>
                   <ChevronDown size={20} />
                 </button>
@@ -146,6 +168,14 @@ export function AdminHeader({
       <div className="flex-1"></div>
 
       <div className="flex items-center gap-4">
+        <button
+          onClick={() => router.push('/')}
+          className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-none"
+        >
+          <Home className="h-4 w-4" />
+          <span className="text-sm font-medium">Home</span>
+        </button>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="text-gray-600 hover:text-gray-900 focus-visible:outline-none">
@@ -169,8 +199,8 @@ export function AdminHeader({
                 className="rounded-full"
               />
               <div className="hidden md:block">
-                <p className="text-sm font-medium">Deejah Strands</p>
-                <p className="text-xs text-gray-500">deejah@gmail.com</p>
+                <p className="text-sm font-medium">{currentUser.firstName} {currentUser.lastName}</p>
+                <p className="text-xs text-gray-500">{currentUser.email}</p>
               </div>
               <ChevronDown size={20} />
             </button>

@@ -1,13 +1,23 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
 import Reviews from "./Reviews";
-import { users } from "@/data/users";
 
 interface ProductTabsProps {
   description: React.ReactNode;
-  product: any;
+  product: {
+    id: string;
+    reviews?: Array<{
+      user: {
+        id: string;
+        avatar: string;
+        lastName: string;
+        firstName: string;
+      };
+      rating: number;
+      review: string;
+    }>;
+  };
 }
 
 const TABS = [
@@ -25,7 +35,7 @@ export default function ProductTabs({ description, product }: ProductTabsProps) 
           <button
             key={tab.key}
             onClick={() => setActive(tab.key)}
-            className={`flex-1 px-4 py-2 text-base rounded-lg transition font-medium
+            className={`flex-1 px-4 py-2 text-base rounded-lg transition font-medium cursor-pointer
               ${active === tab.key ? "bg-secondary text-black font-semibold" : "bg-transparent text-black"}
             `}
           >
@@ -34,7 +44,7 @@ export default function ProductTabs({ description, product }: ProductTabsProps) 
         ))}
       </div>
       <div className="p-6">
-        {active === "description" ? description : <Reviews product={product} users={users} />}
+        {active === "description" ? description : <Reviews product={product} />}
       </div>
     </div>
   );

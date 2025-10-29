@@ -20,7 +20,7 @@ const PriceDropdown = ({ value, onChange, onApply, onReset, min, max }: PriceDro
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-1 px-4 py-2 rounded-md bg-white text-sm font-semibold border border-gray-200 hover:bg-gray-100 transition">
+        <button className="flex items-center gap-1 px-4 py-2 rounded-md bg-white text-sm font-semibold border border-gray-200 hover:bg-gray-100 transition cursor-pointer">
           <span className="text-black">Price</span>
           <ChevronDown className="w-4 h-4 ml-1 text-gray-400" />
         </button>
@@ -48,14 +48,14 @@ const PriceDropdown = ({ value, onChange, onApply, onReset, min, max }: PriceDro
         </div>
         <div className="flex gap-2">
           <button
-            className="flex-1 px-4 py-2 rounded-md border border-gray-300 bg-white text-xs font-medium hover:bg-gray-100 transition"
+            className="flex-1 px-4 py-2 rounded-md border border-gray-300 bg-white text-xs font-medium hover:bg-gray-100 transition cursor-pointer"
             onClick={() => { onReset(); }}
             type="button"
           >
             Reset
           </button>
           <button
-            className="flex-1 px-4 py-2 rounded-md border border-primary bg-primary text-white text-xs font-medium hover:bg-primary/90 transition"
+            className="flex-1 px-4 py-2 rounded-md border border-primary bg-primary text-white text-xs font-medium hover:bg-primary/90 transition cursor-pointer"
             onClick={() => { onApply(); setOpen(false); }}
             type="button"
           >

@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useState, useRef, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { Search as SearchIcon, X } from "lucide-react";
+import { Search as SearchIcon, X, Package, Loader2 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { debounce } from "lodash";
+import { productsService } from "@/services/products";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -12,13 +16,44 @@ interface SearchModalProps {
 
 export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
-  // TODO: Replace with actual search results
-  const searchResults = [
-    { id: 1, title: "Natural Hair Extension", price: "$199.99", image: "/dummy/product1.jpg" },
-    { id: 2, title: "Synthetic Wig", price: "$99.99", image: "/dummy/product2.jpg" },
-    { id: 3, title: "Hair Care Kit", price: "$49.99", image: "/dummy/product3.jpg" },
-  ];
+  // Debounced search handler
+  const debouncedSearchRef = useRef(
+    debounce(async (query: string) => {
+      if (!query.trim()) {
+        setSearchResults([]);
+        setIsSearching(false);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const response = await productsService.searchProducts(query, { limit: 12 });
+        setSearchResults(response.data || []);
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 400)
+  );
+
+  const handleSearchInput = (value: string) => {
+    setSearchQuery(value);
+    debouncedSearchRef.current(value);
+  };
+
+  // Clear search when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchQuery("");
+      setSearchResults([]);
+      setIsSearching(false);
+    }
+  }, [isOpen]);
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
@@ -55,12 +90,13 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                       type="text"
                       placeholder="Search products..."
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={(e) => handleSearchInput(e.target.value)}
                       className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm"
+                      autoFocus
                     />
                     <button
                       type="button"
-                      className="absolute right-2 top-2 p-2 text-gray-400 hover:text-gray-500"
+                      className="absolute right-2 top-2 p-2 text-gray-400 hover:text-gray-500 cursor-pointer"
                       onClick={onClose}
                     >
                       <X className="h-5 w-5" />
@@ -69,34 +105,61 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
                   {/* Search results */}
                   <div className="mt-8">
-                    <h3 className="text-sm font-medium text-gray-500">Products</h3>
-                    <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                      {searchResults.map((result) => (
-                        <div
-                          key={result.id}
-                          className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
-                        >
-                          <div className="aspect-h-4 aspect-w-3 bg-gray-200 sm:aspect-none sm:h-48 relative">
-                            <Image
-                              src={result.image}
-                              alt={result.title}
-                              width={300}
-                              height={400}
-                              className="h-full w-full object-cover object-center"
-                            />
-                          </div>
-                          <div className="flex flex-1 flex-col space-y-2 p-4">
-                            <h3 className="text-sm font-medium text-gray-900">
-                              <a href="#">
-                                <span aria-hidden="true" className="absolute inset-0" />
-                                {result.title}
-                              </a>
-                            </h3>
-                            <p className="text-sm text-gray-500">{result.price}</p>
-                          </div>
+                    {isSearching ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                        <span className="ml-2 text-sm text-gray-500">Searching...</span>
+                      </div>
+                    ) : searchQuery && searchResults.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-8 text-center">
+                        <Package className="h-12 w-12 text-gray-300 mb-4" />
+                        <h3 className="text-sm font-medium text-gray-900 mb-1">No products found</h3>
+                        <p className="text-sm text-gray-500">Try searching with different keywords</p>
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      <>
+                        <h3 className="text-sm font-medium text-gray-500">Products ({searchResults.length})</h3>
+                        <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                          {searchResults.map((result) => (
+                            <Link
+                              key={result.id}
+                              href={`/products/${result.id}`}
+                              onClick={onClose}
+                              className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white hover:shadow-md transition-shadow"
+                            >
+                              <div className="aspect-h-4 aspect-w-3 bg-gray-200 sm:aspect-none sm:h-48 relative">
+                                <Image
+                                  src={result.thumbnail || '/images/all.jpeg'}
+                                  alt={result.name}
+                                  width={300}
+                                  height={400}
+                                  className="h-full w-full object-cover object-center"
+                                />
+                              </div>
+                              <div className="flex flex-1 flex-col space-y-2 p-4">
+                                <h3 className="text-sm font-medium text-gray-900 line-clamp-2">
+                                  {result.name}
+                                </h3>
+                                <p className="text-sm font-semibold text-primary">
+                                  ₦{result.basePrice?.toLocaleString()}
+                                </p>
+                                {result.customization && (
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    Customizable
+                                  </span>
+                                )}
+                              </div>
+                            </Link>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-8 text-center">
+                        <SearchIcon className="h-12 w-12 text-gray-300 mb-4" />
+                        <h3 className="text-sm font-medium text-gray-900 mb-1">Start searching</h3>
+                        <p className="text-sm text-gray-500">Type to find products</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Dialog.Panel>

@@ -1,13 +1,43 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Image from "next/image";
 import { SectionContainer } from "./section-container";
 import { Button } from "./button";
 import Link from "next/link";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { HairTagsCloud } from "@/components/home/HairTagsCloud";
+import { useCategories } from "@/store/use-categories";
+import type { Category } from "@/types/category";
 
 export function Footer() {
+  const { categories, loading } = useCategories();
+  const [randomCategories, setRandomCategories] = useState<Category[]>([]);
+
+  // Select 2 random categories when categories are loaded
+  useEffect(() => {
+    if (categories.length > 0) {
+      const shuffled = [...categories].sort(() => 0.5 - Math.random());
+      setRandomCategories(shuffled.slice(0, 2));
+    }
+  }, [categories]);
   return (
     <footer className="w-full bg-[#161616] pt-10 pb-20 lg:pb-0">
+      {/* Quick Info Cards */}
+      <SectionContainer>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-10">
+          <Link href="/disclaimers" className="group rounded-2xl border border-[#FCFCFC]/15 bg-white/5 hover:bg-white/10 transition-colors p-5 flex flex-col gap-2">
+            <div className="text-[#FCFCFC] font-semibold text-base">Disclaimers</div>
+            <p className="text-[#FCFCFC]/80 text-xs">Important info on color, texture, length and readiness.</p>
+            <span className="text-[#FCFCFC] text-xs mt-2 group-hover:underline">Read more →</span>
+          </Link>
+          <Link href="/shipping-info" className="group rounded-2xl border border-[#FCFCFC]/15 bg-white/5 hover:bg-white/10 transition-colors p-5 flex flex-col gap-2">
+            <div className="text-[#FCFCFC] font-semibold text-base">Shipping Information</div>
+            <p className="text-[#FCFCFC]/80 text-xs">Processing timelines, delivery windows and return policy.</p>
+            <span className="text-[#FCFCFC] text-xs mt-2 group-hover:underline">Read more →</span>
+          </Link>
+        </div>
+      </SectionContainer>
       <SectionContainer className="grid grid-cols-1 gap-8 text-[#FCFCFC] md:grid-cols-1 lg:grid-cols-10">
         {/* Logo and Contact */}
         <div className="col-span-1 lg:col-span-3">
@@ -40,8 +70,32 @@ export function Footer() {
               <ul className="space-y-1 text-xs">
                 <li className="mb-4"><Link href="/" className="hover:underline">Home</Link></li>
                 <li className="mb-4"><Link href="/shop" className="hover:underline">Shop</Link></li>
-                <li className="mb-4"><Link href="/category/new-arrivals" className="hover:underline">New Arrivals</Link></li>
-                <li className="mb-4"><Link href="/category/categories" className="hover:underline">Categories</Link></li>
+                {loading ? (
+                  // Show skeleton loading while categories are being fetched
+                  <>
+                    <li className="mb-4"><div className="h-4 bg-gray-600 rounded animate-pulse"></div></li>
+                    <li className="mb-4"><div className="h-4 bg-gray-600 rounded animate-pulse"></div></li>
+                  </>
+                ) : randomCategories.length > 0 ? (
+                  // Show random categories
+                  randomCategories.map((category) => (
+                    <li key={category.id} className="mb-4">
+                      <Link
+                        href={`/shop/category/${category.id}`}
+                        className="hover:underline"
+                      >
+                        {category.name}
+                      </Link>
+                    </li>
+                  ))
+                ) : (
+                  // Fallback if no categories are available
+                  <>
+                    <li className="mb-4"><Link href="/shop" className="hover:underline">All Products</Link></li>
+                    <li className="mb-4"><Link href="/collections" className="hover:underline">Browse Collection</Link></li>
+                  </>
+                )}
+                <li className="mb-4"><Link href="/shop" className="hover:underline">All Categories</Link></li>
               </ul>
             </div>
             {/* Service */}
@@ -49,18 +103,17 @@ export function Footer() {
               <div className="font-semibold mb-4 text-sm">Service</div>
               <ul className="space-y-1 text-xs">
                 <li className="mb-4"><Link href="/consultation" className="hover:underline">Consultation</Link></li>
-                <li className="mb-4"><Link href="/custom-wigs" className="hover:underline">Custom Wigs</Link></li>
-                <li className="mb-4"><Link href="/about" className="hover:underline">About Us</Link></li>
+                <li className="mb-4"><Link href="/customizations" className="hover:underline">Custom Wigs</Link></li>
+                <li className="mb-4"><Link href="/collections" className="hover:underline">Browse Collection</Link></li>
+                <li className="mb-4"><Link href="/#deals" className="hover:underline">Deals</Link></li>
               </ul>
             </div>
             {/* Socials */}
             <div>
               <div className="font-semibold mb-4 text-sm">Socials</div>
               <ul className="space-y-1 text-xs">
-                <li className="mb-4"><Link href="https://instagram.com/deejahstrands" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">Instagram</Link></li>
-                <li className="mb-4"><Link href="https://tiktok.com/@deejahstrands" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">Tiktok</Link></li>
-                <li className="mb-4"><Link href="https://pinterest.com/deejahstrands" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">Pinterest</Link></li>
-                <li className="mb-4"><Link href="https://x.com/deejahstrands" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">X</Link></li>
+                <li className="mb-4"><Link href="https://www.instagram.com/deejah_strands?igsh=MXRza3B6djVoejdjcw%3D%3D&utm_source=qr" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">Instagram</Link></li>
+                <li className="mb-4"><Link href="https://www.tiktok.com/@deejah.strands?_t=ZS-8zvHvQwU0er&_r=1" passHref target="_blank" rel="noopener noreferrer" className="hover:underline">Tiktok</Link></li>
               </ul>
             </div>
           </div>

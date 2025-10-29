@@ -9,8 +9,11 @@ import { MobileMenu } from "./mobile-menu";
 import { SearchModal } from "./search-modal";
 import { Button } from "./button";
 import { SectionContainer } from "./section-container";
-import { categories } from "@/data/categories";
 import { useCart } from '@/store/use-cart';
+import { useWishlist } from '@/store/use-wishlist';
+import { useAuth } from '@/store/use-auth';
+import { useCategories } from '@/store/use-categories';
+import { useLoginModal } from '@/hooks/use-login-modal';
 
 const mainNavItems = [
   { label: "Home", href: "/" },
@@ -23,8 +26,31 @@ export function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const isLoggedIn = false; // TODO: Replace with actual auth state
+  const { isAuthenticated, user, logout } = useAuth();
+  const { openModal } = useLoginModal();
+  const { categories } = useCategories();
   const cartCount = useCart(state => state.items.reduce((sum, item) => sum + item.quantity, 0));
+  const wishlistCount = useWishlist(state => state.getWishlistCount());
+
+  const handleCartClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      openModal("View Cart", () => {
+        // After login, user can access cart
+        window.location.href = '/cart';
+      });
+    }
+  };
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      openModal("View Wishlist", () => {
+        // After login, user can access wishlist
+        window.location.href = '/account/wishlist';
+      });
+    }
+  };
 
   return (
     <>
@@ -40,6 +66,7 @@ export function Header() {
                   width={40}
                   height={40}
                   className="h-10 w-auto"
+                  style={{ width: 'auto', height: 'auto' }}
                 />
                 <span className="ml-2 text-lg text-tertiary font-semibold font-ethereal hidden xl:inline">DEEJAH STRANDS</span>
               </Link>
@@ -70,8 +97,8 @@ export function Header() {
                 <div className="absolute left-0 top-full w-48 py-2 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   {categories.map((category) => (
                     <Link
-                      key={category.name}
-                      href={`/shop/category/${encodeURIComponent(category.name)}`}
+                      key={category.id}
+                      href={`/shop/category/${category.id}`}
                       className="block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                     >
                       {category.name}
@@ -86,17 +113,20 @@ export function Header() {
               <div className="hidden lg:flex items-center space-x-4">
                 <button
                   type="button"
-                  className="p-2 text-tertiary hover:text-tertiary"
+                  className="p-2 text-tertiary hover:text-tertiary cursor-pointer"
                   onClick={() => setIsSearchOpen(true)}
                   aria-label="Search"
                 >
                   <Search className="h-5 w-5" />
                 </button>
 
-                {isLoggedIn ? (
+                {isAuthenticated ? (
                   <>
-                    <Link href="/account/wishlist" className="p-2 text-tertiary hover:text-tertiary">
+                    <Link href="/account/wishlist" className="p-2 text-tertiary hover:text-tertiary relative">
                       <Heart className="h-5 w-5" />
+                      {wishlistCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{wishlistCount}</span>
+                      )}
                     </Link>
                     <Link href="/cart" className="p-2 text-tertiary hover:text-tertiary relative">
                       <ShoppingBag className="h-5 w-5" />
@@ -104,23 +134,46 @@ export function Header() {
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
                       )}
                     </Link>
-                    <Link href="/account" className="p-2 text-tertiary hover:text-tertiary">
-                      <User className="h-5 w-5" />
-                    </Link>
+                    <div className="relative group">
+                      <button className="p-2 text-tertiary hover:text-tertiary flex items-center gap-1 cursor-pointer">
+                        <User className="h-5 w-5" />
+                        <span className="text-sm hidden sm:block">{user?.firstName || 'Account'}</span>
+                      </button>
+                      <div className="absolute right-0 top-full w-48 py-2 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <Link href="/account" className="block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+                          My Account
+                        </Link>
+                        <button
+                          onClick={logout}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 cursor-pointer"
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    </div>
                   </>
                 ) : (
                   <>
-                    <Link href="/account/wishlist" className="p-2 text-tertiary hover:text-tertiary">
+                    <button
+                      onClick={handleWishlistClick}
+                      className="p-2 text-tertiary hover:text-tertiary relative cursor-pointer"
+                    >
                       <Heart className="h-5 w-5" />
-                    </Link>
-                    <Link href="/cart" className="p-2 text-tertiary hover:text-tertiary relative">
+                      {isAuthenticated && wishlistCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{wishlistCount}</span>
+                      )}
+                    </button>
+                    <button
+                      onClick={handleCartClick}
+                      className="p-2 text-tertiary hover:text-tertiary relative cursor-pointer"
+                    >
                       <ShoppingBag className="h-5 w-5" />
-                      {cartCount > 0 && (
+                      {isAuthenticated && cartCount > 0 && (
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
                       )}
-                    </Link>
+                    </button>
                     <Link href="/auth/login" className="hidden sm:inline-flex">
-                      <Button variant="tertiary" className="w-full">Login</Button>
+                      <Button variant="tertiary" className="w-full cursor-pointer">Login</Button>
                     </Link>
                   </>
                 )}
@@ -128,14 +181,10 @@ export function Header() {
               {/* Mobile menu button */}
               <button
                 type="button"
-                className="lg:hidden p-2 text-tertiary hover:text-tertiary relative"
+                className="lg:hidden p-2 text-tertiary hover:text-tertiary cursor-pointer"
                 onClick={() => setIsMobileMenuOpen(true)}
               >
-                <ShoppingBag className="h-5 w-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
-                )}
-                <Menu className="h-6 w-6 ml-2" />
+                <Menu className="h-6 w-6" />
               </button>
             </div>
           </div>
@@ -149,9 +198,10 @@ export function Header() {
         mainNavItems={mainNavItems}
         categories={categories.map(cat => ({
           label: cat.name,
-          href: `/shop?category=${encodeURIComponent(cat.name)}`
+          href: `/shop/category/${cat.id}`
         }))}
-        isLoggedIn={isLoggedIn}
+        user={user}
+        onLogout={logout}
       />
 
       {/* Search modal */}

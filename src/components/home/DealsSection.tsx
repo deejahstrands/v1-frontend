@@ -40,6 +40,7 @@ export default function DealsSection() {
 
   return (
     <motion.section
+      id="deals"
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
@@ -82,7 +83,7 @@ export default function DealsSection() {
           {/* Image Side */}
           <div className="lg:col-span-7 w-full h-[320px] sm:h-[400px] md:h-[440px] lg:h-[500px] flex items-center justify-center">
             <Image
-              src="https://res.cloudinary.com/dwpetnbf1/image/upload/v1750944596/16_witwsk.jpg"
+              src="https://res.cloudinary.com/dhnanmyf3/image/upload/v1753709582/20_wrxtjv.png"
               alt="Deals Of The Month"
               fill={false}
               width={700}

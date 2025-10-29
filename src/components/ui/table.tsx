@@ -23,7 +23,8 @@ export type TableProps<T> = {
   emptyMessage?: string;
 };
 
-export function Table<T extends { id?: string | number }>({
+export function 
+Table<T extends { id?: string | number }>({
   columns,
   data,
   actions,
@@ -49,13 +50,13 @@ export function Table<T extends { id?: string | number }>({
                   {columns.map((col, idx) => (
                     <th
                       key={col.label + idx}
-                      className={`px-2 py-2 sm:px-4 sm:py-3 text-left text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wider ${col.className || ""}`}
+                      className={`px-2 py-2 sm:px-4 sm:py-3 text-left text-xs xl:text-sm font-semibold text-gray-600 uppercase tracking-wider ${col.className || ""}`}
                     >
                       {col.label}
                     </th>
                   ))}
                   {actions && (
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Action</th>
+                    <th className="px-4 py-3 text-center text-xs xl:text-sm font-semibold text-gray-600 uppercase tracking-wider">Action</th>
                   )}
                 </tr>
               </thead>
@@ -73,12 +74,12 @@ export function Table<T extends { id?: string | number }>({
                   data.map((row, rowIdx) => (
                     <tr key={row.id ?? rowIdx} className="hover:bg-gray-50 transition-colors">
                       {columns.map((col, colIdx) => (
-                        <td key={col.label + colIdx} className={`px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm ${col.className || ""}`}>
+                        <td key={col.label + colIdx} className={`px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-xs xl:text-sm ${col.className || ""}`}>
                           {col.render ? col.render(row) : (row as any)[col.accessor]}
                         </td>
                       ))}
                       {actions && (
-                        <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm">{actions(row)}</td>
+                        <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs sm:text-xs xl:text-sm cursor-pointer">{actions(row)}</td>
                       )}
                     </tr>
                   ))
