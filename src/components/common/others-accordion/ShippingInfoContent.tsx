@@ -25,9 +25,7 @@ const ShippingInfoContent: React.FC = () => (
     <div>
       <h4 className="font-semibold">Returns & Exchanges</h4>
       <p>We only accept returns if the wig is damaged by us.</p>
-      <ol className="list-decimal pl-5">
-        <li><b>Return shipping costs:</b> Customers are responsible for return postage costs.</li>
-      </ol>
+      <p><b>Return shipping costs:</b> Customers are responsible for return postage costs.</p>
     </div>
   </div>
 );

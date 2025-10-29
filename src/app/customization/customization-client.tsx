@@ -264,7 +264,7 @@ export default function CustomizationClient() {
 
                   {/* Shipping Info */}
                   <div className="mt-4 text-xs text-gray-600 text-center">
-                    Taxes included. Shipping calculated at checkout.
+                    Taxes included. shipping will be calculated and commutcated.
                   </div>
                 </div>
               )}

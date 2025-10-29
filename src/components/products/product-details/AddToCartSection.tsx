@@ -40,12 +40,12 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
   const selectedDelivery = useDelivery(state => state.selected);
   const measurements = useMeasurements(state => state.data);
   const addToCart = useCart(state => state.addToCart);
-  
+
   // Store reset functions
   const resetCustomization = useProductCustomization(state => state.reset);
   const resetDelivery = useDelivery(state => state.reset);
   const resetMeasurements = useMeasurements(state => state.reset);
-  
+
   // Wishlist functionality
   const addToWishlist = useWishlist(state => state.addToWishlist);
   const removeFromWishlist = useWishlist(state => state.removeFromWishlist);
@@ -93,10 +93,10 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
       let measurementsData = undefined;
       if (measurements.hasMeasurements) {
         const hairlineFiles = measurements.hairlinePictures.filter((file): file is File => file instanceof File);
-        const hairlineImages = hairlineFiles.length > 0 
+        const hairlineImages = hairlineFiles.length > 0
           ? await uploadService.uploadFiles(hairlineFiles)
           : [];
-        
+
         const styleFiles = measurements.styleReference.filter((file): file is File => file instanceof File);
         const styleImages = styleFiles.length > 0
           ? await uploadService.uploadFiles(styleFiles)
@@ -141,83 +141,83 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
 
     // Check authentication first before any API calls
     if (!isAuthenticated) {
-        openModal("Add Item to Cart", async () => {
+      openModal("Add Item to Cart", async () => {
         // This will be called after successful login
-          try {
-            // Double-check authentication before making API call
-            if (!authService.isAuthenticated()) {
-              throw new Error('Authentication required');
-            }
-            
-            const apiData = await prepareCartData();
-            // Call API to add to cart
-            await cartService.addToCart(apiData);
-            
-            // Also add to local cart store for UI consistency
-        addToCart({
-          productId: product.id,
-          title: product.title,
-          image: product.image,
-          basePrice,
-              customizations: Object.fromEntries(
-                Object.entries(selectedCustomizations).filter(([, option]) => option !== null)
-              ) as { [type: string]: CustomizationOption },
-          customizationTotal,
-          totalPrice: singleTotal,
-          quantity,
-          delivery: selectedDelivery,
-          measurements: measurements.hasMeasurements ? measurements : undefined,
-          specifications: product.specifications,
-              apiData,
-        });
-            
-        toast.success(`${product.title} has been added to your cart.`);
-        clearAllSelections();
-        scrollToTop();
-          } catch (error) {
-            toast.error("Failed to add item to cart. Please try again.");
-            console.error("API add to cart error:", error);
+        try {
+          // Double-check authentication before making API call
+          if (!authService.isAuthenticated()) {
+            throw new Error('Authentication required');
           }
+
+          const apiData = await prepareCartData();
+          // Call API to add to cart
+          await cartService.addToCart(apiData);
+
+          // Also add to local cart store for UI consistency
+          addToCart({
+            productId: product.id,
+            title: product.title,
+            image: product.image,
+            basePrice,
+            customizations: Object.fromEntries(
+              Object.entries(selectedCustomizations).filter(([, option]) => option !== null)
+            ) as { [type: string]: CustomizationOption },
+            customizationTotal,
+            totalPrice: singleTotal,
+            quantity,
+            delivery: selectedDelivery,
+            measurements: measurements.hasMeasurements ? measurements : undefined,
+            specifications: product.specifications,
+            apiData,
+          });
+
+          toast.success(`${product.title} has been added to your cart.`);
+          clearAllSelections();
+          scrollToTop();
+        } catch (error) {
+          toast.error("Failed to add item to cart. Please try again.");
+          console.error("API add to cart error:", error);
+        }
       });
       return;
     }
 
-      try {
-        const apiData = await prepareCartData();
-        // Call API to add to cart
-        await cartService.addToCart(apiData);
-      
+    try {
+      const apiData = await prepareCartData();
+      // Call API to add to cart
+      await cartService.addToCart(apiData);
+
       // Also add to local cart store for UI consistency
-    addToCart({
-      productId: product.id,
-      title: product.title,
-      image: product.image,
-      basePrice,
+      addToCart({
+        productId: product.id,
+        title: product.title,
+        image: product.image,
+        basePrice,
         customizations: Object.fromEntries(
           Object.entries(selectedCustomizations).filter(([, option]) => option !== null)
         ) as { [type: string]: CustomizationOption },
-      customizationTotal,
-      totalPrice: singleTotal,
-      quantity,
-      delivery: selectedDelivery,
-      measurements: measurements.hasMeasurements ? measurements : undefined,
-      specifications: product.specifications,
+        customizationTotal,
+        totalPrice: singleTotal,
+        quantity,
+        delivery: selectedDelivery,
+        measurements: measurements.hasMeasurements ? measurements : undefined,
+        specifications: product.specifications,
         apiData,
-    });
-      
-    toast.success(`${product.title} has been added to your cart.`);
-    clearAllSelections();
-    scrollToTop();
-      } catch (error) {
-        if (error instanceof Error && error.message === 'delivery_incomplete') {
-          toast.info('Please select both Processing Time and Private Fitting to continue.');
-        } else if (error instanceof Error && error.message.includes('upload')) {
-          toast.error("Failed to upload images. Please try again.");
-        } else {
-          toast.error("Failed to add item to cart. Please try again.");
-        }
-        console.error("Add to cart error:", error);
+      });
+
+      toast.success(`${product.title} has been added to your cart.`);
+      clearAllSelections();
+      scrollToTop();
+    } catch (error) {
+      if (error instanceof Error && error.message === 'delivery_incomplete') {
+        toast.info('Please select both Processing Time and Private Fitting to continue.');
+      } else if (error instanceof Error && error.message.includes('upload')) {
+        toast.error("Failed to upload images. Please try again.");
+      } else {
+        toast.error("Failed to add item to cart. Please try again.");
       }
+      console.error("Add to cart error:", error);
+    }
   };
 
   const handleWishlistToggle = () => {
@@ -297,33 +297,32 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
             </>
           ) : (
             <>
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-13z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="21" r="1" fill="currentColor"/><circle cx="19" cy="21" r="1" fill="currentColor"/></svg>
-          {isDeliveryComplete ? `Add to Cart - ₦${totalPrice.toLocaleString()}` : 'Select delivery options to continue'}
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-13z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><circle cx="9" cy="21" r="1" fill="currentColor" /><circle cx="19" cy="21" r="1" fill="currentColor" /></svg>
+              {isDeliveryComplete ? `Add to Cart - ₦${totalPrice.toLocaleString()}` : 'Select delivery options to continue'}
             </>
           )}
         </button>
         {isHydrated && (
           <button
             type="button"
-            className={`w-12 h-12 flex items-center justify-center border rounded-lg transition-colors cursor-pointer ${
-              isInWishlist(product.id) 
-                ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100' 
+            className={`w-12 h-12 flex items-center justify-center border rounded-lg transition-colors cursor-pointer ${isInWishlist(product.id)
+                ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'
                 : 'bg-white text-black hover:bg-gray-100'
-            }`}
+              }`}
             onClick={handleWishlistToggle}
             aria-label={isInWishlist(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
           >
-            <svg 
-              width="24" 
-              height="24" 
-              fill={isInWishlist(product.id) ? "currentColor" : "none"} 
+            <svg
+              width="24"
+              height="24"
+              fill={isInWishlist(product.id) ? "currentColor" : "none"}
               viewBox="0 0 24 24"
             >
-              <path 
-                d="M12 21s-6.5-4.35-9-7.5C1.5 10.5 2.5 7 6 7c2.5 0 3.5 2 3.5 2s1-2 3.5-2c3.5 0 4.5 3.5 3 6.5-2.5 3.15-9 7.5-9 7.5z" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
+              <path
+                d="M12 21s-6.5-4.35-9-7.5C1.5 10.5 2.5 7 6 7c2.5 0 3.5 2 3.5 2s1-2 3.5-2c3.5 0 4.5 3.5 3 6.5-2.5 3.15-9 7.5-9 7.5z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
                 strokeLinejoin="round"
               />
             </svg>
@@ -335,17 +334,17 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
             className="w-12 h-12 flex items-center justify-center border rounded-lg bg-white text-black hover:bg-gray-100 cursor-pointer"
             aria-label="Add to Wishlist"
           >
-            <svg 
-              width="24" 
-              height="24" 
-              fill="none" 
+            <svg
+              width="24"
+              height="24"
+              fill="none"
               viewBox="0 0 24 24"
             >
-              <path 
-                d="M12 21s-6.5-4.35-9-7.5C1.5 10.5 2.5 7 6 7c2.5 0 3.5 2 3.5 2s1-2 3.5-2c3.5 0 4.5 3.5 3 6.5-2.5 3.15-9 7.5-9 7.5z" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
+              <path
+                d="M12 21s-6.5-4.35-9-7.5C1.5 10.5 2.5 7 6 7c2.5 0 3.5 2 3.5 2s1-2 3.5-2c3.5 0 4.5 3.5 3 6.5-2.5 3.15-9 7.5-9 7.5z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
                 strokeLinejoin="round"
               />
             </svg>
@@ -354,8 +353,8 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
       </div>
       {/* Info / Helper */}
       <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
-        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#98A2B3" strokeWidth="2"/><path d="M12 8v4m0 4h.01" stroke="#98A2B3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        Taxes included. <span className="underline ml-1 cursor-pointer">Shipping</span> calculated at checkout.
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#98A2B3" strokeWidth="2" /><path d="M12 8v4m0 4h.01" stroke="#98A2B3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        Taxes included. shipping will be calculated and commutcated.
       </div>
       {!isDeliveryComplete && (
         <div className="text-xs text-red-600 mt-1">Please select both Processing Time and Private Fitting above to enable Add to Cart.</div>
