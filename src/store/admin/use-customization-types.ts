@@ -53,8 +53,13 @@ interface CustomizationTypesState {
     status?: string;
   }) => Promise<void>;
   fetchType: (id: string) => Promise<void>;
-  createType: (data: CreateCustomizationTypeData) => Promise<CustomizationType | null>;
-  updateType: (id: string, data: UpdateCustomizationTypeData) => Promise<CustomizationType | null>;
+  createType: (
+    data: CreateCustomizationTypeData
+  ) => Promise<CustomizationType | null>;
+  updateType: (
+    id: string,
+    data: UpdateCustomizationTypeData
+  ) => Promise<CustomizationType | null>;
   deleteType: (id: string) => Promise<boolean>;
 
   // Utility actions
@@ -65,7 +70,7 @@ interface CustomizationTypesState {
   getActiveFilters: () => Partial<CustomizationTypesState["filters"]>;
   getPaginatedTypes: () => CustomizationType[];
 
-  // Computed values
+  // Pagination from API
   totalPages: number;
 }
 
@@ -79,6 +84,7 @@ const initialState = {
   currentPage: 1,
   itemsPerPage: 10,
   totalItems: 0,
+  totalPages: 1,
   filters: {
     search: "",
     sortBy: "createdAt",
@@ -105,78 +111,16 @@ export const useCustomizationTypesStore = create<CustomizationTypesState>()(
       setError: (error) => set({ error }),
       clearError: () => set({ error: null }),
 
-      // Computed values
-      get totalPages() {
-        const state = get();
-        if (!state) return 1;
+      // No computed getters; we rely on API meta.totalPages set during fetch
 
-        let filteredCount = state.types?.length || 0;
-
-        // Apply search filter
-        if (state.filters?.search) {
-          filteredCount = (state.types || []).filter(
-            (type) =>
-              type.name
-                .toLowerCase()
-                .includes(state.filters.search.toLowerCase()) ||
-              type.description
-                .toLowerCase()
-                .includes(state.filters.search.toLowerCase())
-          ).length;
-        }
-
-        return Math.ceil(filteredCount / (state.itemsPerPage || 10));
-      },
-
-      // Function version of paginatedTypes
+      // Function version of paginatedTypes - now returns API paginated data directly
       getPaginatedTypes: () => {
         const state = get();
         if (!state) {
           return [];
         }
-
-        const startIndex = (state.currentPage - 1) * state.itemsPerPage;
-        const endIndex = startIndex + state.itemsPerPage;
-
-        let filteredTypes = state.types || [];
-
-        // Apply search filter
-        if (state.filters?.search) {
-          filteredTypes = filteredTypes.filter(
-            (type) =>
-              type.name
-                .toLowerCase()
-                .includes(state.filters.search.toLowerCase()) ||
-              type.description
-                .toLowerCase()
-                .includes(state.filters.search.toLowerCase())
-          );
-        }
-
-        // Apply sorting
-        if (state.filters?.sortBy) {
-          filteredTypes = [...filteredTypes].sort((a, b) => {
-            const aValue = a[state.filters.sortBy as keyof CustomizationType];
-            const bValue = b[state.filters.sortBy as keyof CustomizationType];
-
-            if (typeof aValue === "string" && typeof bValue === "string") {
-              return state.filters.sortOrder === "asc"
-                ? aValue.localeCompare(bValue)
-                : bValue.localeCompare(aValue);
-            }
-
-            if (typeof aValue === "number" && typeof bValue === "number") {
-              return state.filters.sortOrder === "asc"
-                ? aValue - bValue
-                : bValue - aValue;
-            }
-
-            return 0;
-          });
-        }
-
-        const result = filteredTypes.slice(startIndex, endIndex);
-        return result;
+        // API handles pagination, so just return the data as-is
+        return state.types || [];
       },
 
       // Fetch all types
@@ -195,12 +139,24 @@ export const useCustomizationTypesStore = create<CustomizationTypesState>()(
           globalCustomizationTypesFetching = true;
           set({ isLoading: true, error: null });
 
-          const response = await customizationTypeService.getCustomizationTypes(params);
+          const response = await customizationTypeService.getCustomizationTypes(
+            params
+          );
 
           set({
             types: response.data,
             totalItems: response.meta.totalItems,
             currentPage: response.meta.page,
+            itemsPerPage: params?.limit || state.itemsPerPage,
+            totalPages:
+              response.meta.totalPages ||
+              Math.max(
+                1,
+                Math.ceil(
+                  response.meta.totalItems /
+                    (params?.limit || state.itemsPerPage || 10)
+                )
+              ),
           });
         } catch (error) {
           const errorMessage =
@@ -222,8 +178,8 @@ export const useCustomizationTypesStore = create<CustomizationTypesState>()(
 
           // For now, find from local state since we don't have a single type endpoint
           const state = get();
-          const type = state.types.find(t => t.id === id);
-          
+          const type = state.types.find((t) => t.id === id);
+
           if (type) {
             set({ currentType: type });
           } else {
@@ -231,7 +187,9 @@ export const useCustomizationTypesStore = create<CustomizationTypesState>()(
           }
         } catch (error) {
           const errorMessage =
-            error instanceof Error ? error.message : "Failed to fetch customization type";
+            error instanceof Error
+              ? error.message
+              : "Failed to fetch customization type";
           set({ error: errorMessage });
           console.error("Error fetching customization type:", error);
         } finally {
@@ -244,10 +202,15 @@ export const useCustomizationTypesStore = create<CustomizationTypesState>()(
         try {
           set({ isCreating: true, error: null });
 
-          const response = await customizationTypeService.createCustomizationType(data);
+          const response =
+            await customizationTypeService.createCustomizationType(data);
 
           // Refetch types to get the latest data
-          await get().fetchTypes();
+          const state = get();
+          await get().fetchTypes({
+            page: state.currentPage,
+            limit: state.itemsPerPage,
+          });
 
           return response.type;
         } catch (error) {
@@ -268,10 +231,15 @@ export const useCustomizationTypesStore = create<CustomizationTypesState>()(
         try {
           set({ isUpdating: true, error: null });
 
-          const response = await customizationTypeService.updateCustomizationType(id, data);
+          const response =
+            await customizationTypeService.updateCustomizationType(id, data);
 
           // Refetch types to get the latest data
-          await get().fetchTypes();
+          const state = get();
+          await get().fetchTypes({
+            page: state.currentPage,
+            limit: state.itemsPerPage,
+          });
 
           return response.type;
         } catch (error) {
@@ -295,7 +263,11 @@ export const useCustomizationTypesStore = create<CustomizationTypesState>()(
           await customizationTypeService.deleteCustomizationType(id);
 
           // Refetch types to get the latest data
-          await get().fetchTypes();
+          const state = get();
+          await get().fetchTypes({
+            page: state.currentPage,
+            limit: state.itemsPerPage,
+          });
 
           return true;
         } catch (error) {

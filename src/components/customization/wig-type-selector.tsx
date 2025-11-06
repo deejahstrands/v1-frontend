@@ -40,7 +40,7 @@ export const WigTypeSelector: React.FC<WigTypeSelectorProps> = ({ wigTypes, clas
               >
                 <div className="font-medium text-xs mb-1">{wigType.name}</div>
                 <div className="text-xs text-gray-600 font-semibold">
-                  ₦{wigType.basePrice.toLocaleString()}
+                 <span className="text-xs font-bold">From</span> ₦{wigType.basePrice.toLocaleString()}
                 </div>
               </button>
             );

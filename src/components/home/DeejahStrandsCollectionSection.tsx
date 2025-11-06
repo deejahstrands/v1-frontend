@@ -11,12 +11,14 @@ import "swiper/css/navigation";
 import { useRef, useEffect } from "react";
 import { motion } from "motion/react";
 import { useCollections } from "@/store/use-collections";
+import type { Swiper as SwiperType } from "swiper";
 
 export function DeejahStrandsCollectionSection() {
     const prevRef = useRef<HTMLButtonElement>(null);
     const nextRef = useRef<HTMLButtonElement>(null);
     const prevMobileRef = useRef<HTMLButtonElement>(null);
     const nextMobileRef = useRef<HTMLButtonElement>(null);
+    const swiperRef = useRef<SwiperType | null>(null);
 
     const {
         featuredCollection,
@@ -28,6 +30,50 @@ export function DeejahStrandsCollectionSection() {
     useEffect(() => {
         fetchFeaturedCollection();
     }, [fetchFeaturedCollection]);
+
+    // Ensure Swiper navigation binds to the correct buttons after refs are set and on resize
+    useEffect(() => {
+        const updateNavigation = () => {
+            const swiper = swiperRef.current;
+            if (!swiper) return;
+
+            const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+            const prevEl = isMobile ? prevMobileRef.current : prevRef.current;
+            const nextEl = isMobile ? nextMobileRef.current : nextRef.current;
+
+            if (!prevEl || !nextEl) return;
+
+            const navigationParams = (swiper.params.navigation ?? {}) as Record<string, unknown>;
+            navigationParams.prevEl = prevEl as unknown as HTMLElement;
+            navigationParams.nextEl = nextEl as unknown as HTMLElement;
+            // Assign back to params
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (swiper.params as any).navigation = navigationParams;
+
+            if (swiper.navigation && typeof swiper.navigation.destroy === "function") {
+                swiper.navigation.destroy();
+            }
+            swiper.navigation.init();
+            swiper.navigation.update();
+        };
+
+        updateNavigation();
+        window.addEventListener("resize", updateNavigation);
+        return () => window.removeEventListener("resize", updateNavigation);
+    }, []);
+
+    // Rebind navigation once products load/render (prevents race between refs and Swiper init)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const swiper = swiperRef.current;
+            if (!swiper) return;
+            if (typeof swiper.updateSize === 'function') swiper.updateSize();
+            if (swiper.navigation) {
+                swiper.navigation.update();
+            }
+        }, 50);
+        return () => clearTimeout(timer);
+    }, [featuredCollection]);
 
     if (featuredLoading) {
         return (
@@ -143,6 +189,7 @@ export function DeejahStrandsCollectionSection() {
                             ref={prevMobileRef}
                             className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow flex items-center justify-center border border-gray-200"
                             aria-label="Previous"
+                            onClick={() => swiperRef.current?.slidePrev()}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
                             transition={{ duration: 0.2 }}
@@ -153,6 +200,7 @@ export function DeejahStrandsCollectionSection() {
                             ref={nextMobileRef}
                             className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow flex items-center justify-center border border-gray-200"
                             aria-label="Next"
+                            onClick={() => swiperRef.current?.slideNext()}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
                             transition={{ duration: 0.2 }}
@@ -168,20 +216,12 @@ export function DeejahStrandsCollectionSection() {
                             640: { slidesPerView: 2 },
                             1024: { slidesPerView: 4 },
                         }}
-                        navigation={{
-                            prevEl: typeof window !== "undefined" && window.innerWidth < 768 ? prevMobileRef.current : prevRef.current,
-                            nextEl: typeof window !== "undefined" && window.innerWidth < 768 ? nextMobileRef.current : nextRef.current,
-                        }}
-                        onInit={(swiper) => {
-                            // @ts-expect-error: Swiper navigation expects DOM element, ref assignment is safe
-                            swiper.params.navigation.prevEl = window.innerWidth < 768 ? prevMobileRef.current : prevRef.current;
-                            // @ts-expect-error: Swiper navigation expects DOM element, ref assignment is safe
-                            swiper.params.navigation.nextEl = window.innerWidth < 768 ? nextMobileRef.current : nextRef.current;
-                            swiper.navigation.init();
-                            swiper.navigation.update();
+                        navigation={false}
+                        onBeforeInit={(swiper) => {
+                            swiperRef.current = swiper;
                         }}
                     >
-                        {validProducts.map((product, index) => (
+                        {validProducts.slice(0, 6).map((product, index) => (
                             <SwiperSlide key={product.id}>
                                 <motion.div
                                     initial={{ opacity: 0, y: 30 }}
@@ -200,6 +240,7 @@ export function DeejahStrandsCollectionSection() {
                                         title={product.name || 'Product'}
                                         price={`₦${(product.basePrice || 0).toLocaleString()}`}
                                         customization={product.customization || false}
+                                        status={(product as unknown as { status?: string })?.status}
                                     />
                                 </motion.div>
                             </SwiperSlide>
@@ -211,6 +252,7 @@ export function DeejahStrandsCollectionSection() {
                             ref={prevRef}
                             className="w-9 h-9 rounded-md border border-gray-300 bg-black text-white flex items-center justify-center disabled:opacity-50"
                             aria-label="Previous"
+                            onClick={() => swiperRef.current?.slidePrev()}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             transition={{ duration: 0.2 }}
@@ -221,6 +263,7 @@ export function DeejahStrandsCollectionSection() {
                             ref={nextRef}
                             className="w-9 h-9 rounded-md border border-gray-300 bg-black text-white flex items-center justify-center disabled:opacity-50"
                             aria-label="Next"
+                            onClick={() => swiperRef.current?.slideNext()}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             transition={{ duration: 0.2 }}

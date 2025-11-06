@@ -29,6 +29,7 @@ interface AddToCartSectionProps {
     image?: string;
     category?: string;
     specifications?: { type: string; value: string }[];
+    status?: string;
   };
 }
 
@@ -130,7 +131,13 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
     }
   };
 
+  const isSoldOut = product.status === 'sold_out';
+
   const handleAddToCart = async () => {
+    if (isSoldOut) {
+      toast.info('This product is sold out.');
+      return;
+    }
     if (isUploading) return; // Prevent multiple clicks during upload
 
     // Enforce delivery requirements
@@ -285,7 +292,7 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
           type="button"
           className="flex-1 flex items-center justify-center gap-2 bg-[#C9A18A] hover:bg-[#b88b6d] text-white font-semibold rounded-lg py-3 text-base transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={handleAddToCart}
-          disabled={isUploading || !isDeliveryComplete}
+          disabled={isUploading || !isDeliveryComplete || isSoldOut}
         >
           {isUploading ? (
             <>
@@ -298,7 +305,9 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
           ) : (
             <>
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9h-13z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><circle cx="9" cy="21" r="1" fill="currentColor" /><circle cx="19" cy="21" r="1" fill="currentColor" /></svg>
-              {isDeliveryComplete ? `Add to Cart - ₦${totalPrice.toLocaleString()}` : 'Select delivery options to continue'}
+              {isSoldOut
+                ? 'Sold Out'
+                : (isDeliveryComplete ? `Add to Cart - ₦${totalPrice.toLocaleString()}` : 'Select delivery options to continue')}
             </>
           )}
         </button>
@@ -306,8 +315,8 @@ const AddToCartSection: React.FC<AddToCartSectionProps> = ({ product }) => {
           <button
             type="button"
             className={`w-12 h-12 flex items-center justify-center border rounded-lg transition-colors cursor-pointer ${isInWishlist(product.id)
-                ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'
-                : 'bg-white text-black hover:bg-gray-100'
+              ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'
+              : 'bg-white text-black hover:bg-gray-100'
               }`}
             onClick={handleWishlistToggle}
             aria-label={isInWishlist(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}

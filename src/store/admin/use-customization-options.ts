@@ -56,8 +56,13 @@ interface CustomizationOptionsState {
     typeId?: string;
   }) => Promise<void>;
   fetchOption: (id: string) => Promise<void>;
-  createOption: (data: CreateCustomizationOptionData) => Promise<CustomizationOption | null>;
-  updateOption: (id: string, data: UpdateCustomizationOptionData) => Promise<CustomizationOption | null>;
+  createOption: (
+    data: CreateCustomizationOptionData
+  ) => Promise<CustomizationOption | null>;
+  updateOption: (
+    id: string,
+    data: UpdateCustomizationOptionData
+  ) => Promise<CustomizationOption | null>;
   deleteOption: (id: string) => Promise<boolean>;
 
   // Utility actions
@@ -68,7 +73,7 @@ interface CustomizationOptionsState {
   getActiveFilters: () => Partial<CustomizationOptionsState["filters"]>;
   getPaginatedOptions: () => CustomizationOption[];
 
-  // Computed values
+  // Pagination from API
   totalPages: number;
 }
 
@@ -82,6 +87,7 @@ const initialState = {
   currentPage: 1,
   itemsPerPage: 10,
   totalItems: 0,
+  totalPages: 1,
   filters: {
     search: "",
     status: "",
@@ -110,106 +116,16 @@ export const useCustomizationOptionsStore = create<CustomizationOptionsState>()(
       setError: (error) => set({ error }),
       clearError: () => set({ error: null }),
 
-      // Computed values
-      get totalPages() {
-        const state = get();
-        if (!state) return 1;
+      // No computed getters; we rely on API meta.totalPages set during fetch
 
-        let filteredCount = state.options?.length || 0;
-
-        // Apply search filter
-        if (state.filters?.search) {
-          filteredCount = (state.options || []).filter(
-            (option) =>
-              option.name
-                .toLowerCase()
-                .includes(state.filters.search.toLowerCase()) ||
-              option.description
-                .toLowerCase()
-                .includes(state.filters.search.toLowerCase())
-          ).length;
-        }
-
-        // Apply status filter
-        if (state.filters?.status) {
-          filteredCount = (state.options || []).filter(
-            (option) => option.status === state.filters.status
-          ).length;
-        }
-
-        // Apply type filter
-        if (state.filters?.typeId) {
-          filteredCount = (state.options || []).filter(
-            (option) => option.customizationType.id === state.filters.typeId
-          ).length;
-        }
-
-        return Math.ceil(filteredCount / (state.itemsPerPage || 10));
-      },
-
-      // Function version of paginatedOptions
+      // Function version of paginatedOptions - now returns API paginated data directly
       getPaginatedOptions: () => {
         const state = get();
         if (!state) {
           return [];
         }
-
-        const startIndex = (state.currentPage - 1) * state.itemsPerPage;
-        const endIndex = startIndex + state.itemsPerPage;
-
-        let filteredOptions = state.options || [];
-
-        // Apply search filter
-        if (state.filters?.search) {
-          filteredOptions = filteredOptions.filter(
-            (option) =>
-              option.name
-                .toLowerCase()
-                .includes(state.filters.search.toLowerCase()) ||
-              option.description
-                .toLowerCase()
-                .includes(state.filters.search.toLowerCase())
-          );
-        }
-
-        // Apply status filter
-        if (state.filters?.status) {
-          filteredOptions = filteredOptions.filter(
-            (option) => option.status === state.filters.status
-          );
-        }
-
-        // Apply type filter
-        if (state.filters?.typeId) {
-          filteredOptions = filteredOptions.filter(
-            (option) => option.customizationType.id === state.filters.typeId
-          );
-        }
-
-        // Apply sorting
-        if (state.filters?.sortBy) {
-          filteredOptions = [...filteredOptions].sort((a, b) => {
-            const aValue = a[state.filters.sortBy as keyof CustomizationOption];
-            const bValue = b[state.filters.sortBy as keyof CustomizationOption];
-
-            if (typeof aValue === "string" && typeof bValue === "string") {
-              return state.filters.sortOrder === "asc"
-                ? aValue.localeCompare(bValue)
-                : bValue.localeCompare(aValue);
-            }
-
-            if (typeof aValue === "number" && typeof bValue === "number") {
-              return state.filters.sortOrder === "asc"
-                ? aValue - bValue
-                : bValue - aValue;
-            }
-
-            return 0;
-          });
-        }
-
-        const result = filteredOptions.slice(startIndex, endIndex);
-        return result;
+        // API handles pagination, so just return the data as-is
+        return state.options || [];
       },
 
       // Fetch all options
@@ -229,12 +145,23 @@ export const useCustomizationOptionsStore = create<CustomizationOptionsState>()(
           globalCustomizationOptionsFetching = true;
           set({ isLoading: true, error: null });
 
-          const response = await customizationOptionService.getCustomizationOptions(params);
+          const response =
+            await customizationOptionService.getCustomizationOptions(params);
 
           set({
             options: response.data,
             totalItems: response.meta.totalItems,
             currentPage: response.meta.page,
+            itemsPerPage: params?.limit || state.itemsPerPage,
+            totalPages:
+              response.meta.totalPages ||
+              Math.max(
+                1,
+                Math.ceil(
+                  response.meta.totalItems /
+                    (params?.limit || state.itemsPerPage || 10)
+                )
+              ),
           });
         } catch (error) {
           const errorMessage =
@@ -256,8 +183,8 @@ export const useCustomizationOptionsStore = create<CustomizationOptionsState>()(
 
           // For now, find from local state since we don't have a single option endpoint
           const state = get();
-          const option = state.options.find(o => o.id === id);
-          
+          const option = state.options.find((o) => o.id === id);
+
           if (option) {
             set({ currentOption: option });
           } else {
@@ -265,7 +192,9 @@ export const useCustomizationOptionsStore = create<CustomizationOptionsState>()(
           }
         } catch (error) {
           const errorMessage =
-            error instanceof Error ? error.message : "Failed to fetch customization option";
+            error instanceof Error
+              ? error.message
+              : "Failed to fetch customization option";
           set({ error: errorMessage });
           console.error("Error fetching customization option:", error);
         } finally {
@@ -278,10 +207,15 @@ export const useCustomizationOptionsStore = create<CustomizationOptionsState>()(
         try {
           set({ isCreating: true, error: null });
 
-          const response = await customizationOptionService.createCustomizationOption(data);
+          const response =
+            await customizationOptionService.createCustomizationOption(data);
 
           // Refetch options to get the latest data
-          await get().fetchOptions();
+          const state = get();
+          await get().fetchOptions({
+            page: state.currentPage,
+            limit: state.itemsPerPage,
+          });
 
           return response.option;
         } catch (error) {
@@ -302,10 +236,18 @@ export const useCustomizationOptionsStore = create<CustomizationOptionsState>()(
         try {
           set({ isUpdating: true, error: null });
 
-          const response = await customizationOptionService.updateCustomizationOption(id, data);
+          const response =
+            await customizationOptionService.updateCustomizationOption(
+              id,
+              data
+            );
 
           // Refetch options to get the latest data
-          await get().fetchOptions();
+          const state = get();
+          await get().fetchOptions({
+            page: state.currentPage,
+            limit: state.itemsPerPage,
+          });
 
           return response.option;
         } catch (error) {
@@ -329,7 +271,11 @@ export const useCustomizationOptionsStore = create<CustomizationOptionsState>()(
           await customizationOptionService.deleteCustomizationOption(id);
 
           // Refetch options to get the latest data
-          await get().fetchOptions();
+          const state = get();
+          await get().fetchOptions({
+            page: state.currentPage,
+            limit: state.itemsPerPage,
+          });
 
           return true;
         } catch (error) {
@@ -401,7 +347,9 @@ export const selectPaginatedOptions = (
   if (state.filters?.search) {
     filteredOptions = filteredOptions.filter(
       (option) =>
-        option.name.toLowerCase().includes(state.filters.search.toLowerCase()) ||
+        option.name
+          .toLowerCase()
+          .includes(state.filters.search.toLowerCase()) ||
         option.description
           .toLowerCase()
           .includes(state.filters.search.toLowerCase())
@@ -455,7 +403,9 @@ export const selectTotalPages = (state: CustomizationOptionsState): number => {
   if (state.filters?.search) {
     filteredCount = (state.options || []).filter(
       (option) =>
-        option.name.toLowerCase().includes(state.filters.search.toLowerCase()) ||
+        option.name
+          .toLowerCase()
+          .includes(state.filters.search.toLowerCase()) ||
         option.description
           .toLowerCase()
           .includes(state.filters.search.toLowerCase())

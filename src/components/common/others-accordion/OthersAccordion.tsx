@@ -1,16 +1,11 @@
 import * as Accordion from '@radix-ui/react-accordion';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import CapSizeGuideContent from './CapSizeGuideContent';
 import DisclaimersContent from './DisclaimersContent';
 import ShippingInfoContent from './ShippingInfoContent';
 
 const sections = [
-  {
-    value: 'cap-size-guide',
-    label: 'Cap size guide',
-    Content: CapSizeGuideContent,
-  },
+
   {
     value: 'disclaimers',
     label: 'Disclaimers (PLEASE READ)',

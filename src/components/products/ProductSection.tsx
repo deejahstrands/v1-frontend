@@ -135,6 +135,7 @@ export function ProductSection() {
               title={product.name}
               price={`₦${product.basePrice.toLocaleString()}`}
               customization={product.customization}
+              status={product.status}
             />
           </motion.div>
         ))}

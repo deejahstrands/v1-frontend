@@ -35,7 +35,9 @@ const RelatedProductsSection: React.FC<RelatedProductsSectionProps> = ({ related
               title={product.name}
               price={`₦${product.basePrice.toLocaleString()}`}
               customization={product.customization}
-              // Add-to-cart and wishlist handlers can be implemented as needed
+              status={product.status}
+
+            // Add-to-cart and wishlist handlers can be implemented as needed
             />
           ))}
         </div>

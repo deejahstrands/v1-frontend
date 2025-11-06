@@ -53,14 +53,15 @@ export default function CustomizationOptionsPage() {
 
   // Load data on mount
   useEffect(() => {
-    fetchOptionsRef.current();
+    fetchOptionsRef.current({ page: 1, limit: 10 });
   }, []);
 
   // Handle search with debouncing
   useEffect(() => {
     const searchParams = {
       search: debouncedSearchTerm || undefined,
-      page: 1
+      page: 1,
+      limit: 10
     };
     fetchOptionsRef.current(searchParams);
     setCurrentPageRef.current(1);
@@ -76,6 +77,7 @@ export default function CustomizationOptionsPage() {
     setCurrentPage(page);
     fetchOptionsRef.current({
       page,
+      limit: 10,
       search: searchTerm || undefined
     });
   };
@@ -119,10 +121,10 @@ export default function CustomizationOptionsPage() {
     }
   };
 
-  const handleSaveOption = async (optionData: { 
-    name: string; 
-    description?: string; 
-    typeId: string; 
+  const handleSaveOption = async (optionData: {
+    name: string;
+    description?: string;
+    typeId: string;
     status: 'active' | 'hidden';
   }) => {
     try {
@@ -179,11 +181,10 @@ export default function CustomizationOptionsPage() {
       label: 'STATUS',
       accessor: 'status',
       render: (row) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          row.status === 'active'
-            ? 'bg-green-100 text-green-800'
-            : 'bg-gray-100 text-gray-600'
-        }`}>
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${row.status === 'active'
+          ? 'bg-green-100 text-green-800'
+          : 'bg-gray-100 text-gray-600'
+          }`}>
           {row.status === 'active' ? 'Active' : 'Hidden'}
         </span>
       )

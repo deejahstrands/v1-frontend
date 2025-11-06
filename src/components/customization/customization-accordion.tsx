@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCustomization } from '@/store/use-customization';
 import { CustomizationType } from '@/data/customization';
+import { Plus } from 'lucide-react';
 
 interface CustomizationAccordionProps {
   className?: string;
@@ -32,15 +33,15 @@ export const CustomizationAccordion: React.FC<CustomizationAccordionProps> = ({ 
 
   return (
     <div className={className}>
-      <Accordion.Root 
-        type="single" 
-        collapsible 
-        value={openType} 
-        onValueChange={setOpenType} 
+      <Accordion.Root
+        type="single"
+        collapsible
+        value={openType}
+        onValueChange={setOpenType}
         className="rounded-2xl border-[0.5px] border-[#98A2B3] w-full max-w-md mx-auto"
       >
         <div className="p-4 pb-0 text-base font-semibold">Customize your {selectedWigType.name} Wig</div>
-        
+
         {selectedWigType.customizations.map((custom: CustomizationType) => (
           <Accordion.Item value={custom.type} key={custom.type} className="border-b border-gray-200">
             <Accordion.Header>
@@ -56,22 +57,22 @@ export const CustomizationAccordion: React.FC<CustomizationAccordionProps> = ({ 
                     </span>
                   )}
                 </span>
-                <svg 
-                  className="ml-2 h-4 w-4 transition-transform data-[state=open]:rotate-180" 
-                  viewBox="0 0 20 20" 
+                <svg
+                  className="ml-2 h-4 w-4 transition-transform data-[state=open]:rotate-180"
+                  viewBox="0 0 20 20"
                   fill="none"
                 >
-                  <path 
-                    d="M6 8l4 4 4-4" 
-                    stroke="#222" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
+                  <path
+                    d="M6 8l4 4 4-4"
+                    stroke="#222"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
               </Accordion.Trigger>
             </Accordion.Header>
-            
+
             <Accordion.Content className="overflow-hidden">
               <AnimatePresence>
                 <motion.div
@@ -111,6 +112,7 @@ export const CustomizationAccordion: React.FC<CustomizationAccordionProps> = ({ 
                           <span>{option.label}</span>
                           {option.price ? (
                             <span className="text-gray-700 font-medium">
+                              <Plus className="inline-block w-3 h-3 mr-1" />
                               ₦{option.price.toLocaleString()}
                             </span>
                           ) : (

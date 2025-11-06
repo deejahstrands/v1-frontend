@@ -1,9 +1,9 @@
 import { create } from "zustand";
-import { 
-  Collection, 
+import {
+  Collection,
   FeaturedCollection,
   GetCollectionsParams,
-  GetFeaturedCollectionParams 
+  GetFeaturedCollectionParams,
 } from "@/types/collection";
 import { collectionsService } from "@/services/collections";
 
@@ -12,17 +12,17 @@ interface CollectionsState {
   collections: Collection[];
   loading: boolean;
   error: string | null;
-  
+
   // Featured collection state
   featuredCollection: FeaturedCollection | null;
   featuredLoading: boolean;
   featuredError: string | null;
-  
+
   // Single collection state
   currentCollection: FeaturedCollection | null;
   collectionLoading: boolean;
   collectionError: string | null;
-  
+
   // Pagination
   currentPage: number;
   totalPages: number;
@@ -33,7 +33,9 @@ interface CollectionsState {
   // Actions
   fetchCollections: (params?: GetCollectionsParams) => Promise<void>;
   fetchActiveCollections: () => Promise<void>;
-  fetchFeaturedCollection: (params?: GetFeaturedCollectionParams) => Promise<void>;
+  fetchFeaturedCollection: (
+    params?: GetFeaturedCollectionParams
+  ) => Promise<void>;
   fetchCollectionWithProducts: (id: string) => Promise<void>;
   clearError: () => void;
   clearFeaturedError: () => void;
@@ -47,17 +49,17 @@ const initialState = {
   collections: [],
   loading: false,
   error: null,
-  
+
   // Featured collection
   featuredCollection: null,
   featuredLoading: false,
   featuredError: null,
-  
+
   // Single collection
   currentCollection: null,
   collectionLoading: false,
   collectionError: null,
-  
+
   // Pagination
   currentPage: 1,
   totalPages: 1,
@@ -71,10 +73,10 @@ export const useCollections = create<CollectionsState>((set) => ({
 
   fetchCollections: async (params) => {
     set({ loading: true, error: null });
-    
+
     try {
       const response = await collectionsService.getCollections(params);
-      
+
       set({
         collections: response.data,
         currentPage: response.meta?.page || 1,
@@ -88,17 +90,20 @@ export const useCollections = create<CollectionsState>((set) => ({
     } catch (error) {
       set({
         loading: false,
-        error: error instanceof Error ? error.message : "Failed to fetch collections",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch collections",
       });
     }
   },
 
   fetchActiveCollections: async () => {
     set({ loading: true, error: null });
-    
+
     try {
       const response = await collectionsService.getActiveCollections();
-      
+
       set({
         collections: response.data,
         loading: false,
@@ -107,17 +112,23 @@ export const useCollections = create<CollectionsState>((set) => ({
     } catch (error) {
       set({
         loading: false,
-        error: error instanceof Error ? error.message : "Failed to fetch collections",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch collections",
       });
     }
   },
 
   fetchFeaturedCollection: async (params) => {
     set({ featuredLoading: true, featuredError: null });
-    
+
     try {
-      const response = await collectionsService.getFeaturedCollection(params);
-      
+      const response = await collectionsService.getFeaturedCollection({
+        limit: 12,
+        ...params,
+      });
+
       set({
         featuredCollection: response.data,
         featuredLoading: false,
@@ -126,17 +137,20 @@ export const useCollections = create<CollectionsState>((set) => ({
     } catch (error) {
       set({
         featuredLoading: false,
-        featuredError: error instanceof Error ? error.message : "Failed to fetch featured collection",
+        featuredError:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch featured collection",
       });
     }
   },
 
   fetchCollectionWithProducts: async (id) => {
     set({ collectionLoading: true, collectionError: null });
-    
+
     try {
       const response = await collectionsService.getCollectionWithProducts(id);
-      
+
       set({
         currentCollection: response.data,
         collectionLoading: false,
@@ -145,7 +159,8 @@ export const useCollections = create<CollectionsState>((set) => ({
     } catch (error) {
       set({
         collectionLoading: false,
-        collectionError: error instanceof Error ? error.message : "Failed to fetch collection",
+        collectionError:
+          error instanceof Error ? error.message : "Failed to fetch collection",
       });
     }
   },
