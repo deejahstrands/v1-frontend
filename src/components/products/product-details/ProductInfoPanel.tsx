@@ -17,17 +17,23 @@ interface ProductInfoPanelProps {
     price: string;
     inStock?: boolean;
     quantity?: number;
+    status?: string;
     specifications?: Specification[];
   };
 }
 
 const ProductInfoPanel: React.FC<ProductInfoPanelProps> = ({ product }) => {
   const { basePrice, totalPrice, hasCustomization } = useProductDetailPrice(product.price);
-  
+
   return (
     <div className="rounded-lg p-4 sm:p-6 space-y-4">
-      {/* Product Name */}
-      <h1 className="text-xl sm:text-2xl font-bold mb-1">{product.title}</h1>
+      {/* Product Name + Status */}
+      <div className="flex items-center gap-2 mb-1">
+        <h1 className="text-xl sm:text-2xl font-bold">{product.title}</h1>
+        {product.status === 'sold_out' && (
+          <span className="inline-block bg-red-500 text-white text-[10px] sm:text-xs px-2 py-0.5 rounded-md uppercase tracking-wide">Sold Out</span>
+        )}
+      </div>
       {/* Star Rating and Reviews */}
       <div className="flex items-center gap-2 my-2">
         <StarRating rating={product.rating || 0} size={20} />

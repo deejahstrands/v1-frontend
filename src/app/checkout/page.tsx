@@ -150,7 +150,7 @@ export default function CheckoutPage() {
       <BannerSection
         title="CHECK OUT"
         description="Complete your order below"
-        bgImage="/images/bg2.svg"
+        bgImage="/images/banner.jpg"
         disableAnimation={!isHydrated}
         breadcrumb={
           <Breadcrumb

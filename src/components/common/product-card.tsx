@@ -20,6 +20,7 @@ export function ProductCard({
   price,
   customization,
   id,
+  status,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   specifications: _unusedSpecifications,
 }: {
@@ -28,6 +29,7 @@ export function ProductCard({
   price: string;
   customization: boolean;
   id: string;
+  status?: string;
   specifications?: { type: string; value: string }[]; // kept for type compatibility
 }) {
   const [isHovered, setIsHovered] = useState(false);
@@ -37,7 +39,7 @@ export function ProductCard({
   const { addToWishlist, addToWishlistApi, removeFromWishlist, removeFromWishlistApi, isInWishlist } = useWishlist();
   const { toast } = useToast();
   const router = useRouter();
-  
+
   // Use first image as default, second image on hover
   const defaultImage = images[0];
   const hoverImage = images[1] || images[0]; // Fallback to first image if no second image
@@ -54,7 +56,7 @@ export function ProductCard({
     e.preventDefault();
     e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation();
-    
+
     if (!isAuthenticated) {
       openModal("Add Item to Wishlist", () => {
         // This will be called after successful login
@@ -62,7 +64,7 @@ export function ProductCard({
       });
       return;
     }
-    
+
     toggleWishlist();
   };
 
@@ -96,12 +98,17 @@ export function ProductCard({
 
   return (
     <Link href={`/products/${id}`} className="block">
-      <motion.div 
+      <motion.div
         className="bg-white rounded-2xl overflow-hidden transition-shadow duration-200 hover:shadow-lg hover:shadow-[#4A85E4]/20 cursor-pointer"
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
       >
         <div className="aspect-[4/5] w-full relative">
+          {status === 'sold_out' && (
+            <div className="absolute left-2 top-2 z-20 bg-red-500 text-white text-[10px] md:text-xs px-2 py-1 rounded-md uppercase tracking-wide">
+              Sold Out
+            </div>
+          )}
           <motion.div
             className="absolute inset-0"
             initial={false}
@@ -149,7 +156,7 @@ export function ProductCard({
             >
               <Button
                 variant="primary"
-                icon={<ShoppingBag size={18} className="text-xs md:text-base xl:text-lg hidden md:block"/>}
+                icon={<ShoppingBag size={18} className="text-xs md:text-base xl:text-lg hidden md:block" />}
                 className="w-full bg-white border border-[#E4E7EC] text-black hover:bg-gray-50 text-xs md:text-base xl:text-lg !px-1 !lg:px-4"
                 onClick={handleAddToCart}
               >
@@ -164,7 +171,7 @@ export function ProductCard({
               whileTap={{ scale: 0.9 }}
               className={`col-span-3 md:col-span-2 lg:col-span-2 cursor-pointer w-full h-10 flex items-center justify-center rounded-md md:border border-gray-200 hover:bg-gray-100 transition-colors ${isInWishlist(id) ? "text-[#4A85E4]" : "text-gray-400"}`}
             >
-              <Heart fill={isInWishlist(id) ? "#4A85E4" : "none"} className="text-xs md:text-base xl:text-lg "/>
+              <Heart fill={isInWishlist(id) ? "#4A85E4" : "none"} className="text-xs md:text-base xl:text-lg " />
             </motion.button>
           </div>
         </div>

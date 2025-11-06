@@ -55,16 +55,16 @@ export default function CustomizationTypesPage() {
 
   // Load data on mount
   useEffect(() => {
-    fetchTypesRef.current();
+    fetchTypesRef.current({ page: 1, limit: 10 });
   }, []);
 
   // Handle search with debouncing
   useEffect(() => {
-
     // Always fetch when debouncedSearchTerm changes
     const searchParams = {
       search: debouncedSearchTerm || undefined,
-      page: 1
+      page: 1,
+      limit: 10
     };
     fetchTypesRef.current(searchParams);
     setCurrentPageRef.current(1);
@@ -80,6 +80,7 @@ export default function CustomizationTypesPage() {
     setCurrentPage(page);
     fetchTypesRef.current({
       page,
+      limit: 10,
       search: searchTerm || undefined
     });
   };

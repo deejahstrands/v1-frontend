@@ -30,7 +30,7 @@ export const PriceSummary: React.FC<PriceSummaryProps> = ({ className }) => {
           {/* Base Price */}
           <div className="flex justify-between items-center py-2 border-b border-gray-100">
             <span className="text-sm text-gray-600">
-              {selectedWigType.name} Wig (Base)
+              {selectedWigType.name} Wig
             </span>
             <span className="text-sm font-medium">
               ₦{basePrice.toLocaleString()}
