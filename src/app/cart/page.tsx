@@ -76,7 +76,6 @@ export default function CartPage() {
       <BannerSection
         title="SHOPPING CART"
         description="View all your products to be purchased here"
-        bgImage="/images/bg2.svg"
         disableAnimation={!isHydrated}
         breadcrumb={
           <Breadcrumb
