@@ -16,8 +16,8 @@ import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 
 export default function WishlistPage() {
   const { isAuthenticated } = useAuth();
-  const { 
-    items: localWishlistItems, 
+  const {
+    items: localWishlistItems,
     apiItems: apiWishlistItems,
     loading,
     error,
@@ -97,7 +97,7 @@ export default function WishlistPage() {
       toast.error('Please login to move items to cart');
       return;
     }
-    
+
     try {
       await moveToCart(productId);
       toast.success(`${productTitle} moved to cart successfully`);
@@ -135,7 +135,6 @@ export default function WishlistPage() {
       <BannerSection
         title="WISHLIST"
         description="View all your saved products to be purchased here"
-        bgImage="/images/bg2.svg"
         disableAnimation={!isHydrated}
         breadcrumb={
           <Breadcrumb
@@ -146,7 +145,7 @@ export default function WishlistPage() {
           />
         }
       />
-      
+
       <SectionContainer>
         {!isHydrated || loading ? (
           <div className="flex justify-center items-center min-h-[400px]">
@@ -202,12 +201,12 @@ export default function WishlistPage() {
                   className="relative group"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ 
-                    duration: 0.5, 
+                  transition={{
+                    duration: 0.5,
                     delay: index * 0.1,
                     ease: "easeOut"
                   }}
-                  whileHover={{ 
+                  whileHover={{
                     y: -5,
                     transition: { duration: 0.2 }
                   }}

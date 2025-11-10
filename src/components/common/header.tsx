@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Search, Heart, ShoppingBag, User, Menu, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MobileMenu } from "./mobile-menu";
 import { SearchModal } from "./search-modal";
 import { Button } from "./button";
@@ -26,6 +26,8 @@ export function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+  const categoriesDropdownRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, user, logout } = useAuth();
   const { openModal } = useLoginModal();
   const { categories } = useCategories();
@@ -51,6 +53,23 @@ export function Header() {
       });
     }
   };
+
+  // Close categories dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (categoriesDropdownRef.current && !categoriesDropdownRef.current.contains(event.target as Node)) {
+        setIsCategoriesOpen(false);
+      }
+    };
+
+    if (isCategoriesOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isCategoriesOpen]);
 
   return (
     <>
@@ -78,27 +97,33 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`text-sm font-medium py-2 border-b-2 transition-colors text-tertiary hover:text-tertiary ${
-                    pathname === item.href
-                      ? "border-secondary text-secondary"
-                      : "border-transparent text-secondary"
-                  }`}
+                  className={`text-sm font-medium py-2 border-b-2 transition-colors text-tertiary hover:text-tertiary ${pathname === item.href
+                    ? "border-secondary text-secondary"
+                    : "border-transparent text-secondary"
+                    }`}
                 >
                   {item.label}
                 </Link>
               ))}
-              
+
               {/* Categories Dropdown */}
-              <div className="relative group">
-                <button className="flex items-center text-sm font-medium py-2 border-b-2 border-transparent text-tertiary hover:text-tertiary">
+              <div className="relative group" ref={categoriesDropdownRef}>
+                <button
+                  onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+                  className="flex items-center text-sm font-medium py-2 border-b-2 border-transparent text-tertiary hover:text-tertiary cursor-pointer"
+                >
                   Categories
-                  <ChevronDown className="ml-1 h-4 w-4" />
+                  <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
                 </button>
-                <div className="absolute left-0 top-full w-48 py-2 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className={`absolute left-0 top-full w-48 py-2 bg-white rounded-lg shadow-lg transition-all duration-200 z-50 ${isCategoriesOpen
+                  ? 'opacity-100 visible'
+                  : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible'
+                  }`}>
                   {categories.map((category) => (
                     <Link
                       key={category.id}
                       href={`/shop/category/${category.id}`}
+                      onClick={() => setIsCategoriesOpen(false)}
                       className="block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                     >
                       {category.name}

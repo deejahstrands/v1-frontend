@@ -25,6 +25,11 @@ interface ProductInfoPanelProps {
 const ProductInfoPanel: React.FC<ProductInfoPanelProps> = ({ product }) => {
   const { basePrice, totalPrice, hasCustomization } = useProductDetailPrice(product.price);
 
+  // Determine stock status from status prop or inStock prop
+  const isInStock = product.status === 'sold_out'
+    ? false
+    : (product.inStock ?? (product.status === 'available'));
+
   return (
     <div className="rounded-lg p-4 sm:p-6 space-y-4">
       {/* Product Name + Status */}
@@ -46,7 +51,7 @@ const ProductInfoPanel: React.FC<ProductInfoPanelProps> = ({ product }) => {
       )}
       <div className="text-2xl font-bold mb-1">₦{totalPrice.toLocaleString()}</div>
       {/* Stock Status */}
-      <Status inStock={product.inStock ?? true} quantity={product.quantity} />
+      <Status inStock={isInStock} quantity={product.quantity} />
       {/* Specifications */}
       {product.specifications && product.specifications.length > 0 && (
         <div className="mt-4">
