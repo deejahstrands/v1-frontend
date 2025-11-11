@@ -27,7 +27,9 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
   const categoriesDropdownRef = useRef<HTMLDivElement>(null);
+  const accountDropdownRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, user, logout } = useAuth();
   const { openModal } = useLoginModal();
   const { categories } = useCategories();
@@ -54,22 +56,26 @@ export function Header() {
     }
   };
 
-  // Close categories dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (categoriesDropdownRef.current && !categoriesDropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (categoriesDropdownRef.current && !categoriesDropdownRef.current.contains(target)) {
         setIsCategoriesOpen(false);
+      }
+      if (accountDropdownRef.current && !accountDropdownRef.current.contains(target)) {
+        setIsAccountOpen(false);
       }
     };
 
-    if (isCategoriesOpen) {
+    if (isCategoriesOpen || isAccountOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isCategoriesOpen]);
+  }, [isCategoriesOpen, isAccountOpen]);
 
   return (
     <>
@@ -159,17 +165,25 @@ export function Header() {
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">{cartCount}</span>
                       )}
                     </Link>
-                    <div className="relative group">
-                      <button className="p-2 text-tertiary hover:text-tertiary flex items-center gap-1 cursor-pointer">
+                    <div className="relative group" ref={accountDropdownRef}>
+                      <button
+                        onClick={() => setIsAccountOpen(!isAccountOpen)}
+                        className="p-2 text-tertiary hover:text-tertiary flex items-center gap-1 cursor-pointer"
+                      >
                         <User className="h-5 w-5" />
                         <span className="text-sm hidden sm:block">{user?.firstName || 'Account'}</span>
                       </button>
-                      <div className="absolute right-0 top-full w-48 py-2 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                        <Link href="/account" className="block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50">
+                      <div className={`absolute right-0 top-full w-48 py-2 bg-white rounded-lg shadow-lg transition-all duration-200 z-50 ${isAccountOpen ? 'opacity-100 visible' : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible'}`}>
+                        <Link
+                          href="/account"
+                          onClick={() => setIsAccountOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                        >
                           My Account
                         </Link>
                         <button
                           onClick={logout}
+                          onMouseDown={() => setIsAccountOpen(false)}
                           className="block w-full text-left px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 cursor-pointer"
                         >
                           Logout
