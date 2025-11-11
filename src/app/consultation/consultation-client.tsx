@@ -1,56 +1,56 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BannerSection } from '@/components/common/banner-section';
 import { SectionContainer } from '@/components/common/section-container';
 import { Button } from '@/components/ui/button';
+import { Modal } from '@/components/ui';
 import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useConsultation } from '@/store/use-consultation';
 import { useAuth } from '@/store/use-auth';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
+import { useLoginModal } from '@/hooks/use-login-modal';
 
 export default function ConsultationClient() {
-  const { 
-    consultationTypes, 
-    selectedConsultation, 
-    setSelectedConsultation, 
-    loading, 
-    error, 
+  const {
+    consultationTypes,
+    selectedConsultation,
+    setSelectedConsultation,
+    loading,
+    error,
     fetchConsultationTypes,
     bookConsultation,
     isBooking,
     bookingError,
     clearBookingError
   } = useConsultation();
-  const { isAuthenticated } = useAuth();
-  const router = useRouter();
+  const { isAuthenticated, user, updateProfile } = useAuth();
+  // const router = useRouter();
+  const { openModal } = useLoginModal();
   const hasFetchedRef = useRef(false);
+  const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
+  const [phoneInput, setPhoneInput] = useState('');
+  const [isUpdatingPhone, setIsUpdatingPhone] = useState(false);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   // Fetch consultation types on mount
   useEffect(() => {
     if (!hasFetchedRef.current) {
       hasFetchedRef.current = true;
-    fetchConsultationTypes({ status: 'active' });
+      fetchConsultationTypes({ status: 'active' });
     }
   }, []);
 
-  const handleBookConsultation = async () => {
+  const proceedToBook = async () => {
     if (!selectedConsultation) return;
-
-    // Check if user is authenticated
-    if (!isAuthenticated) {
-      router.push('/auth/login?returnUrl=/consultation');
-      return;
-    }
-
     try {
       const callbackUrl = `${process.env.NEXT_PUBLIC_CHECKOUT_SUCCESS_URL}/consultation/success`;
       const cancelUrl = `${process.env.NEXT_PUBLIC_CHECKOUT_CANCEL_URL}/consultation/failed`;
-      
+
       if (!callbackUrl || !cancelUrl) {
         throw new Error('Consultation URLs not configured');
       }
@@ -62,6 +62,62 @@ export default function ConsultationClient() {
       });
     } catch (error) {
       console.error('Failed to book consultation:', error);
+    }
+  };
+
+  const handleBookConsultation = async () => {
+    if (!selectedConsultation) return;
+
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      openModal("Book Consultation", async () => {
+        // After successful login, re-check phone then proceed
+        if (!user?.phone || user.phone.trim() === '') {
+          setPhoneInput('');
+          setPhoneError(null);
+          setIsPhoneModalOpen(true);
+          return;
+        }
+        await proceedToBook();
+      });
+      return;
+    }
+
+    // If user has no phone number, prompt to update before proceeding
+    if (!user?.phone || user.phone.trim() === '') {
+      setPhoneInput('');
+      setPhoneError(null);
+      setIsPhoneModalOpen(true);
+      return;
+    }
+
+    await proceedToBook();
+  };
+
+  const handleSavePhone = async () => {
+    const trimmed = phoneInput.trim();
+    if (!trimmed) {
+      setPhoneError('Phone number is required');
+      return;
+    }
+    // Basic validation: at least 7 digits
+    const digits = trimmed.replace(/\\D/g, '');
+    if (digits.length < 7) {
+      setPhoneError('Enter a valid phone number');
+      return;
+    }
+    try {
+      setIsUpdatingPhone(true);
+      setPhoneError(null);
+      // Only send phone field
+      await (updateProfile as unknown as (data: { phone: string }) => Promise<unknown>)({ phone: trimmed });
+      setIsPhoneModalOpen(false);
+      // Continue to booking after successful update
+      await proceedToBook();
+    } catch {
+      setPhoneError('Failed to update phone. Please try again.');
+    } finally {
+      setIsUpdatingPhone(false);
     }
   };
 
@@ -83,13 +139,53 @@ export default function ConsultationClient() {
       {/* Main Content */}
       <div className="py-12">
         <SectionContainer>
+          {/* Phone Update Modal */}
+          <Modal open={isPhoneModalOpen} onClose={() => setIsPhoneModalOpen(false)} size="sm">
+            <div className="p-5">
+              <h3 className="text-lg font-semibold text-[#344054] mb-2">
+                Add Phone Number
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Please add your phone number to continue with booking.
+              </p>
+              <div className="space-y-2 mb-4">
+                <label className="block text-sm text-gray-700">Phone</label>
+                <input
+                  type="tel"
+                  value={phoneInput}
+                  onChange={(e) => setPhoneInput(e.target.value)}
+                  placeholder="Enter phone number"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C9A18A] focus:border-transparent"
+                />
+                {phoneError && <div className="text-xs text-red-600">{phoneError}</div>}
+              </div>
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 cursor-pointer"
+                  onClick={() => setIsPhoneModalOpen(false)}
+                  disabled={isUpdatingPhone}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded-md bg-[#C9A18A] text-white hover:bg-[#b88b6d] disabled:opacity-50 cursor-pointer"
+                  onClick={handleSavePhone}
+                  disabled={isUpdatingPhone}
+                >
+                  {isUpdatingPhone ? 'Saving...' : 'Save & Continue'}
+                </button>
+              </div>
+            </div>
+          </Modal>
           {/* Main Content - Full Width */}
-          <motion.div 
+          <motion.div
             className="mb-8"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ 
-              duration: 0.6, 
+            transition={{
+              duration: 0.6,
               ease: [0.25, 0.46, 0.45, 0.94],
               delay: 0.2
             }}
@@ -98,15 +194,15 @@ export default function ConsultationClient() {
               <h2 className="text-2xl font-semibold text-[#344054] mb-4">
                 NEW TO WIGS OR NOT SURE WHAT TO CHOOSE?
               </h2>
-              
+
               <p className="text-gray-700 mb-6">
                 Let us help you feel confident, beautiful, and informed.
               </p>
-              
+
               <p className="text-gray-700 mb-6">
                 At Deejah Strands, our consultations are designed to make your wig journey simple, stress-free, and perfectly tailored to your needs. Whether you&apos;re new to wigs, exploring new styles, or just need expert advice, we&apos;ve got you.
               </p>
-              
+
               <p className="text-gray-700 mb-6">
                 Consultations can be booked virtually or in-person at our Lagos Studio.
               </p>
@@ -153,12 +249,12 @@ export default function ConsultationClient() {
           {/* Image and Consultation Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8">
             {/* Salon Image */}
-            <motion.div 
+            <motion.div
               className="lg:col-span-7"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ 
-                duration: 0.8, 
+              transition={{
+                duration: 0.8,
                 ease: [0.25, 0.46, 0.45, 0.94],
                 delay: 0.4
               }}
@@ -175,23 +271,23 @@ export default function ConsultationClient() {
             </motion.div>
 
             {/* Right Column - Consultation Booking */}
-            <motion.div 
+            <motion.div
               className="lg:col-span-5 space-y-8"
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ 
-                duration: 0.8, 
+              transition={{
+                duration: 0.8,
                 ease: [0.25, 0.46, 0.45, 0.94],
                 delay: 0.6
               }}
             >
               {/* Consultation Type Selection */}
-              <motion.div 
+              <motion.div
                 className="bg-white rounded-xl p-6 border border-[#98A2B3] w-full max-w-md mx-auto"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ 
-                  duration: 0.6, 
+                transition={{
+                  duration: 0.6,
                   ease: [0.25, 0.46, 0.45, 0.94],
                   delay: 0.8
                 }}
@@ -223,7 +319,7 @@ export default function ConsultationClient() {
                   ) : error ? (
                     <div className="text-center py-4">
                       <p className="text-red-600 text-sm">Failed to load consultation types</p>
-                      <button 
+                      <button
                         onClick={() => fetchConsultationTypes({ status: 'active' })}
                         className="text-primary text-sm underline mt-2"
                       >
@@ -243,11 +339,10 @@ export default function ConsultationClient() {
                           key={type.id}
                           type="button"
                           onClick={() => setSelectedConsultation(type)}
-                          className={`w-full p-4 rounded-lg border-2 transition-all duration-200 text-left cursor-pointer ${
-                            isSelected
-                              ? 'border-[#C9A18A] bg-[#C9A18A] text-white'
-                              : 'border-[#98A2B3] hover:border-[#C9A18A] hover:bg-gray-50'
-                          }`}
+                          className={`w-full p-4 rounded-lg border-2 transition-all duration-200 text-left cursor-pointer ${isSelected
+                            ? 'border-[#C9A18A] bg-[#C9A18A] text-white'
+                            : 'border-[#98A2B3] hover:border-[#C9A18A] hover:bg-gray-50'
+                            }`}
                         >
                           <div className="flex justify-between items-start mb-2">
                             <span className="font-medium text-sm">{type.name}</span>
@@ -304,7 +399,7 @@ export default function ConsultationClient() {
                       <p className="text-sm text-red-700 text-center">
                         {bookingError}
                       </p>
-                      <button 
+                      <button
                         onClick={clearBookingError}
                         className="text-red-600 text-sm underline mt-2 block mx-auto"
                       >

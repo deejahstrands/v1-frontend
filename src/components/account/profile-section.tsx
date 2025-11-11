@@ -7,12 +7,12 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/store/use-auth';
 import cloudinaryService from '@/services/cloudinary';
 import { toast } from 'react-toastify';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  Edit3, 
-  Upload, 
+import {
+  User,
+  Mail,
+  Phone,
+  Edit3,
+  Upload,
   Camera,
   Check,
   X
@@ -88,7 +88,7 @@ export function ProfileSection() {
 
     try {
       setIsUploadingAvatar(true);
-      
+
       // Create preview immediately for better UX
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -100,21 +100,21 @@ export function ProfileSection() {
       // Upload to Cloudinary with user avatars folder
       const result = await cloudinaryService.uploadImage(file, 'user-avatars');
       const avatarUrl = result.secure_url;
-      
+
       // Update form data with Cloudinary URL
       setFormData(prev => ({
         ...prev,
         avatar: avatarUrl
       }));
-      
+
       // Update preview with Cloudinary URL
       setAvatarPreview(avatarUrl);
-      
+
       toast.success('Avatar uploaded successfully');
     } catch (error: any) {
       console.error('Avatar upload error:', error);
       toast.error(error.message || 'Failed to upload avatar');
-      
+
       // Reset preview on error
       setAvatarPreview(user?.avatar || '');
     } finally {
@@ -125,15 +125,33 @@ export function ProfileSection() {
   const handleSave = async () => {
     try {
       setIsUpdating(true);
-      
-      const updateData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone,
-        avatar: formData.avatar
-      };
 
-      await updateProfile(updateData);
+      // Build payload with only changed fields
+      const updateData: Record<string, string> = {};
+      if (user) {
+        if (formData.firstName !== (user.firstName || '')) {
+          updateData.firstName = formData.firstName;
+        }
+        if (formData.lastName !== (user.lastName || '')) {
+          updateData.lastName = formData.lastName;
+        }
+        if (formData.phone !== (user.phone || '')) {
+          updateData.phone = formData.phone;
+        }
+        // Only include avatar if changed and non-empty; backend expects URL when present
+        if (formData.avatar && formData.avatar !== (user.avatar || '')) {
+          updateData.avatar = formData.avatar;
+        }
+      }
+
+      // If nothing changed, just exit edit mode gracefully
+      if (Object.keys(updateData).length === 0) {
+        setIsEditing(false);
+        toast.info('No changes to update');
+        return;
+      }
+
+      await (updateProfile as unknown as (data: any) => Promise<any>)(updateData);
       setIsEditing(false);
       toast.success('Profile updated successfully');
     } catch (error: any) {
@@ -211,11 +229,10 @@ export function ProfileSection() {
               <button
                 onClick={() => !isUploadingAvatar && fileInputRef.current?.click()}
                 disabled={isUploadingAvatar}
-                className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                  isUploadingAvatar 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-[#C9A898] text-white hover:bg-[#b88b6d] cursor-pointer'
-                }`}
+                className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isUploadingAvatar
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-[#C9A898] text-white hover:bg-[#b88b6d] cursor-pointer'
+                  }`}
               >
                 {isUploadingAvatar ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -231,11 +248,10 @@ export function ProfileSection() {
             <div className="flex-1">
               <div
                 onClick={() => !isUploadingAvatar && fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                  isUploadingAvatar 
-                    ? 'border-[#C9A898] bg-[#C9A898] bg-opacity-10 cursor-not-allowed' 
-                    : 'border-gray-300 hover:border-[#C9A898] hover:bg-[#C9A898] hover:bg-opacity-5 cursor-pointer'
-                }`}
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${isUploadingAvatar
+                  ? 'border-[#C9A898] bg-[#C9A898] bg-opacity-10 cursor-not-allowed'
+                  : 'border-gray-300 hover:border-[#C9A898] hover:bg-[#C9A898] hover:bg-opacity-5 cursor-pointer'
+                  }`}
               >
                 {isUploadingAvatar ? (
                   <>
