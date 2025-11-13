@@ -22,7 +22,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const { items } = useCart();
-  const {  selectedAddress, fetchAddresses } = useAddress();
+  const { selectedAddress, fetchAddresses } = useAddress();
   const { toast } = useToast();
 
   const [isHydrated, setIsHydrated] = useState(false);
@@ -92,7 +92,7 @@ export default function CheckoutPage() {
       address.postalCode,
       address.country
     ].filter(Boolean);
-    
+
     return parts.join(', ');
   };
 
@@ -103,27 +103,28 @@ export default function CheckoutPage() {
     }
 
     setIsProcessing(true);
-    
+
     try {
       const callbackUrl = `${process.env.NEXT_PUBLIC_CHECKOUT_SUCCESS_URL}/checkout/success`;
       const cancelUrl = `${process.env.NEXT_PUBLIC_CHECKOUT_CANCEL_URL}/checkout/cancel`;
-      
+
       if (!callbackUrl || !cancelUrl) {
         throw new Error('Checkout URLs not configured');
       }
-      
+
       const checkoutData = {
         deliveryNote: deliveryNote || '',
         shippingAddress: formatAddress(selectedAddress),
         callbackUrl,
         cancelUrl,
+        phone: selectedAddress.phoneNumber,
       };
 
       const response = await checkoutService.checkout(checkoutData);
-      
+
       // Redirect to Paystack payment page
       window.location.href = response.data.authorization_url;
-      
+
     } catch {
       toast.error('Failed to initiate checkout. Please try again.');
       setIsProcessing(false);
@@ -168,7 +169,7 @@ export default function CheckoutPage() {
           {/* Main Content */}
           <div className="flex-1 space-y-6">
             <h2 className="text-xl md:text-2xl font-ethereal font-semibold">CHECKOUT</h2>
-            
+
             {/* Address Section */}
             {showAddressForm ? (
               <AddressForm
@@ -234,7 +235,7 @@ export default function CheckoutPage() {
                     </p>
                   </div>
                 </div>
-                
+
                 <p className="text-xs text-gray-500 mt-4">
                   Note: You&apos;ll be redirected to a secure payment page
                 </p>
@@ -244,7 +245,7 @@ export default function CheckoutPage() {
 
           {/* Order Summary Sidebar */}
           <div className="w-full lg:w-[400px] flex-shrink-0">
-            <OrderSummary 
+            <OrderSummary
               onCheckout={!showAddressForm ? handleCheckout : undefined}
               isProcessing={isProcessing}
               disabled={!selectedAddress}

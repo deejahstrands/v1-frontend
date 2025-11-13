@@ -393,6 +393,12 @@ export default function OrderDetailPage() {
                 <label className="text-sm font-medium text-gray-500">Address</label>
                 <p className="text-gray-900 mt-1 text-sm leading-relaxed">{currentOrder.shippingAddress}</p>
               </div>
+              {currentOrder.phone && (
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Phone</label>
+                  <p className="text-gray-900 mt-1 text-sm">{currentOrder.phone}</p>
+                </div>
+              )}
               {currentOrder.deliveryNote && (
                 <div>
                   <label className="text-sm font-medium text-gray-500">Delivery Note</label>
@@ -429,10 +435,10 @@ export default function OrderDetailPage() {
               </div>
               <div className="flex items-start gap-3">
                 <div className={`w-3 h-3 rounded-full mt-1 flex-shrink-0 ${currentOrder.status === 'processing' ||
-                    currentOrder.status === 'shipped' ||
-                    currentOrder.status === 'completed'
-                    ? 'bg-blue-500'
-                    : 'bg-gray-300'
+                  currentOrder.status === 'shipped' ||
+                  currentOrder.status === 'completed'
+                  ? 'bg-blue-500'
+                  : 'bg-gray-300'
                   }`}></div>
                 <div className="min-w-0">
                   <p className="text-sm font-medium">Processing</p>
@@ -447,9 +453,9 @@ export default function OrderDetailPage() {
               </div>
               <div className="flex items-start gap-3">
                 <div className={`w-3 h-3 rounded-full mt-1 flex-shrink-0 ${currentOrder.status === 'shipped' ||
-                    currentOrder.status === 'completed'
-                    ? 'bg-purple-500'
-                    : 'bg-gray-300'
+                  currentOrder.status === 'completed'
+                  ? 'bg-purple-500'
+                  : 'bg-gray-300'
                   }`}></div>
                 <div className="min-w-0">
                   <p className="text-sm font-medium">Shipped</p>
@@ -463,8 +469,8 @@ export default function OrderDetailPage() {
               </div>
               <div className="flex items-start gap-3">
                 <div className={`w-3 h-3 rounded-full mt-1 flex-shrink-0 ${currentOrder.status === 'completed'
-                    ? 'bg-green-500'
-                    : 'bg-gray-300'
+                  ? 'bg-green-500'
+                  : 'bg-gray-300'
                   }`}></div>
                 <div className="min-w-0">
                   <p className="text-sm font-medium">Completed</p>
