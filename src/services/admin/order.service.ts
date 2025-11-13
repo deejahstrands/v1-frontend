@@ -62,6 +62,7 @@ export interface Order {
   shippingAddress: string;
   deliveryNote: string;
   orderId: string;
+  phone?: string;
   itemCount: number;
 }
 

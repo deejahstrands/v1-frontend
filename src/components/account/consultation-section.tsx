@@ -10,14 +10,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 export function ConsultationSection() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
-  const { 
-    consultations, 
-    consultationsLoading, 
-    consultationsError, 
+
+  const {
+    consultations,
+    consultationsLoading,
+    consultationsError,
     getUserConsultations
   } = useAuth();
-  
+
   const [selectedConsultationId, setSelectedConsultationId] = useState<string | null>(null);
   const [isLoadingConsultationDetails, setIsLoadingConsultationDetails] = useState(false);
   const hasFetchedRef = useRef(false);
@@ -49,13 +49,13 @@ export function ConsultationSection() {
   const handleViewDetails = async (consultationId: string) => {
     setIsLoadingConsultationDetails(true);
     setSelectedConsultationId(consultationId);
-    
+
     // Update URL with query parameter
     router.push(`/account#consultation?consultationId=${consultationId}`);
-    
+
     // Scroll to top when navigating to consultation details
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     try {
       // For now, we'll simulate loading since we don't have a specific consultation fetch method
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -69,7 +69,7 @@ export function ConsultationSection() {
   const handleBackToList = () => {
     setSelectedConsultationId(null);
     setIsLoadingConsultationDetails(false);
-    
+
     // Clear query parameter from URL
     router.push('/account#consultation');
   };
@@ -77,12 +77,15 @@ export function ConsultationSection() {
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'TBD';
+    // If the date string is already formatted (e.g., "Thursday, November 20, 2025"), return it as is
+    // Otherwise, format it
+    if (dateString.includes(',')) {
+      return dateString;
+    }
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      day: 'numeric'
     });
   };
 
@@ -160,10 +163,10 @@ export function ConsultationSection() {
         </div>
       );
     }
-    
+
     // Find the selected consultation
     const selectedConsultation = consultations.find(c => c.id === selectedConsultationId);
-    
+
     if (!selectedConsultation) {
       return (
         <div className="max-w-4xl mx-auto">
@@ -186,7 +189,7 @@ export function ConsultationSection() {
         </div>
       );
     }
-    
+
     return (
       <div className="max-w-4xl mx-auto">
         {/* Breadcrumb */}
@@ -215,14 +218,13 @@ export function ConsultationSection() {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div className="flex items-center space-x-3">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                selectedConsultation.status === 'completed' 
-                  ? 'bg-[#C9A898] bg-opacity-10' 
-                  : 'bg-blue-100'
-              }`}>
-                <MessageCircle 
-                  size={24} 
-                  className={selectedConsultation.status === 'completed' ? 'text-[#C9A898]' : 'text-blue-600'} 
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${selectedConsultation.status === 'completed'
+                ? 'bg-[#C9A898] bg-opacity-10'
+                : 'bg-blue-100'
+                }`}>
+                <MessageCircle
+                  size={24}
+                  className={selectedConsultation.status === 'completed' ? 'text-[#C9A898]' : 'text-blue-600'}
                 />
               </div>
               <div>
@@ -266,7 +268,7 @@ export function ConsultationSection() {
               <h3 className="text-lg font-medium text-gray-900 mb-2">Consultation Type</h3>
               <p className="text-gray-600">{selectedConsultation.consultationType.name}</p>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Status</h3>
               <p className="text-gray-600 capitalize">{selectedConsultation.status}</p>
@@ -298,7 +300,7 @@ export function ConsultationSection() {
               <p className="text-gray-600 text-sm sm:text-base">Schedule and manage your hair consultations</p>
             </div>
           </div>
-          <Button 
+          <Button
             onClick={handleBookConsultation}
             className="bg-[#C9A898] hover:bg-[#b88b6d] w-full sm:w-auto"
           >
@@ -322,7 +324,7 @@ export function ConsultationSection() {
             <MessageCircle size={48} className="mx-auto text-red-300 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load consultations</h3>
             <p className="text-gray-500 mb-6 text-sm sm:text-base px-4">{consultationsError}</p>
-            <Button 
+            <Button
               onClick={() => getUserConsultations({ page: 1, limit: 5 })}
               className="bg-[#C9A898] hover:bg-[#b88b6d] w-full sm:w-auto"
             >
@@ -335,14 +337,13 @@ export function ConsultationSection() {
             <div key={consultation.id} className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
                 <div className="flex items-center space-x-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    consultation.status === 'completed' 
-                      ? 'bg-[#C9A898] bg-opacity-10' 
-                      : 'bg-blue-100'
-                  }`}>
-                    <MessageCircle 
-                      size={20} 
-                      className={consultation.status === 'completed' ? 'text-[#C9A898]' : 'text-blue-600'} 
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${consultation.status === 'completed'
+                    ? 'bg-[#C9A898] bg-opacity-10'
+                    : 'bg-blue-100'
+                    }`}>
+                    <MessageCircle
+                      size={20}
+                      className={consultation.status === 'completed' ? 'text-[#C9A898]' : 'text-blue-600'}
                     />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -355,7 +356,7 @@ export function ConsultationSection() {
                   {consultation.status.charAt(0).toUpperCase() + consultation.status.slice(1)}
                 </span>
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 text-sm text-gray-600">
                 <div className="flex items-center space-x-2">
                   <Calendar size={16} className="text-gray-400 flex-shrink-0" />
@@ -370,10 +371,10 @@ export function ConsultationSection() {
                   <span className="font-medium break-words">{formatPrice(consultation.amount)}</span>
                 </div>
               </div>
-              
+
               <div className="mt-4 pt-4 border-t border-gray-200">
                 <div className="flex items-center justify-between">
-                  <button 
+                  <button
                     onClick={() => handleViewDetails(consultation.id)}
                     className="text-[#C9A898] hover:text-[#b88b6d] text-sm font-medium flex items-center space-x-1"
                   >
@@ -390,7 +391,7 @@ export function ConsultationSection() {
             <MessageCircle size={48} className="mx-auto text-gray-300 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No consultations yet</h3>
             <p className="text-gray-500 mb-6 text-sm sm:text-base px-4">Book a consultation to get personalized hair advice from our experts.</p>
-            <Button 
+            <Button
               onClick={handleBookConsultation}
               className="bg-[#C9A898] hover:bg-[#b88b6d] w-full sm:w-auto"
             >

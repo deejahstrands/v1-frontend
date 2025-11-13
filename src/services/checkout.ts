@@ -1,10 +1,11 @@
-import api from './api';
+import api from "./api";
 
 export interface CheckoutRequest {
   deliveryNote?: string;
   shippingAddress: string;
   callbackUrl: string;
   cancelUrl: string;
+  phone: string;
 }
 
 export interface CheckoutResponse {
@@ -17,7 +18,7 @@ export interface CheckoutResponse {
 }
 
 class CheckoutService {
-  private baseUrl = '/cart/checkout';
+  private baseUrl = "/cart/checkout";
 
   /**
    * Initiate checkout process
