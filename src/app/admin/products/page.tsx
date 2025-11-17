@@ -21,9 +21,9 @@ import cloudinaryService from '@/services/cloudinary';
 export default function AdminProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-    const { toast } = useToast();
+  const { toast } = useToast();
 
-    const {
+  const {
     categories,
     isSaving,
     createProduct,
@@ -118,10 +118,10 @@ export default function AdminProductsPage() {
       setIsLoading(true);
       loadedProductId.current = id;
       const product = await getProduct(id);
-      
+
       // Cast product to any to access all properties
       const productData = product as any;
-      
+
       // Set basic form data
       setFormData({
         name: product.name,
@@ -150,14 +150,14 @@ export default function AdminProductsPage() {
         const galleryData = productData.gallery.map((item: any, index: number) => {
           const url = typeof item === 'string' ? item : item.url;
           let type = 'image'; // Default to image
-          
+
           if (typeof item === 'object' && item.type) {
             type = item.type;
           } else if (typeof item === 'string' || !item.type) {
             // Try to detect type from URL if not provided
             type = url.includes('.mp4') || url.includes('.mov') || url.includes('.avi') || url.includes('video') ? 'video' : 'image';
           }
-          
+
           return {
             id: `existing-${index}`,
             url,
@@ -314,13 +314,13 @@ export default function AdminProductsPage() {
       // Upload gallery files (images and videos) in parallel
       const galleryFiles = galleryImages.filter(img => img.file).map(img => img.file!);
       const galleryData: Array<{ url: string; type: 'image' | 'video' }> = [];
-      
+
       if (galleryFiles.length > 0) {
         try {
           const uploadPromises = galleryFiles.map(async (file) => {
             const imageIndex = galleryImages.findIndex(img => img.file === file);
             const imageType = galleryImages[imageIndex]?.type || (file.type.startsWith('video/') ? 'video' : 'image');
-            
+
             if (imageType === 'video') {
               const result = await cloudinaryService.uploadVideo(file, 'products/gallery');
               return { url: result.secure_url, type: imageType as 'video' };
@@ -329,7 +329,7 @@ export default function AdminProductsPage() {
               return { url: result.secure_url, type: imageType as 'image' };
             }
           });
-          
+
           const uploadResults = await Promise.all(uploadPromises);
           galleryData.push(...uploadResults);
         } catch (error) {
@@ -344,12 +344,12 @@ export default function AdminProductsPage() {
         .filter(img => img.isExisting && img.url)
         .map(img => {
           let type = img.type || 'image';
-          
+
           // If type is still not set, try to detect from URL
           if (!img.type) {
             type = img.url.includes('.mp4') || img.url.includes('.mov') || img.url.includes('.avi') || img.url.includes('video') ? 'video' : 'image';
           }
-          
+
           return {
             url: img.url,
             type
@@ -372,6 +372,7 @@ export default function AdminProductsPage() {
       };
 
       // Add customization data if enabled
+      // For edit mode, if customization is disabled, send empty array to remove it (PATCH requirement)
       const customizationData = formData.customization ? {
         types: selectedCustomizationTypes,
         options: selectedCustomizationOptions.map(opt => ({
@@ -380,7 +381,7 @@ export default function AdminProductsPage() {
           price: opt.price,
           numericPrice: parseInt(opt.price.replace(/,/g, '')) || 0
         }))
-      } : null;
+      } : (mode === 'edit' ? { types: [], options: [] } : null);
 
       // Add delivery preference data
       const deliveryPreferenceData = {
@@ -489,8 +490,8 @@ export default function AdminProductsPage() {
   };
 
   const handleCustomizationPriceChange = (optionId: string, price: string) => {
-    setSelectedCustomizationOptions(prev => 
-      prev.map(opt => 
+    setSelectedCustomizationOptions(prev =>
+      prev.map(opt =>
         opt.optionId === optionId ? { ...opt, price } : opt
       )
     );
@@ -500,7 +501,7 @@ export default function AdminProductsPage() {
   const handleFittingChange = (fittingId: string, checked: boolean) => {
     if (checked) {
       setSelectedFittings(prev => [...prev, fittingId]);
-            } else {
+    } else {
       setSelectedFittings(prev => prev.filter(id => id !== fittingId));
       // Remove price when unselected
       setFittingPrices(prev => {
@@ -557,10 +558,10 @@ export default function AdminProductsPage() {
   }
 
 
-    return (
+  return (
     <div className="w-full mx-auto max-w-4xl pb-10">
       {/* Header */}
-            <div className="mb-6">
+      <div className="mb-6">
         {/* Go Back Button - Separate Row */}
         <div className="mb-4">
           <Button
@@ -573,25 +574,25 @@ export default function AdminProductsPage() {
         </div>
 
         {/* Title and Action Buttons Row */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
             <h1 className="text-2xl font-semibold mb-1">
               {mode === 'add' ? 'Add New Product' : 'Edit Product'}
             </h1>
             <p className="text-gray-500">
               {mode === 'add' ? 'Create a new product for your store' : 'Update product information'}
             </p>
-                    </div>
+          </div>
 
           {/* Top Action Buttons */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                        <Button
+            <Button
               type="button"
               variant="tertiary"
               onClick={handleCancel}
               disabled={isSaving || isUploading}
-                            className="w-full sm:w-auto"
-                        >
+              className="w-full sm:w-auto"
+            >
               Cancel
             </Button>
             <Button
@@ -602,10 +603,10 @@ export default function AdminProductsPage() {
               onClick={handleSubmit}
             >
               {isUploading ? 'Uploading...' : isSaving ? 'Saving...' : mode === 'add' ? 'Add Product' : 'Update Product'}
-                        </Button>
-                    </div>
-                </div>
-            </div>
+            </Button>
+          </div>
+        </div>
+      </div>
 
       {/* Form */}
       <div className="space-y-6">
@@ -689,7 +690,7 @@ export default function AdminProductsPage() {
 
         {/* Bottom Form Actions - Secondary */}
         <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t">
-                            <Button
+          <Button
             type="button"
             variant="tertiary"
             onClick={handleCancel}
@@ -697,8 +698,8 @@ export default function AdminProductsPage() {
             className="w-full sm:w-auto order-2 sm:order-1"
           >
             Cancel
-                            </Button>
-                                <Button
+          </Button>
+          <Button
             type="button"
             disabled={isSaving || isUploading}
             className="!bg-black text-white w-full sm:w-auto order-1 sm:order-2"
@@ -706,9 +707,9 @@ export default function AdminProductsPage() {
             onClick={handleSubmit}
           >
             {isUploading ? 'Uploading...' : isSaving ? 'Saving...' : mode === 'add' ? 'Add Product' : 'Update Product'}
-                                </Button>
-                    </div>
-                    </div>
+          </Button>
+        </div>
+      </div>
 
       {/* Add Value Modal */}
       <Modal
@@ -727,8 +728,8 @@ export default function AdminProductsPage() {
               onChange={(e) => setAddModalValue(e.target.value)}
               placeholder={`Enter ${addModalType} value`}
               autoFocus
-                            />
-                        </div>
+            />
+          </div>
           <div className="flex justify-end space-x-3">
             <Button
               type="button"
@@ -745,9 +746,9 @@ export default function AdminProductsPage() {
             >
               Add
             </Button>
-                </div>
+          </div>
         </div>
       </Modal>
-        </div>
-    );
+    </div>
+  );
 }
