@@ -110,7 +110,7 @@ export function FeaturesSection() {
               <Button 
                 variant="primary" 
                 icon={<Settings2 size={18} />}
-                onClick={() => router.push('/admin/customization')}
+                onClick={() => router.push('/customization')}
               >
                 Start Customizing
               </Button>
