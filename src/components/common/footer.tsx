@@ -103,7 +103,7 @@ export function Footer() {
               <div className="font-semibold mb-4 text-sm">Service</div>
               <ul className="space-y-1 text-xs">
                 <li className="mb-4"><Link href="/consultation" className="hover:underline">Consultation</Link></li>
-                <li className="mb-4"><Link href="/customizations" className="hover:underline">Custom Wigs</Link></li>
+                <li className="mb-4"><Link href="/customization" className="hover:underline">Custom Wigs</Link></li>
                 <li className="mb-4"><Link href="/collections" className="hover:underline">Browse Collection</Link></li>
                 <li className="mb-4"><Link href="/#deals" className="hover:underline">Deals</Link></li>
               </ul>
