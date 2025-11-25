@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation";
 import { SectionContainer } from "@/components/common/section-container";
 import { Button } from "@/components/common/button";
 import Image from "next/image";
@@ -7,6 +8,7 @@ import { Settings2 } from "lucide-react";
 import { motion } from "motion/react"
 
 export function FeaturesSection() {
+  const router = useRouter();
   return (
     <div className="bg-secondary w-full mt-8">
       <SectionContainer className="bg-secondary rounded-2xl py-8 md:py-16 mt-8">
@@ -105,7 +107,11 @@ export function FeaturesSection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Button variant="primary" icon={<Settings2 size={18} />}>
+              <Button 
+                variant="primary" 
+                icon={<Settings2 size={18} />}
+                onClick={() => router.push('/admin/customization')}
+              >
                 Start Customizing
               </Button>
             </motion.div>
